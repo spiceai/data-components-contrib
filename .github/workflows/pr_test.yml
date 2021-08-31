@@ -21,6 +21,12 @@ jobs:
         with:
           go-version: ${{ env.GOVER }}
 
+      - name: write .netrc
+        env:
+          PAT: ${{ secrets.PAT_PHILLIP }}
+        run: |
+          echo "machine github.com login phillipleblanc password $PAT" > ~/.netrc
+
       - name: go get github.com/spiceai/spiceai
         env:
           GONOSUMDB: github.com/spiceai/spiceai
