@@ -21,6 +21,11 @@ jobs:
         with:
           go-version: ${{ env.GOVER }}
 
+      - name: go get github.com/spiceai/spiceai
+        env:
+          GONOSUMDB: github.com/spiceai/spiceai
+        run: go get github.com/spiceai/spiceai
+
       - name: go vet
         run: go vet ./...
 
