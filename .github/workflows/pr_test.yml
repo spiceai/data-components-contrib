@@ -1,0 +1,28 @@
+---
+name: pr_test
+
+on:
+  pull_request:
+    branches:
+      - trunk
+
+jobs:
+  go_test:
+    name: go test ./...
+    runs-on: ubuntu-latest
+    env:
+      GOVER: 1.17
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GOVER }}
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
