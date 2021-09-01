@@ -1,0 +1,39 @@
+---
+name: pr_test
+
+on:
+  pull_request:
+    branches:
+      - trunk
+
+jobs:
+  go_test:
+    name: go test
+    runs-on: ubuntu-latest
+    env:
+      GOVER: 1.17
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GOVER }}
+
+      - name: write .netrc
+        env:
+          PAT: ${{ secrets.PAT_PHILLIP }}
+        run: |
+          echo "machine github.com login phillipleblanc password $PAT" > ~/.netrc
+
+      - name: go get github.com/spiceai/spiceai
+        env:
+          GONOSUMDB: github.com/spiceai/spiceai
+        run: go get github.com/spiceai/spiceai
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
