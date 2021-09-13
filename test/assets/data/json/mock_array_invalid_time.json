@@ -1,0 +1,13 @@
+[
+  {
+    "data": {
+      "eventId": 57391.29,
+      "rating": 64,
+      "speed": 16,
+      "height": 7,
+      "target": 81
+    },
+    "tags": ["tagA"],
+    "time": "invalid_time"
+  }
+]
