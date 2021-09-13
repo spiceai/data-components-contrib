@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"os"
-	"sort"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
@@ -36,9 +35,6 @@ func TestJson(t *testing.T) {
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(data))
 	t.Run("OnData() called with invalid schema", testOnDataInvalidSchema(invalid_data, "0: (root): Invalid type. Expected: array, given: object"))
 	t.Run("OnData() called with invalid time", testOnDataInvalidSchema(invalid_time, "0: 0.time: Must validate at least one schema (anyOf)"))
-	//t.Run("GetState()", testGetStateFunc(data))
-	//t.Run("GetState() called twice", testGetStateTwiceFunc(data))
-	//t.Run("getColumnMappings()", testgetColumnMappingsFunc())
 }
 
 // Tests "Init()"
@@ -185,118 +181,5 @@ func testOnDataInvalidSchema(data []byte, validationError string) func(*testing.
 			assert.IsType(t, &ValidationError{}, err)
 			assert.Equal(t, validationError, err.(*ValidationError).validationError)
 		}
-	}
-}
-
-// Tests "GetState()"
-func testGetStateFunc(data []byte) func(*testing.T) {
-	return func(t *testing.T) {
-		if len(data) == 0 {
-			t.Fatal("no data")
-		}
-
-		dp := NewJsonProcessor()
-		err := dp.Init(nil)
-		assert.NoError(t, err)
-
-		_, err = dp.OnData(data)
-		assert.NoError(t, err)
-
-		actualState, err := dp.GetState(nil)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		assert.Equal(t, 2, len(actualState), "expected two state objects")
-
-		sort.Slice(actualState, func(i, j int) bool {
-			return actualState[i].Path() < actualState[j].Path()
-		})
-
-		assert.Equal(t, "coinbase.btcusd", actualState[0].Path(), "expected path incorrect")
-		assert.Equal(t, "local.portfolio", actualState[1].Path(), "expected path incorrect")
-
-		expectedFirstObservation := observations.Observation{
-			Time: 1626697480,
-			Data: map[string]float64{
-				"price": 31232.709090909084,
-			},
-		}
-
-		actualObservations := actualState[0].Observations()
-		assert.Equal(t, expectedFirstObservation, actualState[0].Observations()[0], "First Observation not correct")
-		assert.Equal(t, 57, len(actualObservations), "number of observations incorrect")
-
-		expectedObservations := make([]observations.Observation, 0)
-		assert.Equal(t, expectedObservations, actualState[1].Observations(), "Observations not correct")
-	}
-}
-
-// Tests "GetState()" called twice
-func testGetStateTwiceFunc(data []byte) func(*testing.T) {
-	return func(t *testing.T) {
-		if len(data) == 0 {
-			t.Fatal("no data")
-		}
-
-		dp := NewJsonProcessor()
-		err := dp.Init(nil)
-		assert.NoError(t, err)
-
-		_, err = dp.OnData(data)
-		assert.NoError(t, err)
-
-		actualState, err := dp.GetState(nil)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		assert.Equal(t, 2, len(actualState), "expected two state objects")
-
-		sort.Slice(actualState, func(i, j int) bool {
-			return actualState[i].Path() < actualState[j].Path()
-		})
-
-		assert.Equal(t, "coinbase.btcusd", actualState[0].Path(), "expected path incorrect")
-		assert.Equal(t, "local.portfolio", actualState[1].Path(), "expected path incorrect")
-
-		expectedFirstObservation := observations.Observation{
-			Time: 1626697480,
-			Data: map[string]float64{
-				"price": 31232.709090909084,
-			},
-		}
-
-		actualObservations := actualState[0].Observations()
-		assert.Equal(t, expectedFirstObservation, actualState[0].Observations()[0], "First Observation not correct")
-		assert.Equal(t, 57, len(actualObservations), "number of observations incorrect")
-
-		expectedObservations := make([]observations.Observation, 0)
-		assert.Equal(t, expectedObservations, actualState[1].Observations(), "Observations not correct")
-
-		actualState2, err := dp.GetState(nil)
-		assert.NoError(t, err)
-		assert.Nil(t, actualState2)
-	}
-}
-
-// Tests "getColumnMappings()"
-func testgetColumnMappingsFunc() func(*testing.T) {
-	return func(t *testing.T) {
-		headers := []string{"time", "local.portfolio.usd_balance", "local.portfolio.btc_balance", "coinbase.btcusd.price"}
-
-		colToPath, colToFieldName, err := getColumnMappings(headers)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		expectedColToPath := []string{"local.portfolio", "local.portfolio", "coinbase.btcusd"}
-		assert.Equal(t, expectedColToPath, colToPath, "column to path mapping incorrect")
-
-		expectedColToFieldName := []string{"usd_balance", "btc_balance", "price"}
-		assert.Equal(t, expectedColToFieldName, colToFieldName, "column to path mapping incorrect")
 	}
 }
