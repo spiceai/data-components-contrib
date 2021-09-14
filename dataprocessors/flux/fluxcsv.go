@@ -166,7 +166,7 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 	return newObservations, nil
 }
 
-func (p *FluxCsvProcessor) GetState(validFields *[]string) ([]*state.State, error) {
+func (p *FluxCsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 	// TODO
 	return nil, nil
 }

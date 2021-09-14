@@ -68,17 +68,9 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("json processor not initialized")
 	}
 
-	p.dataMutex.Lock()
-	defer p.dataMutex.Unlock()
-
-	newDataHash, err := util.ComputeNewHash(p.data, p.dataHash, data)
-	if err != nil {
-		return nil, fmt.Errorf("error computing new data hash in csv processor: %w", err)
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	schemaViolations, err := jsonschema.Validate(ctx, data, *p.format.GetSchema())
+	schemaViolations, err := jsonschema.Validate(ctx, data, p.format.GetSchema())
 	if err != nil {
 		validationError := ""
 		if len(schemaViolations) > 0 {
@@ -89,6 +81,14 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 			message:         err.Error(),
 			validationError: validationError,
 		}
+	}
+
+	p.dataMutex.Lock()
+	defer p.dataMutex.Unlock()
+
+	newDataHash, err := util.ComputeNewHash(p.data, p.dataHash, data)
+	if err != nil {
+		return nil, fmt.Errorf("error computing new data hash in csv processor: %w", err)
 	}
 
 	if newDataHash != nil {
@@ -108,7 +108,7 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 		return nil, nil
 	}
 
-	observations, err := p.format.GetObservations(&p.data)
+	observations, err := p.format.GetObservations(p.data)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 	return observations, nil
 }
 
-func (p *JsonProcessor) GetState(validFields *[]string) ([]*state.State, error) {
+func (p *JsonProcessor) GetState(validFields []string) ([]*state.State, error) {
 	p.dataMutex.RLock()
 	defer p.dataMutex.RUnlock()
 
@@ -126,7 +126,7 @@ func (p *JsonProcessor) GetState(validFields *[]string) ([]*state.State, error) 
 		return nil, nil
 	}
 
-	state, err := p.format.GetState(&p.data, validFields)
+	state, err := p.format.GetState(p.data, validFields)
 	if err != nil {
 		return nil, err
 	}

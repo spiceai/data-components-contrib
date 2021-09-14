@@ -14,7 +14,7 @@ type DataProcessor interface {
 	Init(params map[string]string) error
 	OnData(data []byte) ([]byte, error)
 	GetObservations() ([]observations.Observation, error)
-	GetState(fields *[]string) ([]*state.State, error)
+	GetState(fields []string) ([]*state.State, error)
 }
 
 func NewDataProcessor(name string) (DataProcessor, error) {

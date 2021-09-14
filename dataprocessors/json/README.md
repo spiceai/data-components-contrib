@@ -50,3 +50,6 @@ type JsonFormat interface {
 **GetObservations()** returns the observations that Spice.ai will send to the AI Engine. Observations will only be for a single dataspace.
 
 **GetState()** returns the state that Spice.ai will send to the AI Engine.
+
+Update the [`NewDataProcessor`](https://github.com/spiceai/data-components-contrib/blob/trunk/dataprocessors/dataprocessor.go) switch statement to return the new processor.
+Submit a PR describing the change and which data source the new format will support.

@@ -13,14 +13,14 @@ import (
 type ObservationJsonFormat struct {
 }
 
-func (s *ObservationJsonFormat) GetSchema() *[]byte {
+func (s *ObservationJsonFormat) GetSchema() []byte {
 	return observation.JsonSchema()
 }
 
-func (s *ObservationJsonFormat) GetObservations(data *[]byte) ([]observations.Observation, error) {
+func (s *ObservationJsonFormat) GetObservations(data []byte) ([]observations.Observation, error) {
 	var observationPoints []observation.Observation = make([]observation.Observation, 0)
 
-	err := json.Unmarshal(*data, &observationPoints)
+	err := json.Unmarshal(data, &observationPoints)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (s *ObservationJsonFormat) GetObservations(data *[]byte) ([]observations.Ob
 	return newObservations, nil
 }
 
-func (s *ObservationJsonFormat) GetState(data *[]byte, validFields *[]string) ([]*state.State, error) {
+func (s *ObservationJsonFormat) GetState(data []byte, validFields []string) ([]*state.State, error) {
 	// TODO
 	return nil, nil
 }
