@@ -118,7 +118,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 
 // Processes into State by field path
 // CSV headers are expected to be fully-qualified field names
-func (p *CsvProcessor) GetState(validFields *[]string) ([]*state.State, error) {
+func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 	p.dataMutex.Lock()
 	defer p.dataMutex.Unlock()
 
@@ -138,7 +138,7 @@ func (p *CsvProcessor) GetState(validFields *[]string) ([]*state.State, error) {
 	if validFields != nil {
 		for i := 1; i < len(headers); i++ {
 			header := headers[i]
-			fields := *validFields
+			fields := validFields
 			found := false
 			for _, validField := range fields {
 				if validField == header {
