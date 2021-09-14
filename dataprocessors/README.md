@@ -4,6 +4,7 @@ Currently supported processors:
 
 - [CSV](csv/csv.go)
 - [Flux CSV](flux/fluxcsv.go)
+- [JSON](json/README.md)
 
 ## Contribution guide
 
@@ -22,8 +23,8 @@ Data Processors are consumed in the [Spice.ai pod](https://docs.spiceai.org/conc
 
 ```yaml
 data:
-    processor:
-        name: flux-csv
+  processor:
+    name: flux-csv
 ```
 
 The data processor name is self-declared by the component, but must be unique across all components.
