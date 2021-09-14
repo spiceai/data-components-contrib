@@ -25,9 +25,9 @@ type JsonProcessor struct {
 }
 
 type JsonFormat interface {
-	GetSchema() *[]byte
-	GetObservations(data *[]byte) ([]observations.Observation, error)
-	GetState(data *[]byte, validFields *[]string) ([]*state.State, error)
+	GetSchema() []byte
+	GetObservations(data []byte) ([]observations.Observation, error)
+	GetState(data []byte, validFields []string) ([]*state.State, error)
 }
 
 type ValidationError struct {
@@ -101,8 +101,8 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 }
 
 func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
-	p.dataMutex.Lock()
-	defer p.dataMutex.Unlock()
+	p.dataMutex.RLock()
+	defer p.dataMutex.RUnlock()
 
 	if p.data == nil {
 		return nil, nil
@@ -119,8 +119,8 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 }
 
 func (p *JsonProcessor) GetState(validFields *[]string) ([]*state.State, error) {
-	p.dataMutex.Lock()
-	defer p.dataMutex.Unlock()
+	p.dataMutex.RLock()
+	defer p.dataMutex.RUnlock()
 
 	if p.data == nil {
 		return nil, nil

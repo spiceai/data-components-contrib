@@ -8,9 +8,9 @@ data:
     name: json
 ```
 
-By default the JSON processor will use the [Spice.ai observation json format](https://github.com/spiceai/spiceai/blob/trunk/pkg/api/observation/observation_schema.json).
+By default the JSON processor will consume the [Spice.ai observation json format](https://github.com/spiceai/spiceai/blob/trunk/pkg/api/observation/observation_schema.json).
 
-An example payload with that schema looks like:
+An example payload with the observations schema looks like this:
 
 ```json
 [
@@ -35,7 +35,7 @@ The value of time must either be a Unix timestamp or a string conforming to RFC3
 
 ## More formats
 
-To extend Spice.ai to accept a new JSON format, fork this repo and create a folder in this directory. Implement this interface:
+To extend the JsonProcessor to accept a new JSON format, fork this repo and create a folder in this directory. Implement this interface:
 
 ```golang
 type JsonFormat interface {
