@@ -10,8 +10,9 @@ require (
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/spiceai/spiceai v0.1.0-alpha.5-rc-spiced.0.20210831052121-80234a1fb51a
+	github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210914060017-1c8ce4834520
 	github.com/stretchr/testify v1.7.0
+	go.skia.org/infra v0.0.0-20210910202616-d20447ca9d38
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.0
@@ -48,7 +49,6 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/zeebo/bencode v1.0.0 // indirect
-	go.skia.org/infra v0.0.0-20210910202616-d20447ca9d38 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.44.0 // indirect

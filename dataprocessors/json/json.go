@@ -2,21 +2,15 @@ package json
 
 import (
 	"context"
-	_ "embed"
-	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
 
+	"github.com/spiceai/data-components-contrib/dataprocessors/json/observation"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
 	"github.com/spiceai/spiceai/pkg/util"
 	"go.skia.org/infra/go/jsonschema"
-)
-
-var (
-	//go:embed schema.json
-	schema []byte
 )
 
 const (
@@ -27,6 +21,13 @@ type JsonProcessor struct {
 	data      []byte
 	dataMutex sync.RWMutex
 	dataHash  []byte
+	format    JsonFormat
+}
+
+type JsonFormat interface {
+	GetSchema() *[]byte
+	GetObservations(data *[]byte) ([]observations.Observation, error)
+	GetState(data *[]byte, validFields *[]string) ([]*state.State, error)
 }
 
 type ValidationError struct {
@@ -43,6 +44,22 @@ func NewJsonProcessor() *JsonProcessor {
 }
 
 func (p *JsonProcessor) Init(params map[string]string) error {
+	// Default format if not specified in params
+	format := "default"
+
+	if paramFormat, ok := params["format"]; ok {
+		format = paramFormat
+	}
+
+	switch format {
+	case "default":
+		p.format = &observation.ObservationJsonFormat{}
+	}
+
+	if p.format == nil {
+		return fmt.Errorf("unable to find json format '%s'", format)
+	}
+
 	return nil
 }
 
@@ -57,7 +74,7 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	schemaViolations, err := jsonschema.Validate(ctx, data, schema)
+	schemaViolations, err := jsonschema.Validate(ctx, data, *p.format.GetSchema())
 	if err != nil {
 		validationError := ""
 		if len(schemaViolations) > 0 {
@@ -87,55 +104,28 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 		return nil, nil
 	}
 
-	var observationPoints []ObservationPoint = make([]ObservationPoint, 0)
-
-	err := json.Unmarshal(p.data, &observationPoints)
+	observations, err := p.format.GetObservations(&p.data)
 	if err != nil {
 		return nil, err
 	}
 
 	p.data = nil
 
-	observations, err := getObservations(observationPoints)
+	return observations, nil
+}
+
+func (p *JsonProcessor) GetState(validFields *[]string) ([]*state.State, error) {
+	p.dataMutex.Lock()
+	defer p.dataMutex.Unlock()
+
+	if p.data == nil {
+		return nil, nil
+	}
+
+	state, err := p.format.GetState(&p.data, validFields)
 	if err != nil {
 		return nil, err
 	}
 
-	return observations, nil
-}
-
-func getObservations(observationPoints []ObservationPoint) ([]observations.Observation, error) {
-	var newObservations []observations.Observation
-	for _, point := range observationPoints {
-		var ts int64
-		var err error
-
-		if point.Time.Integer != nil {
-			ts = *point.Time.Integer
-		} else if point.Time.String != nil {
-			var t time.Time
-			t, err = time.Parse(time.RFC3339, *point.Time.String)
-			if err != nil {
-				// This should never happen as the schema validation would have caught this
-				return nil, fmt.Errorf("observation time format is invalid: %s", *point.Time.String)
-			}
-			ts = t.Unix()
-		} else {
-			// This should never happen as the schema validation would have caught this
-			return nil, fmt.Errorf("observation did not include a time component")
-		}
-
-		observation := observations.Observation{
-			Time: ts,
-			Data: point.Data,
-		}
-
-		newObservations = append(newObservations, observation)
-	}
-
-	return newObservations, nil
-}
-
-func (p *JsonProcessor) GetState(validFields *[]string) ([]*state.State, error) {
-	return nil, nil
+	return state, nil
 }

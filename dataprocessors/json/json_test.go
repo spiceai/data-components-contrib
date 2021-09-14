@@ -30,6 +30,7 @@ func TestJson(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
+	t.Run("Init() - with invalid params", testInvalidInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(data))
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(data))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(data))
@@ -46,6 +47,20 @@ func testInitFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		err := p.Init(params)
 		assert.NoError(t, err)
+	}
+}
+
+// Tests "Init()" when passing an invalid format
+func testInvalidInitFunc() func(*testing.T) {
+	p := NewJsonProcessor()
+
+	params := map[string]string{}
+	params["format"] = "nonexist"
+
+	return func(t *testing.T) {
+		err := p.Init(params)
+		assert.Error(t, err)
+		assert.Equal(t, "unable to find json format 'nonexist'", err.Error())
 	}
 }
 
