@@ -30,12 +30,15 @@ func TestJson(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
-	t.Run("Init() - with invalid params", testInvalidInitFunc())
+	t.Run("Init() with invalid params", testInvalidInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(data))
+	t.Run("GetObservations() called before Init()", testGetObservationsNoInitFunc())
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(data))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(data))
+	t.Run("OnData() called before Init()", testOnDataNoInitFunc(data))
 	t.Run("OnData() called with invalid schema", testOnDataInvalidSchema(invalid_data, "0: (root): Invalid type. Expected: array, given: object"))
 	t.Run("OnData() called with invalid time", testOnDataInvalidSchema(invalid_time, "0: 0.time: Must validate at least one schema (anyOf)"))
+	t.Run("GetState() called before Init()", testGetStateNoInitFunc())
 }
 
 // Tests "Init()"
@@ -97,6 +100,17 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
 		snapshotter.SnapshotT(t, actualObservations)
+	}
+}
+
+// Tests "GetObservations()" before Init() is called
+func testGetObservationsNoInitFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		dp := NewJsonProcessor()
+
+		obs, err := dp.GetObservations()
+		assert.NoError(t, err)
+		assert.Nil(t, obs)
 	}
 }
 
@@ -180,6 +194,17 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 	}
 }
 
+// Tests "OnData()" before Init() is called
+func testOnDataNoInitFunc(data []byte) func(*testing.T) {
+	return func(t *testing.T) {
+		dp := NewJsonProcessor()
+
+		_, err := dp.OnData(data)
+		assert.Error(t, err)
+		assert.Equal(t, "json processor not initialized", err.Error())
+	}
+}
+
 func testOnDataInvalidSchema(data []byte, validationError string) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
@@ -196,5 +221,16 @@ func testOnDataInvalidSchema(data []byte, validationError string) func(*testing.
 			assert.IsType(t, &ValidationError{}, err)
 			assert.Equal(t, validationError, err.(*ValidationError).validationError)
 		}
+	}
+}
+
+// Tests "GetState()" before Init() is called
+func testGetStateNoInitFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		dp := NewJsonProcessor()
+
+		state, err := dp.GetState(nil)
+		assert.NoError(t, err)
+		assert.Nil(t, state)
 	}
 }

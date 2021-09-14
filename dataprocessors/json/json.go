@@ -64,6 +64,10 @@ func (p *JsonProcessor) Init(params map[string]string) error {
 }
 
 func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
+	if p.format == nil {
+		return nil, fmt.Errorf("json processor not initialized")
+	}
+
 	p.dataMutex.Lock()
 	defer p.dataMutex.Unlock()
 
@@ -126,6 +130,8 @@ func (p *JsonProcessor) GetState(validFields *[]string) ([]*state.State, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	p.data = nil
 
 	return state, nil
 }
