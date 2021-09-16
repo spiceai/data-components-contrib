@@ -2,6 +2,7 @@ package json
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -217,7 +218,7 @@ func testOnDataInvalidSchema(data []byte, validationError string) func(*testing.
 
 		_, err = dp.OnData(data)
 		if assert.Error(t, err) {
-			assert.Equal(t, err.Error(), "schema violation")
+			assert.Equal(t, err.Error(), fmt.Sprintf("schema violation:%s", validationError))
 			assert.IsType(t, &ValidationError{}, err)
 			assert.Equal(t, validationError, err.(*ValidationError).validationError)
 		}
