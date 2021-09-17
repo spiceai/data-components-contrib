@@ -36,7 +36,7 @@ type ValidationError struct {
 }
 
 func (e *ValidationError) Error() string {
-	return e.message
+	return fmt.Sprintf("%s:%s", e.message, e.validationError)
 }
 
 func NewJsonProcessor() *JsonProcessor {
