@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/spiceai/data-components-contrib/dataprocessors/json/observation"
+	"github.com/phillipleblanc/data-components-contrib/dataprocessors/json/observation"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
 	"github.com/spiceai/spiceai/pkg/util"

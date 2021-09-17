@@ -3,9 +3,9 @@ package dataprocessors
 import (
 	"fmt"
 
-	"github.com/spiceai/data-components-contrib/dataprocessors/csv"
-	"github.com/spiceai/data-components-contrib/dataprocessors/flux"
-	"github.com/spiceai/data-components-contrib/dataprocessors/json"
+	"github.com/phillipleblanc/data-components-contrib/dataprocessors/csv"
+	"github.com/phillipleblanc/data-components-contrib/dataprocessors/flux"
+	"github.com/phillipleblanc/data-components-contrib/dataprocessors/json"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
 )
