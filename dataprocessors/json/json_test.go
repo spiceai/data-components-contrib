@@ -30,9 +30,21 @@ func TestJson(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
+	string_valid_value, err := os.ReadFile("../../test/assets/data/json/observation_string_valid_value.json")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	string_invalid_value, err := os.ReadFile("../../test/assets/data/json/observation_string_invalid_value.json")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
 	t.Run("Init()", testInitFunc())
 	t.Run("Init() with invalid params", testInvalidInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(data))
+	t.Run("GetObservations() -- with a string value for some data points", testGetObservationsFunc(string_valid_value))
+	t.Run("GetObservations() -- with an invalid string value for some data points", testGetObservationsInvalidStringFunc(string_invalid_value))
 	t.Run("GetObservations() called before Init()", testGetObservationsNoInitFunc())
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(data))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(data))
@@ -101,6 +113,27 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
 		snapshotter.SnapshotT(t, actualObservations)
+	}
+}
+
+// Tests "GetObservations()" when given an invalid string data point
+func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
+	return func(t *testing.T) {
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		dp := NewJsonProcessor()
+		err := dp.Init(nil)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		_, err = dp.GetObservations()
+		assert.Error(t, err)
+
+		assert.Equal(t, "strconv.ParseFloat: parsing \"foobar\": invalid syntax", err.Error())
 	}
 }
 
