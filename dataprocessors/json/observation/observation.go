@@ -3,9 +3,10 @@ package observation
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
-	"github.com/spiceai/spiceai/pkg/api/observation"
+	"github.com/phillipleblanc/spiceai/pkg/api/observation"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
 )
@@ -45,9 +46,22 @@ func (s *ObservationJsonFormat) GetObservations(data []byte) ([]observations.Obs
 			return nil, fmt.Errorf("observation did not include a time component")
 		}
 
+		data := make(map[string]float64, len(point.Data))
+
+		for key, val := range point.Data {
+			if val.Float64 != nil {
+				data[key] = *val.Float64
+			} else {
+				data[key], err = strconv.ParseFloat(*val.String, 64)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
 		observation := observations.Observation{
 			Time: ts,
-			Data: point.Data,
+			Data: data,
 		}
 
 		newObservations = append(newObservations, observation)

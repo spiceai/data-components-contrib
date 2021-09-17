@@ -40,6 +40,7 @@ require (
 	github.com/jcgregorio/logger v0.1.2 // indirect
 	github.com/jcgregorio/slog v0.0.0-20190423190439-e6f2d537f900 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
+	github.com/phillipleblanc/spiceai v0.2.0-alpha-rc-spiced.0.20210917010531-ece3da0e95f8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
