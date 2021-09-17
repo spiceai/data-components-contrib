@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/bradleyjkemp/cupaloy"
-	"github.com/phillipleblanc/data-components-contrib/dataconnectors/file"
+	"github.com/spiceai/data-components-contrib/dataconnectors/file"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/stretchr/testify/assert"
 )

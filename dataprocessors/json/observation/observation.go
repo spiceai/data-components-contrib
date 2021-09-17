@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/phillipleblanc/spiceai/pkg/api/observation"
+	"github.com/spiceai/spiceai/pkg/api/observation"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
 )

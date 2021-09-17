@@ -1,4 +1,4 @@
-module github.com/phillipleblanc/data-components-contrib
+module github.com/spiceai/data-components-contrib
 
 go 1.17
 
@@ -10,7 +10,7 @@ require (
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210914095457-91c82109b461
+	github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210917015218-a50887cec3e9
 	github.com/stretchr/testify v1.7.0
 	go.skia.org/infra v0.0.0-20210910202616-d20447ca9d38
 	go.uber.org/atomic v1.9.0 // indirect
@@ -40,7 +40,6 @@ require (
 	github.com/jcgregorio/logger v0.1.2 // indirect
 	github.com/jcgregorio/slog v0.0.0-20190423190439-e6f2d537f900 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
-	github.com/phillipleblanc/spiceai v0.2.0-alpha-rc-spiced.0.20210917010531-ece3da0e95f8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect

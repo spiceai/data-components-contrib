@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/phillipleblanc/data-components-contrib/dataconnectors/file"
-	"github.com/phillipleblanc/data-components-contrib/dataconnectors/influxdb"
+	"github.com/spiceai/data-components-contrib/dataconnectors/file"
+	"github.com/spiceai/data-components-contrib/dataconnectors/influxdb"
 )
 
 type DataConnector interface {
