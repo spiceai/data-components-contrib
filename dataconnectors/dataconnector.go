@@ -2,7 +2,6 @@ package dataconnectors
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/spiceai/data-components-contrib/dataconnectors/file"
 	"github.com/spiceai/data-components-contrib/dataconnectors/influxdb"
@@ -10,7 +9,7 @@ import (
 
 type DataConnector interface {
 	Init(params map[string]string) error
-	FetchData(epoch time.Time, period time.Duration, interval time.Duration) ([]byte, error)
+	Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error
 }
 
 func NewDataConnector(name string) (DataConnector, error) {

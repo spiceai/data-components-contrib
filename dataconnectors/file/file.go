@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"io/ioutil"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/logrusorgru/aurora"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -20,10 +22,12 @@ const (
 
 type FileConnector struct {
 	path      string
-	fileInfo  fs.FileInfo
 	noWatch   bool
-	data      []byte
+	readHandlers []*func(data []byte, metadata map[string]string) ([]byte, error)
+
 	dataMutex sync.RWMutex
+	fileInfo  fs.FileInfo
+	data      []byte
 }
 
 func NewFileConnector() *FileConnector {
@@ -48,6 +52,10 @@ func (c *FileConnector) Init(params map[string]string) error {
 		if err != nil {
 			return err
 		}
+		err = c.sendData()
+		if err != nil {
+			return err
+		}
 	}
 
 	if !c.noWatch {
@@ -57,21 +65,9 @@ func (c *FileConnector) Init(params map[string]string) error {
 	return nil
 }
 
-func (c *FileConnector) FetchData(epoch time.Time, period time.Duration, interval time.Duration) ([]byte, error) {
-	c.dataMutex.Lock()
-	defer c.dataMutex.Unlock()
-
-	newFileInfo, err := os.Stat(c.path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open file '%s': %w", c.path, err)
-	}
-
-	if c.fileInfo == nil || newFileInfo.ModTime().After(c.fileInfo.ModTime()) {
-		// Only load file if it's changed since last read
-		return c.loadFileData(newFileInfo)
-	}
-
-	return c.data, nil
+func (c *FileConnector) Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error {
+	c.readHandlers = append(c.readHandlers, &handler)
+	return nil
 }
 
 func (c *FileConnector) loadFileData(newFileInfo fs.FileInfo) ([]byte, error) {
@@ -132,9 +128,18 @@ func (c *FileConnector) processWatchNotifyEvent(event fsnotify.Event, path strin
 		if err != nil {
 			return fmt.Errorf("failed to open file '%s': %w", file, err)
 		}
-		_, err = c.loadFileData(newFileInfo)
-		if err != nil {
-			return err
+		c.dataMutex.Lock()
+		defer c.dataMutex.Unlock()
+		if c.fileInfo == nil || newFileInfo.ModTime().After(c.fileInfo.ModTime()) {
+			// Only load file if it's changed since last read
+			_, err = c.loadFileData(newFileInfo)
+			if err != nil {
+				return err
+			}
+			err = c.sendData()
+			if err != nil {
+				return err
+			}
 		}
 	case fsnotify.Remove:
 		c.dataMutex.Lock()
@@ -144,4 +149,30 @@ func (c *FileConnector) processWatchNotifyEvent(event fsnotify.Event, path strin
 	}
 
 	return nil
+}
+
+func (c *FileConnector) sendData() error {
+	if len(c.readHandlers) == 0 || c.fileInfo == nil || c.data == nil {
+		// Nothing to read
+		return nil
+	}
+
+	metadata := map[string]string{}
+	metadata["mod_time"] = c.fileInfo.ModTime().Format(time.RFC3339)
+	metadata["size"] = fmt.Sprintf("%d", c.fileInfo.Size())
+
+	errGroup, _ := errgroup.WithContext(context.Background())
+
+	c.dataMutex.RLock()
+	defer c.dataMutex.RUnlock()
+
+	for _, handler := range c.readHandlers {
+		readHandler := *handler
+		errGroup.Go(func() error {
+			_, err := readHandler(c.data, metadata)
+			return err
+		})
+	}
+
+	return errGroup.Wait()
 }
