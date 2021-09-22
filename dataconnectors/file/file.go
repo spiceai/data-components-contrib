@@ -34,7 +34,7 @@ func NewFileConnector() *FileConnector {
 	return &FileConnector{}
 }
 
-func (c *FileConnector) Init(params map[string]string) error {
+func (c *FileConnector) Init(epoch time.Time, period time.Duration, interval time.Duration, params map[string]string) error {
 	c.dataMutex = sync.RWMutex{}
 
 	path := params["path"]
