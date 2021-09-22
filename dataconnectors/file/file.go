@@ -21,8 +21,8 @@ const (
 )
 
 type FileConnector struct {
-	path      string
-	noWatch   bool
+	path         string
+	noWatch      bool
 	readHandlers []*func(data []byte, metadata map[string]string) ([]byte, error)
 
 	dataMutex sync.RWMutex
@@ -158,13 +158,17 @@ func (c *FileConnector) sendData() error {
 	}
 
 	metadata := map[string]string{}
-	metadata["mod_time"] = c.fileInfo.ModTime().Format(time.RFC3339)
+	metadata["mod_time"] = c.fileInfo.ModTime().Format(time.RFC3339Nano)
 	metadata["size"] = fmt.Sprintf("%d", c.fileInfo.Size())
 
 	errGroup, _ := errgroup.WithContext(context.Background())
 
 	c.dataMutex.RLock()
 	defer c.dataMutex.RUnlock()
+
+	if len(c.readHandlers) == 0 {
+		return nil
+	}
 
 	for _, handler := range c.readHandlers {
 		readHandler := *handler

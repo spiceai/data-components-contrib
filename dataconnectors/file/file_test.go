@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/spiceai/data-components-contrib/dataconnectors/file"
@@ -42,7 +43,7 @@ func testReadFunc(params map[string]string) func(*testing.T) {
 		var readData []byte
 		var readMetadata map[string]string
 
-		readChan := make(chan bool)
+		readChan := make(chan bool, 1)
 
 		err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
 			readData = data
@@ -55,10 +56,13 @@ func testReadFunc(params map[string]string) func(*testing.T) {
 		err = c.Init(params)
 		assert.NoError(t, err)
 
-		<- readChan
+		<-readChan
 
-		assert.Equal(t, "123", readMetadata["mod_time"])
-		assert.Equal(t, "123", readMetadata["size"])
+		assert.Equal(t, "82627", readMetadata["size"])
+
+		modTime, err := time.Parse(time.RFC3339Nano, readMetadata["mod_time"])
+		assert.NoError(t, err)
+		assert.Equal(t, int64(1632218687313302691), modTime.UnixNano())
 
 		snapshotter.SnapshotT(t, string(readData))
 	}
