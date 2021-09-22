@@ -7,6 +7,10 @@
       (string) (len=6) "rating": (float64) 86,
       (string) (len=5) "speed": (float64) 15,
       (string) (len=6) "target": (float64) 42
+    },
+    Tags: ([]string) (len=2) {
+      (string) (len=8) "testTagA",
+      (string) (len=8) "testTagB"
     }
   }
 }

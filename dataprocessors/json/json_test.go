@@ -109,6 +109,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 				"speed":   15,
 				"target":  42,
 			},
+			Tags: []string{"testTagA", "testTagB"},
 		}
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
@@ -174,6 +175,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 				"speed":   15,
 				"target":  42,
 			},
+			Tags: []string{"testTagA", "testTagB"},
 		}
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
@@ -209,6 +211,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 				"speed":   15,
 				"target":  42,
 			},
+			Tags: []string{"testTagA", "testTagB"},
 		}
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
