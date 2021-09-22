@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/array"
 	flux_csv "github.com/influxdata/flux/csv"
 	"github.com/spiceai/spiceai/pkg/loggers"
 	"github.com/spiceai/spiceai/pkg/observations"
@@ -86,6 +87,7 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 				timeCol := -1
 				fieldCol := -1
 				valueCol := -1
+				tagColMap := make(map[string]int)
 				for col, colMeta := range c.Cols() {
 					// We currently only support one field and float for now
 					if colMeta.Label == "_time" {
@@ -103,9 +105,11 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 						continue
 					}
 
-					if timeCol >= 0 && fieldCol >= 0 && valueCol >= 0 {
-						break
+					if colMeta.Label == "_measurement" || colMeta.Type.String() != "string" {
+						continue
 					}
+
+					tagColMap[colMeta.Label] = col
 				}
 
 				if timeCol == -1 {
@@ -129,15 +133,32 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 				values := c.Floats(valueCol)
 				defer values.Release()
 
+				tags := make(map[string]*array.String, len(tagColMap))
+
+				for tagName, colIndex := range tagColMap {
+					tags[tagName] = c.Strings(colIndex)
+					defer tags[tagName].Release()
+				}
+
 				for i := 0; i < c.Len(); i++ {
 					if times.IsValid(i) && !times.IsNull(i) &&
 						fields.IsValid(i) && !fields.IsNull(i) &&
 						values.IsValid(i) && !values.IsNull(i) {
 						rowData := make(map[string]float64, 1)
 						rowData[fields.Value(i)] = values.Value(i)
+
+						tagData := make([]string, 0)
+
+						for _, tagValue := range tags {
+							if tagValue.IsValid(i) && !tagValue.IsNull(i) {
+								tagData = append(tagData, tagValue.Value(i))
+							}
+						}
+
 						observation := observations.Observation{
 							Time: times.Value(i) / int64(time.Second),
 							Data: rowData,
+							Tags: tagData,
 						}
 						tableObservations[i] = observation
 					}

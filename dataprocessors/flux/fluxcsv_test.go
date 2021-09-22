@@ -63,8 +63,11 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			Data: map[string]float64{
 				"usage_idle": 99.56272495215877,
 			},
+			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
 		}
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Data, actualObservations[0].Data, "First Observation not correct")
+		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
 		// marshal to JSON so the snapshot is easy to consume
 		data, err := json.MarshalIndent(actualObservations, "", "  ")
@@ -72,6 +75,8 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			t.Fatal(err)
 		}
 
+		// TODO: Change this to load the test data from JSON and compare each element individually,
+		// with an order insensitive compare for the tags
 		snapshotter.SnapshotT(t, data)
 	}
 }
@@ -100,8 +105,11 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 			Data: map[string]float64{
 				"usage_idle": 99.56272495215877,
 			},
+			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
 		}
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Data, actualObservations[0].Data, "First Observation not correct")
+		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
 		actualObservations2, err := dp.GetObservations()
 		assert.NoError(t, err)
@@ -133,8 +141,11 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 			Data: map[string]float64{
 				"usage_idle": 99.56272495215877,
 			},
+			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
 		}
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Data, actualObservations[0].Data, "First Observation not correct")
+		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
