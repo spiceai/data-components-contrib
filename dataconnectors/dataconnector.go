@@ -9,8 +9,8 @@ import (
 )
 
 type DataConnector interface {
-	Init(params map[string]string) error
-	FetchData(epoch time.Time, period time.Duration, interval time.Duration) ([]byte, error)
+	Init(Epoch time.Time, Period time.Duration, Interval time.Duration, params map[string]string) error
+	Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error
 }
 
 func NewDataConnector(name string) (DataConnector, error) {

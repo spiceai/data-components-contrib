@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"sort"
+	"sync"
 	"testing"
 	"time"
 
@@ -17,15 +18,29 @@ import (
 var snapshotter = cupaloy.New(cupaloy.SnapshotSubdirectory("../../test/assets/snapshots/dataprocessors/csv"))
 
 func TestCsv(t *testing.T) {
+	epoch := time.Unix(1605312000, 0)
+	period := 7 * 24 * time.Hour
+	interval := time.Hour
+
+	var wg sync.WaitGroup
+
 	localFileConnector := file.NewFileConnector()
-	err := localFileConnector.Init(map[string]string{
-		"path":  "../../test/assets/data/csv/COINBASE_BTCUSD, 30.csv",
-		"watch": "false",
+
+	var localData []byte
+	err := localFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+		localData = data
+		wg.Done()
+		return nil, nil
 	})
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	localData, err := localFileConnector.FetchData(time.Unix(1605312000, 0), 7*24*time.Hour, time.Hour)
+	wg.Add(1)
+
+	err = localFileConnector.Init(epoch, period, interval, map[string]string{
+		"path":  "../../test/assets/data/csv/COINBASE_BTCUSD, 30.csv",
+		"watch": "false",
+	})
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -41,17 +56,27 @@ func TestCsv(t *testing.T) {
 	}
 
 	globalFileConnector := file.NewFileConnector()
-	err = globalFileConnector.Init(map[string]string{
+
+	var globalData []byte
+	err = globalFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+		globalData = data
+		wg.Done()
+		return nil, nil
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	wg.Add(1)
+
+	err = globalFileConnector.Init(epoch, period, interval, map[string]string{
 		"path":  "../../test/assets/data/csv/trader_input.csv",
 		"watch": "false",
 	})
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	globalData, err := globalFileConnector.FetchData(time.Unix(1605312000, 0), 7*24*time.Hour, time.Hour)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+
+	wg.Wait()
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
@@ -65,8 +90,20 @@ func TestCsv(t *testing.T) {
 }
 
 func BenchmarkGetObservations(b *testing.B) {
+	epoch := time.Unix(1605312000, 0)
+	period := 7 * 24 * time.Hour
+	interval := time.Hour
+
 	localFileConnector := file.NewFileConnector()
-	err := localFileConnector.Init(map[string]string{
+
+	err := localFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+		return nil, nil
+	})
+	if err != nil {
+		b.Fatal(err.Error())
+	}
+
+	err = localFileConnector.Init(epoch, period, interval, map[string]string{
 		"path":  "../../test/assets/data/csv/COINBASE_BTCUSD, 30.csv",
 		"watch": "false",
 	})
