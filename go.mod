@@ -26,7 +26,7 @@ require (
 	github.com/alecthomas/jsonschema v0.0.0-20210920000243-787cd8204a0d // indirect
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20210922070358-ec7aeb577330 // indirect
-	github.com/benbjohnson/immutable v0.3.0 // indirect
+	github.com/benbjohnson/immutable v0.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
