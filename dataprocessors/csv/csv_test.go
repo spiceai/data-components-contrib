@@ -35,6 +35,11 @@ func TestCsv(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
+	globalDataTags, err := os.ReadFile("../../test/assets/data/csv/global_tag_data.csv")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
 	globalFileConnector := file.NewFileConnector()
 	err = globalFileConnector.Init(map[string]string{
 		"path":  "../../test/assets/data/csv/trader_input.csv",
@@ -54,6 +59,7 @@ func TestCsv(t *testing.T) {
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
 	t.Run("GetState()", testGetStateFunc(globalData))
+	t.Run("GetState() with tags", testGetStateTagsFunc(globalDataTags))
 	t.Run("GetState() called twice", testGetStateTwiceFunc(globalData))
 	t.Run("getColumnMappings()", testgetColumnMappingsFunc())
 }
@@ -246,6 +252,59 @@ func testGetStateFunc(data []byte) func(*testing.T) {
 
 		expectedObservations := make([]observations.Observation, 0)
 		assert.Equal(t, expectedObservations, actualState[1].Observations(), "Observations not correct")
+	}
+}
+
+// Tests "GetState()" with tag data
+func testGetStateTagsFunc(data []byte) func(*testing.T) {
+	return func(t *testing.T) {
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		dp := NewCsvProcessor()
+		err := dp.Init(nil)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualState, err := dp.GetState(nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		assert.Equal(t, 5, len(actualState), "expected two state objects")
+
+		sort.Slice(actualState, func(i, j int) bool {
+			return actualState[i].Path() < actualState[j].Path()
+		})
+
+		assert.Equal(t, "bitmex.btcusd", actualState[0].Path(), "expected path incorrect")
+		assert.Equal(t, "bitthumb.btcusd", actualState[1].Path(), "expected path incorrect")
+		assert.Equal(t, "coinbase.btcusd", actualState[2].Path(), "expected path incorrect")
+		assert.Equal(t, "coinbase_pro.btcusd", actualState[3].Path(), "expected path incorrect")
+		assert.Equal(t, "local.btcusd", actualState[4].Path(), "expected path incorrect")
+
+		expectedFirstObservation := observations.Observation{
+			Time: 1605312000,
+			Data: map[string]float64{
+				"low": 16240,
+			},
+		}
+
+		actualObservations := actualState[0].Observations()
+		assert.Equal(t, expectedFirstObservation, actualState[0].Observations()[0], "First Observation not correct")
+		assert.Equal(t, 5, len(actualObservations), "number of observations incorrect")
+
+		testTime := time.Unix(1610057400, 0)
+		testTime = testTime.UTC()
+		for _, state := range actualState {
+			state.Time = testTime
+		}
+
+		snapshotter.SnapshotT(t, actualState)
 	}
 }
 
