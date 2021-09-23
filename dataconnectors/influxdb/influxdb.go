@@ -93,10 +93,10 @@ func (c *InfluxDbConnector) Init(epoch time.Time, period time.Duration, interval
             case <-done:
                 return
             case <-ticker.C:
-                _, err := c.refreshData()
+                err := c.refreshData(epoch, period, interval)
 				if err != nil && c.lastError != nil {
 					// Two errors in a row, stop refresh
-					log.Println("InfluxDb connector refresh error: %s", c.lastError)
+					log.Printf("InfluxDb connector refresh error: %s\n", c.lastError.Error())
 					return
 				}
 				c.lastError = err

@@ -31,7 +31,11 @@ func testInitFunc(params map[string]string) func(*testing.T) {
 	c := file.NewFileConnector()
 
 	return func(t *testing.T) {
-		err := c.Init(params)
+		var epoch time.Time
+		var period time.Duration
+		var interval time.Duration
+
+		err := c.Init(epoch, period, interval, params)
 		assert.NoError(t, err)
 	}
 }
@@ -53,7 +57,11 @@ func testReadFunc(params map[string]string) func(*testing.T) {
 		})
 		assert.NoError(t, err)
 
-		err = c.Init(params)
+		var epoch time.Time
+		var period time.Duration
+		var interval time.Duration
+
+		err = c.Init(epoch, period, interval, params)
 		assert.NoError(t, err)
 
 		<-readChan
