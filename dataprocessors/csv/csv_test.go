@@ -3,6 +3,7 @@ package csv
 import (
 	"bytes"
 	"io"
+	"os"
 	"sort"
 	"testing"
 	"time"
@@ -29,6 +30,11 @@ func TestCsv(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
+	localDataTags, err := os.ReadFile("../../test/assets/data/csv/observation_tag_data.csv")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
 	globalFileConnector := file.NewFileConnector()
 	err = globalFileConnector.Init(map[string]string{
 		"path":  "../../test/assets/data/csv/trader_input.csv",
@@ -44,6 +50,7 @@ func TestCsv(t *testing.T) {
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
+	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
 	t.Run("GetState()", testGetStateFunc(globalData))
@@ -106,6 +113,11 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 				"volume": 274.42607,
 			},
 		}
+
+		if len(actualObservations[0].Tags) > 0 {
+			expectedFirstObservation.Tags = []string{"elon_tweet", "market_open"}
+		}
+
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
 		snapshotter.SnapshotT(t, actualObservations)
