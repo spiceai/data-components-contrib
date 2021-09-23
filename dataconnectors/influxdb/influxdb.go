@@ -50,7 +50,8 @@ func (c *InfluxDbConnector) Init(epoch time.Time, period time.Duration, interval
 		return errors.New("influxdb connector requires the 'token' parameter to be set")
 	}
 
-	c.client = influxdb2.NewClient(params["url"], params["token"])
+	client := influxdb2.NewClient(params["url"], params["token"])
+	c.SetInfluxdbClient(client)
 
 	if org, ok := params["org"]; ok {
 		c.org = org
@@ -79,30 +80,37 @@ func (c *InfluxDbConnector) Init(epoch time.Time, period time.Duration, interval
 		if err != nil {
 			return fmt.Errorf("invalid refresh_interval '%s': %s", refreshInterval, err)
 		}
-		if ri.Seconds() < 5 {
-			return fmt.Errorf("invalid refresh_interval '%s': interval must be >= 5 seconds", refreshInterval)
+		if ri.Seconds() < 0 {
+			return fmt.Errorf("invalid refresh_interval '%s': interval must be >= 0", refreshInterval)
 		}
 		c.refreshInterval = ri
 	}
 
-	ticker := time.NewTicker(c.refreshInterval)
-	done := make(chan bool)
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case <-ticker.C:
-				err := c.refreshData(epoch, period, interval)
-				if err != nil && c.lastError != nil {
-					// Two errors in a row, stop refresh
-					log.Printf("InfluxDb connector refresh error: %s\n", c.lastError.Error())
+	err := c.refreshData(epoch, period, interval)
+	if err != nil {
+		return err
+	}
+
+	if c.refreshInterval > 0 {
+		ticker := time.NewTicker(c.refreshInterval)
+		done := make(chan bool)
+		go func() {
+			for {
+				select {
+				case <-done:
 					return
+				case <-ticker.C:
+					err := c.refreshData(epoch, period, interval)
+					if err != nil && c.lastError != nil {
+						// Two errors in a row, stop refresh
+						log.Printf("InfluxDb connector refresh error: %s\n", c.lastError.Error())
+						return
+					}
+					c.lastError = err
 				}
-				c.lastError = err
 			}
-		}
-	}()
+		}()
+	}
 
 	return nil
 }
@@ -190,4 +198,10 @@ func (c *InfluxDbConnector) sendData(periodStart string, periodEnd string) error
 	}
 
 	return errGroup.Wait()
+}
+
+func (c *InfluxDbConnector)SetInfluxdbClient(client influxdb2.Client) {
+	if c.client == nil {
+		c.client = client
+	}
 }
