@@ -24,7 +24,7 @@ var (
 
 const (
 	CsvProcessorName string = "csv"
-	tagsColumnsName  string = "_tags"
+	tagsColumnName   string = "_tags"
 )
 
 type CsvProcessor struct {
@@ -100,7 +100,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		for col := 1; col < len(record); col++ {
 			field := record[col]
 
-			if headers[col] == tagsColumnsName && field != "" {
+			if headers[col] == tagsColumnName && field != "" {
 				tags = strings.Split(field, " ")
 				continue
 			}
@@ -178,7 +178,7 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 		}
 		fieldName := columnToFieldName[col]
 
-		if fieldName == tagsColumnsName {
+		if fieldName == tagsColumnName {
 			continue
 		}
 
@@ -210,7 +210,7 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 			path := columnToPath[fieldCol]
 			fieldName := columnToFieldName[fieldCol]
 
-			if fieldName == tagsColumnsName {
+			if fieldName == tagsColumnName {
 				tagData[path] = strings.Split(field, " ")
 				continue
 			}
