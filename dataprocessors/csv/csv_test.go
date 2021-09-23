@@ -30,7 +30,7 @@ func TestCsv(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	localDataTags, err := os.ReadFile("../../test/assets/data/csv/observation_tag_data.csv")
+	localDataTags, err := os.ReadFile("../../test/assets/data/csv/local_tag_data.csv")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
