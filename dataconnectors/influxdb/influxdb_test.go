@@ -23,7 +23,6 @@ func TestInfluxDbConnector(t *testing.T) {
 
 func testInitFunc(params map[string]string) func(*testing.T) {
 	c := influxdb.NewInfluxDbConnector()
-	c.client = fakeClient{}
 
 	return func(t *testing.T) {
 		var epoch time.Time
