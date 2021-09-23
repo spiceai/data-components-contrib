@@ -5,16 +5,14 @@ Currently supported connectors:
 - [File](file/file.go)
 - [InfluxDB](influxdb/influxdb.go)
 
-> Data Connectors currently only support fetching data. Spice.ai will move to a streaming model in v0.2.0-alpha. See the [Spice.ai Roadmap](https://github.com/spiceai/spiceai/blob/trunk/docs/ROADMAP.md) for more details.
-
 ## Contribution guide
 
 Writing a data connector means implementing the `DataConnector` interface defined at [dataconnector.go](dataconnector.go) and adding it to the `NewDataConnector` factory function.
 
 ```golang
 type DataConnector interface {
-	Init(params map[string]string) error
-	FetchData(epoch time.Time, period time.Duration, interval time.Duration) ([]byte, error)
+	Init(Epoch time.Time, Period time.Duration, Interval time.Duration, params map[string]string) error
+	Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error
 }
 ```
 

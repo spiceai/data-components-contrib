@@ -20,10 +20,10 @@ func TestFileConnector(t *testing.T) {
 
 		params := make(map[string]string)
 		params["path"] = filePath
+		params["watch"] = "false"
 
 		t.Run(fmt.Sprintf("Init() - %s", fileToTest), testInitFunc(params))
-		t.Run(fmt.Sprintf("FetchData() - %s", fileToTest), testFetchDataFunc(params))
-		t.Run(fmt.Sprintf("FetchData() twice - %s", fileToTest), testFetchDataTwiceFunc(params))
+		t.Run(fmt.Sprintf("Read() - %s", fileToTest), testReadFunc(params))
 	}
 }
 
@@ -31,40 +31,46 @@ func testInitFunc(params map[string]string) func(*testing.T) {
 	c := file.NewFileConnector()
 
 	return func(t *testing.T) {
-		err := c.Init(params)
+		var epoch time.Time
+		var period time.Duration
+		var interval time.Duration
+
+		err := c.Init(epoch, period, interval, params)
 		assert.NoError(t, err)
 	}
 }
 
-func testFetchDataFunc(params map[string]string) func(*testing.T) {
+func testReadFunc(params map[string]string) func(*testing.T) {
 	c := file.NewFileConnector()
 
 	return func(t *testing.T) {
-		err := c.Init(params)
+		var readData []byte
+		var readMetadata map[string]string
+
+		readChan := make(chan bool, 1)
+
+		err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+			readData = data
+			readMetadata = metadata
+			readChan <- true
+			return nil, nil
+		})
 		assert.NoError(t, err)
 
-		data, err := c.FetchData(time.Unix(1605312000, 0), time.Hour*24*365*10, time.Minute*1)
+		var epoch time.Time
+		var period time.Duration
+		var interval time.Duration
+
+		err = c.Init(epoch, period, interval, params)
 		assert.NoError(t, err)
 
-		snapshotter.SnapshotT(t, string(data))
-	}
-}
+		<-readChan
 
-func testFetchDataTwiceFunc(params map[string]string) func(*testing.T) {
-	c := file.NewFileConnector()
+		assert.Equal(t, "82627", readMetadata["size"])
 
-	return func(t *testing.T) {
-		err := c.Init(params)
+		_, err = time.Parse(time.RFC3339Nano, readMetadata["mod_time"])
 		assert.NoError(t, err)
 
-		data, err := c.FetchData(time.Unix(1605312000, 0), time.Hour*24*365*10, time.Minute*1)
-		assert.NoError(t, err)
-
-		snapshotter.SnapshotT(t, string(data))
-
-		data2, err := c.FetchData(time.Unix(1605312000, 0), time.Hour*24*365*10, time.Minute*1)
-		assert.NoError(t, err)
-
-		snapshotter.SnapshotT(t, string(data2))
+		snapshotter.SnapshotT(t, string(readData))
 	}
 }
