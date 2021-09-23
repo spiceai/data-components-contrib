@@ -7,7 +7,8 @@
       (string) (len=6) "rating": (float64) 86,
       (string) (len=5) "speed": (float64) 15,
       (string) (len=6) "target": (float64) 42
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 84,
@@ -17,7 +18,8 @@
       (string) (len=6) "rating": (float64) 66,
       (string) (len=5) "speed": (float64) 70,
       (string) (len=6) "target": (float64) 80
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1600121040,
@@ -27,7 +29,8 @@
       (string) (len=6) "rating": (float64) 22,
       (string) (len=5) "speed": (float64) 45,
       (string) (len=6) "target": (float64) 8
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1617019594,
@@ -37,7 +40,8 @@
       (string) (len=6) "rating": (float64) 54,
       (string) (len=5) "speed": (float64) 92,
       (string) (len=6) "target": (float64) 49
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1608586764,
@@ -47,7 +51,8 @@
       (string) (len=6) "rating": (float64) 31,
       (string) (len=5) "speed": (float64) 47,
       (string) (len=6) "target": (float64) 20
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 66,
@@ -57,7 +62,8 @@
       (string) (len=6) "rating": (float64) 60,
       (string) (len=5) "speed": (float64) 45,
       (string) (len=6) "target": (float64) 71
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1608919478,
@@ -67,7 +73,8 @@
       (string) (len=6) "rating": (float64) 18,
       (string) (len=5) "speed": (float64) 2,
       (string) (len=6) "target": (float64) 49
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1622287821,
@@ -77,7 +84,8 @@
       (string) (len=6) "rating": (float64) 39,
       (string) (len=5) "speed": (float64) 28,
       (string) (len=6) "target": (float64) 46
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 85,
@@ -87,7 +95,8 @@
       (string) (len=6) "rating": (float64) 50,
       (string) (len=5) "speed": (float64) 41,
       (string) (len=6) "target": (float64) 100
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1613308755,
@@ -97,7 +106,8 @@
       (string) (len=6) "rating": (float64) 58,
       (string) (len=5) "speed": (float64) 98,
       (string) (len=6) "target": (float64) 59
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1617219483,
@@ -107,7 +117,8 @@
       (string) (len=6) "rating": (float64) 6,
       (string) (len=5) "speed": (float64) 74,
       (string) (len=6) "target": (float64) 74
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1606432823,
@@ -117,7 +128,8 @@
       (string) (len=6) "rating": (float64) 0,
       (string) (len=5) "speed": (float64) 95,
       (string) (len=6) "target": (float64) 76
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1614791060,
@@ -127,7 +139,8 @@
       (string) (len=6) "rating": (float64) 53,
       (string) (len=5) "speed": (float64) 96,
       (string) (len=6) "target": (float64) 89
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1628881563,
@@ -137,7 +150,8 @@
       (string) (len=6) "rating": (float64) 91,
       (string) (len=5) "speed": (float64) 4,
       (string) (len=6) "target": (float64) 48
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1630472273,
@@ -147,7 +161,8 @@
       (string) (len=6) "rating": (float64) 6,
       (string) (len=5) "speed": (float64) 2,
       (string) (len=6) "target": (float64) 73
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 25,
@@ -157,7 +172,8 @@
       (string) (len=6) "rating": (float64) 6,
       (string) (len=5) "speed": (float64) 96,
       (string) (len=6) "target": (float64) 4
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 61,
@@ -167,7 +183,8 @@
       (string) (len=6) "rating": (float64) 73,
       (string) (len=5) "speed": (float64) 64,
       (string) (len=6) "target": (float64) 16
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1624576649,
@@ -177,7 +194,8 @@
       (string) (len=6) "rating": (float64) 70,
       (string) (len=5) "speed": (float64) 66,
       (string) (len=6) "target": (float64) 11
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1621042973,
@@ -187,7 +205,8 @@
       (string) (len=6) "rating": (float64) 18,
       (string) (len=5) "speed": (float64) 35,
       (string) (len=6) "target": (float64) 38
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1627955069,
@@ -197,7 +216,8 @@
       (string) (len=6) "rating": (float64) 90,
       (string) (len=5) "speed": (float64) 62,
       (string) (len=6) "target": (float64) 52
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1623755608,
@@ -207,7 +227,8 @@
       (string) (len=6) "rating": (float64) 31,
       (string) (len=5) "speed": (float64) 22,
       (string) (len=6) "target": (float64) 71
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 9,
@@ -217,7 +238,8 @@
       (string) (len=6) "rating": (float64) 89,
       (string) (len=5) "speed": (float64) 38,
       (string) (len=6) "target": (float64) 90
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 74,
@@ -227,7 +249,8 @@
       (string) (len=6) "rating": (float64) 7,
       (string) (len=5) "speed": (float64) 59,
       (string) (len=6) "target": (float64) 96
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 40,
@@ -237,7 +260,8 @@
       (string) (len=6) "rating": (float64) 22,
       (string) (len=5) "speed": (float64) 76,
       (string) (len=6) "target": (float64) 59
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1613525487,
@@ -247,7 +271,8 @@
       (string) (len=6) "rating": (float64) 16,
       (string) (len=5) "speed": (float64) 98,
       (string) (len=6) "target": (float64) 53
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 64,
@@ -257,7 +282,8 @@
       (string) (len=6) "rating": (float64) 90,
       (string) (len=5) "speed": (float64) 74,
       (string) (len=6) "target": (float64) 69
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1604120604,
@@ -267,7 +293,8 @@
       (string) (len=6) "rating": (float64) 71,
       (string) (len=5) "speed": (float64) 59,
       (string) (len=6) "target": (float64) 34
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1604097627,
@@ -277,7 +304,8 @@
       (string) (len=6) "rating": (float64) 49,
       (string) (len=5) "speed": (float64) 53,
       (string) (len=6) "target": (float64) 14
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 5,
@@ -287,7 +315,8 @@
       (string) (len=6) "rating": (float64) 32,
       (string) (len=5) "speed": (float64) 97,
       (string) (len=6) "target": (float64) 95
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1623223829,
@@ -297,7 +326,8 @@
       (string) (len=6) "rating": (float64) 81,
       (string) (len=5) "speed": (float64) 87,
       (string) (len=6) "target": (float64) 8
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1604622073,
@@ -307,7 +337,8 @@
       (string) (len=6) "rating": (float64) 1,
       (string) (len=5) "speed": (float64) 53,
       (string) (len=6) "target": (float64) 48
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 2,
@@ -317,7 +348,8 @@
       (string) (len=6) "rating": (float64) 28,
       (string) (len=5) "speed": (float64) 71,
       (string) (len=6) "target": (float64) 44
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1612730263,
@@ -327,7 +359,8 @@
       (string) (len=6) "rating": (float64) 55,
       (string) (len=5) "speed": (float64) 72,
       (string) (len=6) "target": (float64) 38
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1631022711,
@@ -337,7 +370,8 @@
       (string) (len=6) "rating": (float64) 33,
       (string) (len=5) "speed": (float64) 87,
       (string) (len=6) "target": (float64) 79
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1619646514,
@@ -347,7 +381,8 @@
       (string) (len=6) "rating": (float64) 83,
       (string) (len=5) "speed": (float64) 25,
       (string) (len=6) "target": (float64) 82
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 65,
@@ -357,7 +392,8 @@
       (string) (len=6) "rating": (float64) 53,
       (string) (len=5) "speed": (float64) 76,
       (string) (len=6) "target": (float64) 16
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 9,
@@ -367,7 +403,8 @@
       (string) (len=6) "rating": (float64) 19,
       (string) (len=5) "speed": (float64) 82,
       (string) (len=6) "target": (float64) 87
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 41,
@@ -377,7 +414,8 @@
       (string) (len=6) "rating": (float64) 26,
       (string) (len=5) "speed": (float64) 84,
       (string) (len=6) "target": (float64) 77
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1610495569,
@@ -387,7 +425,8 @@
       (string) (len=6) "rating": (float64) 29,
       (string) (len=5) "speed": (float64) 1,
       (string) (len=6) "target": (float64) 42
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1603538489,
@@ -397,7 +436,8 @@
       (string) (len=6) "rating": (float64) 64,
       (string) (len=5) "speed": (float64) 16,
       (string) (len=6) "target": (float64) 81
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 27,
@@ -407,7 +447,8 @@
       (string) (len=6) "rating": (float64) 23,
       (string) (len=5) "speed": (float64) 31,
       (string) (len=6) "target": (float64) 98
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 67,
@@ -417,7 +458,8 @@
       (string) (len=6) "rating": (float64) 96,
       (string) (len=5) "speed": (float64) 55,
       (string) (len=6) "target": (float64) 35
-    }
+    },
+    Tags: ([]string) <nil>
   },
   (observations.Observation) {
     Time: (int64) 1631499271,
@@ -427,6 +469,7 @@
       (string) (len=6) "rating": (float64) 4,
       (string) (len=5) "speed": (float64) 26,
       (string) (len=6) "target": (float64) 12
-    }
+    },
+    Tags: ([]string) <nil>
   }
 }

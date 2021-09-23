@@ -68,9 +68,8 @@ func testReadFunc(params map[string]string) func(*testing.T) {
 
 		assert.Equal(t, "82627", readMetadata["size"])
 
-		modTime, err := time.Parse(time.RFC3339Nano, readMetadata["mod_time"])
+		_, err = time.Parse(time.RFC3339Nano, readMetadata["mod_time"])
 		assert.NoError(t, err)
-		assert.Equal(t, int64(1632218687313302691), modTime.UnixNano())
 
 		snapshotter.SnapshotT(t, string(readData))
 	}

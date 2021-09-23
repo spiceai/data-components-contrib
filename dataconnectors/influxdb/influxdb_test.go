@@ -8,6 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type fakeClient struct {
+}
+
 func TestInfluxDbConnector(t *testing.T) {
 	params := map[string]string{
 		"url":   "fake-url-for-test",
@@ -15,12 +18,27 @@ func TestInfluxDbConnector(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc(params))
+	t.Run("Read()", testReadFunc(params))
 }
 
 func testInitFunc(params map[string]string) func(*testing.T) {
 	c := influxdb.NewInfluxDbConnector()
+	c.client = fakeClient{}
 
-	return func(t *testing.T) {		
+	return func(t *testing.T) {
+		var epoch time.Time
+		var period time.Duration
+		var interval time.Duration
+
+		err := c.Init(epoch, period, interval, params)
+		assert.NoError(t, err)
+	}
+}
+
+func testReadFunc(params map[string]string) func(*testing.T) {
+	c := influxdb.NewInfluxDbConnector()
+
+	return func(t *testing.T) {
 		var epoch time.Time
 		var period time.Duration
 		var interval time.Duration

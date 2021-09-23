@@ -18,20 +18,20 @@ const (
 )
 
 type InfluxDbConnector struct {
-	client             influxdb2.Client
-	readHandlers       []*func(data []byte, metadata map[string]string) ([]byte, error)
+	client       influxdb2.Client
+	readHandlers []*func(data []byte, metadata map[string]string) ([]byte, error)
 
 	lastFetchPeriodEnd time.Time
-	lastError		   error
+	lastError          error
 
 	dataMutex sync.RWMutex
 	data      []byte
 
-	org                string
-	bucket             string
-	field              string
-	measurement        string
-	refreshInterval    time.Duration
+	org             string
+	bucket          string
+	field           string
+	measurement     string
+	refreshInterval time.Duration
 }
 
 func NewInfluxDbConnector() *InfluxDbConnector {
@@ -86,23 +86,23 @@ func (c *InfluxDbConnector) Init(epoch time.Time, period time.Duration, interval
 	}
 
 	ticker := time.NewTicker(c.refreshInterval)
-    done := make(chan bool)
-    go func() {
-        for {
-            select {
-            case <-done:
-                return
-            case <-ticker.C:
-                err := c.refreshData(epoch, period, interval)
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case <-ticker.C:
+				err := c.refreshData(epoch, period, interval)
 				if err != nil && c.lastError != nil {
 					// Two errors in a row, stop refresh
 					log.Printf("InfluxDb connector refresh error: %s\n", c.lastError.Error())
 					return
 				}
 				c.lastError = err
-            }
-        }
-    }()
+			}
+		}
+	}()
 
 	return nil
 }
