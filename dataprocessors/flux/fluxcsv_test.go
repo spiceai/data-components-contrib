@@ -2,18 +2,15 @@ package flux
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
-	"github.com/bradleyjkemp/cupaloy"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/stretchr/testify/assert"
 )
 
-var snapshotter = cupaloy.New(cupaloy.SnapshotSubdirectory("../../test/assets/snapshots/dataprocessors/flux"))
-
 func TestFlux(t *testing.T) {
-	data, err := ioutil.ReadFile("../../test/assets/data/annotated-csv/cpu_metrics_influxdb_annotated.csv")
+	data, err := os.ReadFile("../../test/assets/data/annotated-csv/cpu_metrics_influxdb_annotated.csv")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,15 +66,24 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		assert.Equal(t, expectedFirstObservation.Data, actualObservations[0].Data, "First Observation not correct")
 		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
-		// marshal to JSON so the snapshot is easy to consume
-		data, err := json.MarshalIndent(actualObservations, "", "  ")
+		expectedObservationsBytes, err := os.ReadFile("../../test/assets/data/json/TestFlux-GetObservations()-expected_observations.json")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// TODO: Change this to load the test data from JSON and compare each element individually,
-		// with an order insensitive compare for the tags
-		snapshotter.SnapshotT(t, data)
+		expectedObservations := make([]observations.Observation, 0, 100)
+		err = json.Unmarshal(expectedObservationsBytes, &expectedObservations)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, len(expectedObservations), len(actualObservations), "Expected observations count different from actual")
+
+		for idx, expectedObservation := range expectedObservations {
+			assert.Equal(t, expectedObservation.Time, actualObservations[idx].Time)
+			assert.Equal(t, expectedObservation.Data, actualObservations[idx].Data)
+			assert.ElementsMatch(t, expectedObservation.Tags, actualObservations[idx].Tags)
+		}
 	}
 }
 
