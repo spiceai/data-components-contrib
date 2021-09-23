@@ -7,7 +7,7 @@
       "height": "29",
       "target": 42
     },
-    "tags": ["tagA", "tagB"],
+    "tags": ["testTagA", "testTagB"],
     "time": 1605312000
   }
 ]
