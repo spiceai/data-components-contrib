@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -189,6 +190,9 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 
 	numDataFields := len(headers) - 1
 
+	// Map from path -> set of detected tags on that path
+	allTagData := make(map[string]map[string]bool)
+
 	for line, record := range lines {
 		ts, err := util.ParseTime(record[0])
 		if err != nil {
@@ -212,6 +216,13 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 
 			if fieldName == tagsColumnName {
 				tagData[path] = strings.Split(field, " ")
+
+				for _, tagVal := range tagData[path] {
+					if _, ok := allTagData[path]; !ok {
+						allTagData[path] = make(map[string]bool)
+					}
+					allTagData[path][tagVal] = true
+				}
 				continue
 			}
 
@@ -249,8 +260,14 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 
 	i := 0
 	for path, obs := range pathToObservations {
+		tags := make([]string, 0)
+		for tagVal := range allTagData[path] {
+			tags = append(tags, tagVal)
+		}
+		sort.Strings(tags)
+
 		fieldNames := pathToFieldNames[path]
-		result[i] = state.NewState(path, fieldNames, obs)
+		result[i] = state.NewState(path, fieldNames, tags, obs)
 		i++
 	}
 
