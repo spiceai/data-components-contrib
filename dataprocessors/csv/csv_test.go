@@ -44,6 +44,7 @@ func TestCsv(t *testing.T) {
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
+	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
 	t.Run("GetState()", testGetStateFunc(globalData))
@@ -85,6 +86,56 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		dp := NewCsvProcessor()
 		err := dp.Init(nil)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualObservations, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		expectedFirstObservation := observations.Observation{
+			Time: 1605312000,
+			Data: map[string]float64{
+				"open":   16339.56,
+				"high":   16339.6,
+				"low":    16240,
+				"close":  16254.51,
+				"volume": 274.42607,
+			},
+		}
+		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+
+		snapshotter.SnapshotT(t, actualObservations)
+	}
+}
+
+// Tests "GetObservations() - custom time format"
+func testGetObservationsCustomTimeFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		localFileConnector := file.NewFileConnector()
+		err := localFileConnector.Init(map[string]string{
+			"path":  "../../test/assets/data/csv/custom_time.csv",
+		})
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+		data, err := localFileConnector.FetchData(time.Unix(1605312000, 0), 7*24*time.Hour, time.Hour)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		dp := NewCsvProcessor()
+		err = dp.Init(map[string]string{
+			"time_format": "2006-01-02 15:04:05-07:00",
+		})
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)

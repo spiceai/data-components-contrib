@@ -999,6 +999,8 @@ github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210914095457-91c82109b461/
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210917015218-a50887cec3e9/go.mod h1:nK2cyAhXDAcwqNvFrczDbsIHJqQAf6Hm+GMx36W6utI=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210917030658-b4df27a862b8 h1:uW8341ybE43L2qaC23CGSBASGmffE1AsbLYDcwly/tU=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210917030658-b4df27a862b8/go.mod h1:ib07IwmmfLf+1hR0RXYDvAfHZ1jlc4QwqHWeikpTXIU=
+github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210928011616-8fa255ba355f h1:yJJ8j+YryDaScAcKnMiUglB6HGY+NEiF8jvTSnh/VaA=
+github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210928011616-8fa255ba355f/go.mod h1:9bzEftlEy2Od14DZl+/nYpoHqtuqVQliwQbBZl+a+0Y=
 github.com/src-d/gcfg v1.4.0/go.mod h1:p/UMsR43ujA89BJY9duynAwIpvqEujIH/jFlfL7jWoI=
 github.com/stoewer/go-strcase v1.2.0/go.mod h1:IBiWB2sKIp3wVVQ3Y035++gc+knqhUQag1KpM8ahLw8=
 github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=

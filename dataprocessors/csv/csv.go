@@ -14,6 +14,7 @@ import (
 	"github.com/spiceai/spiceai/pkg/loggers"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
+	"github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
 	"go.uber.org/zap"
 )
@@ -27,8 +28,10 @@ const (
 )
 
 type CsvProcessor struct {
-	data      []byte
+	timeFormat string
+
 	dataMutex sync.RWMutex
+	data      []byte
 	dataHash  []byte
 }
 
@@ -37,6 +40,10 @@ func NewCsvProcessor() *CsvProcessor {
 }
 
 func (p *CsvProcessor) Init(params map[string]string) error {
+	if format, ok := params["time_format"]; ok {
+		p.timeFormat = format
+	}
+
 	return nil
 }
 
@@ -87,7 +94,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 
 	var newObservations []observations.Observation
 	for line, record := range lines {
-		ts, err := util.ParseTime(record[0])
+		ts, err := time.ParseTime(record[0], p.timeFormat)
 		if err != nil {
 			log.Printf("ignoring invalid line %d - %v: %v", line+1, record, err)
 			continue
@@ -106,7 +113,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		}
 
 		observation := observations.Observation{
-			Time: ts,
+			Time: ts.Unix(),
 			Data: data,
 		}
 
