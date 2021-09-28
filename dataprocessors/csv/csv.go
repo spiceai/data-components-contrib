@@ -197,7 +197,7 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 	numDataFields := len(headers) - 1
 
 	for line, record := range lines {
-		ts, err := util.ParseTime(record[0])
+		ts, err := time.ParseTime(record[0], p.timeFormat)
 		if err != nil {
 			log.Printf("ignoring invalid line %d - %v: %v", line+1, record, err)
 			continue
@@ -243,7 +243,7 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 
 		for path, data := range lineData {
 			observation := &observations.Observation{
-				Time: ts,
+				Time: ts.Unix(),
 				Data: data,
 				Tags: tagData[path],
 			}
