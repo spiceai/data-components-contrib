@@ -200,7 +200,7 @@ func (c *InfluxDbConnector) sendData(periodStart string, periodEnd string) error
 	return errGroup.Wait()
 }
 
-func (c *InfluxDbConnector)SetInfluxdbClient(client influxdb2.Client) {
+func (c *InfluxDbConnector) SetInfluxdbClient(client influxdb2.Client) {
 	if c.client == nil {
 		c.client = client
 	}
