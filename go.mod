@@ -10,7 +10,7 @@ require (
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210924080330-e4e6de522889
+	github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210928064733-8a93c58a76a3
 	github.com/stretchr/testify v1.7.0
 	go.skia.org/infra v0.0.0-20210922034012-a5235f7a8e5b
 	go.uber.org/atomic v1.9.0 // indirect
