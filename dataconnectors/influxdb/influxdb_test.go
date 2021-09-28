@@ -13,50 +13,52 @@ import (
 )
 
 type mockClient struct {
-	queryAPIFunc func (org string) api.QueryAPI
+	queryAPIFunc func(org string) api.QueryAPI
 }
 
-func (c *mockClient)Setup(ctx context.Context, username, password, org, bucket string, retentionPeriodHours int) (*domain.OnboardingResponse, error){ return nil, nil }
-func (c *mockClient)Ready(ctx context.Context) (bool, error){ return true, nil }
-func (c *mockClient)Health(ctx context.Context) (*domain.HealthCheck, error){ return nil, nil }
-func (c *mockClient)Close(){}
-func (c *mockClient)Options() *influxdb2.Options{ return nil }
-func (c *mockClient)ServerURL() string{ return "" }
-func (c *mockClient)ServerUrl() string{ return "" }
-func (c *mockClient)WriteAPI(org, bucket string) api.WriteAPI{ return nil }
-func (c *mockClient)WriteApi(org, bucket string) api.WriteApi{ return nil }
-func (c *mockClient)WriteAPIBlocking(org, bucket string) api.WriteAPIBlocking{ return nil }
-func (c *mockClient)WriteApiBlocking(org, bucket string) api.WriteApiBlocking{ return nil }
-func (c *mockClient)QueryAPI(org string) api.QueryAPI{
-	 return c.queryAPIFunc(org)
+func (c *mockClient) Setup(ctx context.Context, username, password, org, bucket string, retentionPeriodHours int) (*domain.OnboardingResponse, error) {
+	return nil, nil
 }
-func (c *mockClient)QueryApi(org string) api.QueryApi{ return nil }
-func (c *mockClient)AuthorizationsAPI() api.AuthorizationsAPI{ return nil }
-func (c *mockClient)AuthorizationsApi() api.AuthorizationsApi{ return nil }
-func (c *mockClient)OrganizationsAPI() api.OrganizationsAPI{ return nil }
-func (c *mockClient)OrganizationsApi() api.OrganizationsApi{ return nil }
-func (c *mockClient)UsersAPI() api.UsersAPI{ return nil }
-func (c *mockClient)UsersApi() api.UsersApi{ return nil }
-func (c *mockClient)DeleteAPI() api.DeleteAPI{ return nil }
-func (c *mockClient)DeleteApi() api.DeleteApi{ return nil }
-func (c *mockClient)BucketsAPI() api.BucketsAPI{ return nil }
-func (c *mockClient)BucketsApi() api.BucketsApi{ return nil }
-func (c *mockClient)LabelsAPI() api.LabelsAPI{ return nil }
-func (c *mockClient)LabelsApi() api.LabelsApi{ return nil }
+func (c *mockClient) Ready(ctx context.Context) (bool, error)                  { return true, nil }
+func (c *mockClient) Health(ctx context.Context) (*domain.HealthCheck, error)  { return nil, nil }
+func (c *mockClient) Close()                                                   {}
+func (c *mockClient) Options() *influxdb2.Options                              { return nil }
+func (c *mockClient) ServerURL() string                                        { return "" }
+func (c *mockClient) ServerUrl() string                                        { return "" }
+func (c *mockClient) WriteAPI(org, bucket string) api.WriteAPI                 { return nil }
+func (c *mockClient) WriteApi(org, bucket string) api.WriteApi                 { return nil }
+func (c *mockClient) WriteAPIBlocking(org, bucket string) api.WriteAPIBlocking { return nil }
+func (c *mockClient) WriteApiBlocking(org, bucket string) api.WriteApiBlocking { return nil }
+func (c *mockClient) QueryAPI(org string) api.QueryAPI {
+	return c.queryAPIFunc(org)
+}
+func (c *mockClient) QueryApi(org string) api.QueryApi         { return nil }
+func (c *mockClient) AuthorizationsAPI() api.AuthorizationsAPI { return nil }
+func (c *mockClient) AuthorizationsApi() api.AuthorizationsApi { return nil }
+func (c *mockClient) OrganizationsAPI() api.OrganizationsAPI   { return nil }
+func (c *mockClient) OrganizationsApi() api.OrganizationsApi   { return nil }
+func (c *mockClient) UsersAPI() api.UsersAPI                   { return nil }
+func (c *mockClient) UsersApi() api.UsersApi                   { return nil }
+func (c *mockClient) DeleteAPI() api.DeleteAPI                 { return nil }
+func (c *mockClient) DeleteApi() api.DeleteApi                 { return nil }
+func (c *mockClient) BucketsAPI() api.BucketsAPI               { return nil }
+func (c *mockClient) BucketsApi() api.BucketsApi               { return nil }
+func (c *mockClient) LabelsAPI() api.LabelsAPI                 { return nil }
+func (c *mockClient) LabelsApi() api.LabelsApi                 { return nil }
 
 type mockQueryAPI struct {
-	queryRawFunc func (ctx context.Context, query string, dialect *domain.Dialect) (string, error)
+	queryRawFunc func(ctx context.Context, query string, dialect *domain.Dialect) (string, error)
 }
 
-func (q *mockQueryAPI)QueryRaw(ctx context.Context, query string, dialect *domain.Dialect) (string, error) {
+func (q *mockQueryAPI) QueryRaw(ctx context.Context, query string, dialect *domain.Dialect) (string, error) {
 	return q.queryRawFunc(ctx, query, dialect)
 }
 
-func (q *mockQueryAPI)setQueryRaw(queryRawFunc func (ctx context.Context, query string, dialect *domain.Dialect) (string, error)) {
+func (q *mockQueryAPI) setQueryRaw(queryRawFunc func(ctx context.Context, query string, dialect *domain.Dialect) (string, error)) {
 	q.queryRawFunc = queryRawFunc
 }
 
-func (q *mockQueryAPI)Query(ctx context.Context, query string) (*api.QueryTableResult, error) {
+func (q *mockQueryAPI) Query(ctx context.Context, query string) (*api.QueryTableResult, error) {
 	return nil, nil
 }
 
