@@ -1,0 +1,322 @@
+([]*state.State) (len=5) {
+  (*state.State)({
+    Time: (time.Time) 2021-01-07 22:10:00 +0000 UTC,
+    TimeSentToAIEngine: (time.Time) 0001-01-01 00:00:00 +0000 UTC,
+    path: (string) (len=13) "bitmex.btcusd",
+    fieldNames: ([]string) (len=1) {
+      (string) (len=3) "low"
+    },
+    fields: ([]string) (len=1) {
+      (string) (len=17) "bitmex.btcusd.low"
+    },
+    observations: ([]observations.Observation) (len=5) {
+      (observations.Observation) {
+        Time: (int64) 1605312000,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=3) "low": (float64) 16240
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605313800,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=3) "low": (float64) 16248.6
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605315600,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=3) "low": (float64) 16210.99
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605317400,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=3) "low": (float64) 16200.01
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605319200,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=3) "low": (float64) 16175.62
+        },
+        Tags: ([]string) <nil>
+      }
+    },
+    observationsMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    }
+  }),
+  (*state.State)({
+    Time: (time.Time) 2021-01-07 22:10:00 +0000 UTC,
+    TimeSentToAIEngine: (time.Time) 0001-01-01 00:00:00 +0000 UTC,
+    path: (string) (len=15) "bitthumb.btcusd",
+    fieldNames: ([]string) (len=1) {
+      (string) (len=4) "high"
+    },
+    fields: ([]string) (len=1) {
+      (string) (len=20) "bitthumb.btcusd.high"
+    },
+    observations: ([]observations.Observation) (len=5) {
+      (observations.Observation) {
+        Time: (int64) 1605312000,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "high": (float64) 16339.6
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605313800,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "high": (float64) 16305
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605315600,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "high": (float64) 16303.88
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605317400,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "high": (float64) 16246.92
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605319200,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "high": (float64) 16234
+        },
+        Tags: ([]string) <nil>
+      }
+    },
+    observationsMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    }
+  }),
+  (*state.State)({
+    Time: (time.Time) 2021-01-07 22:10:00 +0000 UTC,
+    TimeSentToAIEngine: (time.Time) 0001-01-01 00:00:00 +0000 UTC,
+    path: (string) (len=15) "coinbase.btcusd",
+    fieldNames: ([]string) (len=1) {
+      (string) (len=4) "open"
+    },
+    fields: ([]string) (len=1) {
+      (string) (len=20) "coinbase.btcusd.open"
+    },
+    observations: ([]observations.Observation) (len=5) {
+      (observations.Observation) {
+        Time: (int64) 1605312000,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "open": (float64) 16339.56
+        },
+        Tags: ([]string) (len=2) {
+          (string) (len=10) "elon_tweet",
+          (string) (len=11) "market_open"
+        }
+      },
+      (observations.Observation) {
+        Time: (int64) 1605313800,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "open": (float64) 16256.42
+        },
+        Tags: ([]string) (len=1) {
+          (string) (len=12) "market_close"
+        }
+      },
+      (observations.Observation) {
+        Time: (int64) 1605315600,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "open": (float64) 16303.88
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605317400,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "open": (float64) 16221.78
+        },
+        Tags: ([]string) (len=11) {
+          (string) (len=3) "use",
+          (string) (len=5) "spice",
+          (string) (len=2) "ai",
+          (string) (len=3) "for",
+          (string) (len=3) "all",
+          (string) (len=4) "your",
+          (string) (len=11) "intelligent",
+          (string) (len=4) "time",
+          (string) (len=6) "series",
+          (string) (len=3) "app",
+          (string) (len=6) "needs!"
+        }
+      },
+      (observations.Observation) {
+        Time: (int64) 1605319200,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=4) "open": (float64) 16214.26
+        },
+        Tags: ([]string) <nil>
+      }
+    },
+    observationsMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    }
+  }),
+  (*state.State)({
+    Time: (time.Time) 2021-01-07 22:10:00 +0000 UTC,
+    TimeSentToAIEngine: (time.Time) 0001-01-01 00:00:00 +0000 UTC,
+    path: (string) (len=19) "coinbase_pro.btcusd",
+    fieldNames: ([]string) (len=1) {
+      (string) (len=5) "close"
+    },
+    fields: ([]string) (len=1) {
+      (string) (len=25) "coinbase_pro.btcusd.close"
+    },
+    observations: ([]observations.Observation) (len=5) {
+      (observations.Observation) {
+        Time: (int64) 1605312000,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=5) "close": (float64) 16254.51
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605313800,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=5) "close": (float64) 16305
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605315600,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=5) "close": (float64) 16222.16
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605317400,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=5) "close": (float64) 16214.15
+        },
+        Tags: ([]string) <nil>
+      },
+      (observations.Observation) {
+        Time: (int64) 1605319200,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=5) "close": (float64) 16223.08
+        },
+        Tags: ([]string) <nil>
+      }
+    },
+    observationsMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    }
+  }),
+  (*state.State)({
+    Time: (time.Time) 2021-01-07 22:10:00 +0000 UTC,
+    TimeSentToAIEngine: (time.Time) 0001-01-01 00:00:00 +0000 UTC,
+    path: (string) (len=12) "local.btcusd",
+    fieldNames: ([]string) (len=1) {
+      (string) (len=6) "volume"
+    },
+    fields: ([]string) (len=1) {
+      (string) (len=19) "local.btcusd.volume"
+    },
+    observations: ([]observations.Observation) (len=5) {
+      (observations.Observation) {
+        Time: (int64) 1605312000,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=6) "volume": (float64) 274.42607
+        },
+        Tags: ([]string) (len=2) {
+          (string) (len=8) "bought_1",
+          (string) (len=5) "tag_2"
+        }
+      },
+      (observations.Observation) {
+        Time: (int64) 1605313800,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=6) "volume": (float64) 110.91971
+        },
+        Tags: ([]string) (len=2) {
+          (string) (len=11) "local_tag_1",
+          (string) (len=11) "local_tag_2"
+        }
+      },
+      (observations.Observation) {
+        Time: (int64) 1605315600,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=6) "volume": (float64) 231.64805
+        },
+        Tags: ([]string) (len=2) {
+          (string) (len=11) "local_tag_1",
+          (string) (len=11) "local_tag_2"
+        }
+      },
+      (observations.Observation) {
+        Time: (int64) 1605317400,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=6) "volume": (float64) 135.86161
+        },
+        Tags: ([]string) (len=1) {
+          (string) (len=11) "local_tag_1"
+        }
+      },
+      (observations.Observation) {
+        Time: (int64) 1605319200,
+        Data: (map[string]float64) (len=1) {
+          (string) (len=6) "volume": (float64) 164.32561
+        },
+        Tags: ([]string) (len=1) {
+          (string) (len=11) "local_tag_2"
+        }
+      }
+    },
+    observationsMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    }
+  })
+}

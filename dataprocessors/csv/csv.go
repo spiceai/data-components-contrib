@@ -25,6 +25,7 @@ var (
 
 const (
 	CsvProcessorName string = "csv"
+	tagsColumnName   string = "_tags"
 )
 
 type CsvProcessor struct {
@@ -101,9 +102,16 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		}
 
 		data := make(map[string]float64)
+		var tags []string
 
 		for col := 1; col < len(record); col++ {
 			field := record[col]
+
+			if headers[col] == tagsColumnName && field != "" {
+				tags = strings.Split(field, " ")
+				continue
+			}
+
 			val, err := strconv.ParseFloat(field, 64)
 			if err != nil {
 				log.Printf("ignoring invalid field %d - %v: %v", line+1, field, err)
@@ -115,6 +123,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		observation := observations.Observation{
 			Time: ts.Unix(),
 			Data: data,
+			Tags: tags,
 		}
 
 		newObservations = append(newObservations, observation)
@@ -175,6 +184,11 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 			pathToFieldNames[path] = make([]string, 0)
 		}
 		fieldName := columnToFieldName[col]
+
+		if fieldName == tagsColumnName {
+			continue
+		}
+
 		pathToFieldNames[path] = append(pathToFieldNames[path], fieldName)
 	}
 
@@ -190,11 +204,21 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 		}
 
 		lineData := make(map[string]map[string]float64, numDataFields)
+		tagData := make(map[string][]string)
 
 		for col := 1; col < len(record); col++ {
 			field := record[col]
 
 			if field == "" {
+				continue
+			}
+
+			fieldCol := col - 1
+			path := columnToPath[fieldCol]
+			fieldName := columnToFieldName[fieldCol]
+
+			if fieldName == tagsColumnName {
+				tagData[path] = strings.Split(field, " ")
 				continue
 			}
 
@@ -204,10 +228,6 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 				continue
 			}
 
-			fieldCol := col - 1
-			fieldName := columnToFieldName[fieldCol]
-
-			path := columnToPath[fieldCol]
 			data := lineData[path]
 			if data == nil {
 				data = make(map[string]float64)
@@ -225,6 +245,7 @@ func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
 			observation := &observations.Observation{
 				Time: ts,
 				Data: data,
+				Tags: tagData[path],
 			}
 			obs := pathToObservations[path]
 			pathToObservations[path] = append(obs, *observation)

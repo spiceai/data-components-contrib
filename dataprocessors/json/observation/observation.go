@@ -62,6 +62,7 @@ func (s *ObservationJsonFormat) GetObservations(data []byte) ([]observations.Obs
 		observation := observations.Observation{
 			Time: ts,
 			Data: data,
+			Tags: point.Tags,
 		}
 
 		newObservations = append(newObservations, observation)
