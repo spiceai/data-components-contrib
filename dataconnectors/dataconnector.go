@@ -6,6 +6,7 @@ import (
 
 	"github.com/spiceai/data-components-contrib/dataconnectors/file"
 	"github.com/spiceai/data-components-contrib/dataconnectors/influxdb"
+	"github.com/spiceai/data-components-contrib/dataconnectors/twitter"
 )
 
 type DataConnector interface {
@@ -19,6 +20,8 @@ func NewDataConnector(name string) (DataConnector, error) {
 		return file.NewFileConnector(), nil
 	case influxdb.InfluxDbConnectorName:
 		return influxdb.NewInfluxDbConnector(), nil
+	case twitter.TwitterConnectorName:
+		return twitter.NewTwitterConnector(), nil
 	}
 
 	return nil, fmt.Errorf("unknown data connector '%s'", name)
