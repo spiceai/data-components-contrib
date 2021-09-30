@@ -4,6 +4,7 @@ Currently supported connectors:
 
 - [File](file/file.go)
 - [InfluxDB](influxdb/influxdb.go)
+- [Twitter](twitter/twitter.go)
 
 ## Contribution guide
 
@@ -20,10 +21,10 @@ Data Connectors are consumed in the [Spice.ai pod](https://docs.spiceai.org/conc
 
 ```yaml
 data:
-    connector:
-    name: file
-    params:
-        path: my-data.csv
+  connector:
+  name: file
+  params:
+    path: my-data.csv
 ```
 
 The data connector name is self-declared by the component, but must be unique across all components.
