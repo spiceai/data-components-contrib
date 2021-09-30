@@ -5,6 +5,8 @@ go 1.17
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
 	github.com/deepmap/oapi-codegen v1.8.2 // indirect
+	github.com/dghubble/go-twitter v0.0.0-20210609183100-2fdbf421508e
+	github.com/dghubble/oauth1 v0.7.0
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/influxdata/flux v0.131.0
 	github.com/influxdata/influxdb-client-go v1.4.0
@@ -31,8 +33,6 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dghubble/go-twitter v0.0.0-20210609183100-2fdbf421508e // indirect
-	github.com/dghubble/oauth1 v0.7.0 // indirect
 	github.com/dghubble/sling v1.3.0 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
