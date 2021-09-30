@@ -9,6 +9,8 @@
     fields: ([]string) (len=1) {
       (string) (len=17) "bitmex.btcusd.low"
     },
+    tags: ([]string) {
+    },
     observations: ([]observations.Observation) (len=5) {
       (observations.Observation) {
         Time: (int64) 1605312000,
@@ -67,6 +69,8 @@
     fields: ([]string) (len=1) {
       (string) (len=20) "bitthumb.btcusd.high"
     },
+    tags: ([]string) {
+    },
     observations: ([]observations.Observation) (len=5) {
       (observations.Observation) {
         Time: (int64) 1605312000,
@@ -124,6 +128,22 @@
     },
     fields: ([]string) (len=1) {
       (string) (len=20) "coinbase.btcusd.open"
+    },
+    tags: ([]string) (len=14) {
+      (string) (len=2) "ai",
+      (string) (len=3) "all",
+      (string) (len=3) "app",
+      (string) (len=10) "elon_tweet",
+      (string) (len=3) "for",
+      (string) (len=11) "intelligent",
+      (string) (len=12) "market_close",
+      (string) (len=11) "market_open",
+      (string) (len=6) "needs!",
+      (string) (len=6) "series",
+      (string) (len=5) "spice",
+      (string) (len=4) "time",
+      (string) (len=3) "use",
+      (string) (len=4) "your"
     },
     observations: ([]observations.Observation) (len=5) {
       (observations.Observation) {
@@ -200,6 +220,8 @@
     fields: ([]string) (len=1) {
       (string) (len=25) "coinbase_pro.btcusd.close"
     },
+    tags: ([]string) {
+    },
     observations: ([]observations.Observation) (len=5) {
       (observations.Observation) {
         Time: (int64) 1605312000,
@@ -257,6 +279,12 @@
     },
     fields: ([]string) (len=1) {
       (string) (len=19) "local.btcusd.volume"
+    },
+    tags: ([]string) (len=4) {
+      (string) (len=8) "bought_1",
+      (string) (len=11) "local_tag_1",
+      (string) (len=11) "local_tag_2",
+      (string) (len=5) "tag_2"
     },
     observations: ([]observations.Observation) (len=5) {
       (observations.Observation) {
