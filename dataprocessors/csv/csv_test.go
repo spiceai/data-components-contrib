@@ -80,6 +80,7 @@ func TestCsv(t *testing.T) {
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
+	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
@@ -161,6 +162,67 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			expectedFirstObservation.Tags = []string{"elon_tweet", "market_open"}
 		}
 
+		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+
+		snapshotter.SnapshotT(t, actualObservations)
+	}
+}
+
+// Tests "GetObservations() - custom time format"
+func testGetObservationsCustomTimeFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		epoch := time.Date(2006, 1, 1, 0, 0, 0, 0, time.UTC)
+		period := 7 * 24 * time.Hour
+		interval := 24 * time.Hour
+
+		var wg sync.WaitGroup
+
+		localFileConnector := file.NewFileConnector()
+
+		var localData []byte
+		err := localFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+			localData = data
+			wg.Done()
+			return nil, nil
+		})
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+		wg.Add(1)
+
+		err = localFileConnector.Init(epoch, period, interval, map[string]string{
+			"path":  "../../test/assets/data/csv/custom_time.csv",
+			"watch": "false",
+		})
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if len(localData) == 0 {
+			t.Fatal("no data")
+		}
+
+		dp := NewCsvProcessor()
+		err = dp.Init(map[string]string{
+			"time_format": "2006-01-02 15:04:05-07:00",
+		})
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(localData)
+		assert.NoError(t, err)
+
+		actualObservations, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		expectedFirstObservation := observations.Observation{
+			Time: 1547575074,
+			Data: map[string]float64{
+				"val": 34,
+			},
+		}
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
 		snapshotter.SnapshotT(t, actualObservations)
