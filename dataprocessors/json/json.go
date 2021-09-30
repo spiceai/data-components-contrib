@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/spiceai/data-components-contrib/dataprocessors/json/observation"
+	"github.com/spiceai/data-components-contrib/dataprocessors/json/tweet"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
 	"github.com/spiceai/spiceai/pkg/util"
@@ -52,6 +53,8 @@ func (p *JsonProcessor) Init(params map[string]string) error {
 	}
 
 	switch format {
+	case "tweet":
+		p.format = &tweet.TweetJsonFormat{}
 	case "default":
 		p.format = &observation.ObservationJsonFormat{}
 	}

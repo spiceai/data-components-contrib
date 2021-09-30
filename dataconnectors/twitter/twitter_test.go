@@ -48,11 +48,13 @@ func TestRead(t *testing.T) {
 
 	err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
 		if assert.Equal(t, metadata["type"], "tweet") {
-			var tweet twitter.Tweet
-			err := json.Unmarshal(data, &tweet)
+			var tweets []*twitter.Tweet
+			err := json.Unmarshal(data, &tweets)
 			if assert.NoError(t, err) {
-				t.Logf("tweet: %s\n", tweet.Text)
-				tweets = append(tweets, tweet)
+				for _, tweet := range tweets {
+					t.Logf("tweet: %s\n", tweet.Text)
+					tweets = append(tweets, tweet)
+				}
 			}
 		}
 		wg.Done()

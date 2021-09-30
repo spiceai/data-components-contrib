@@ -61,7 +61,9 @@ func (c *TwitterConnector) Init(epoch time.Time, period time.Duration, interval 
 	c.client = twitter.NewClient(httpClient)
 
 	demux := twitter.NewSwitchDemux()
-	demux.Tweet = c.sendData
+	demux.Tweet = func(tweet *twitter.Tweet) {
+		c.sendData(tweet)
+	}
 
 	filterParams := &twitter.StreamFilterParams{
 		Track:         []string{filter},
@@ -83,7 +85,7 @@ func (c *TwitterConnector) Read(handler func(data []byte, metadata map[string]st
 	return nil
 }
 
-func (c *TwitterConnector) sendData(tweet *twitter.Tweet) {
+func (c *TwitterConnector) sendData(tweets ...*twitter.Tweet) {
 	if len(c.readHandlers) == 0 {
 		// Nothing to read
 		return
@@ -98,7 +100,7 @@ func (c *TwitterConnector) sendData(tweet *twitter.Tweet) {
 		return
 	}
 
-	data, err := json.Marshal(tweet)
+	data, err := json.Marshal(tweets)
 	if err != nil {
 		log.Println(err.Error())
 		return

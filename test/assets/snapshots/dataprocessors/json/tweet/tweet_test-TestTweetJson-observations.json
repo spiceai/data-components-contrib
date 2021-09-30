@@ -1,0 +1,11 @@
+([]observations.Observation) (len=1) {
+  (observations.Observation) {
+    Time: (int64) 1633005391,
+    Data: (map[string]float64) (len=1) {
+      (string) (len=14) "favorite_count": (float64) 123
+    },
+    Tags: ([]string) (len=1) {
+      (string) (len=2) "en"
+    }
+  }
+}
