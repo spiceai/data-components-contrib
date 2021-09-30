@@ -72,9 +72,9 @@ func TestRead(t *testing.T) {
 
 func getAuthParams() map[string]string {
 	return map[string]string{
-		"consumer_key": "change_me",
+		"consumer_key":    "change_me",
 		"consumer_secret": "change_me",
-		"access_token": "change_me",
-		"access_secret": "change_me",
+		"access_token":    "change_me",
+		"access_secret":   "change_me",
 	}
 }

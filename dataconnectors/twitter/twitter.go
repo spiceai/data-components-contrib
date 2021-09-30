@@ -19,7 +19,7 @@ const (
 )
 
 type TwitterConnector struct {
-	client *twitter.Client
+	client       *twitter.Client
 	readHandlers []*func(data []byte, metadata map[string]string) ([]byte, error)
 }
 
