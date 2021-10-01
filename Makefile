@@ -14,3 +14,7 @@ generate-acknowledgements:
 	go get github.com/google/go-licenses
 	pushd dataconnectors && go-licenses csv . 2>/dev/null >> ../ACKNOWLEDGEMENTS.md && popd
 	pushd dataprocessors && go-licenses csv . 2>/dev/null >> ../ACKNOWLEDGEMENTS.md && popd
+
+	sed -i 's/\"//g' ACKNOWLEDGEMENTS.md
+	sed -i 's/,/, /g' ACKNOWLEDGEMENTS.md
+	sed -i 's/,  /, /g' ACKNOWLEDGEMENTS.md
