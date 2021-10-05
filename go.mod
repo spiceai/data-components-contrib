@@ -11,6 +11,7 @@ require (
 	github.com/influxdata/flux v0.131.0
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
+	github.com/jonboulle/clockwork v0.2.2
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210928064733-8a93c58a76a3
 	github.com/stretchr/testify v1.7.0

@@ -1,16 +1,21 @@
-package influxdb_test
+package influxdb
 
 import (
 	"context"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/bradleyjkemp/cupaloy"
 	influxdb2 "github.com/influxdata/influxdb-client-go"
 	"github.com/influxdata/influxdb-client-go/api"
 	"github.com/influxdata/influxdb-client-go/domain"
-	"github.com/spiceai/data-components-contrib/dataconnectors/influxdb"
+	"github.com/jonboulle/clockwork"
 	"github.com/stretchr/testify/assert"
 )
+
+var snapshotter = cupaloy.New(cupaloy.SnapshotSubdirectory("../../test/assets/snapshots/dataconnectors/influxdb"))
 
 type mockClient struct {
 	queryAPIFunc func(org string) api.QueryAPI
@@ -73,8 +78,42 @@ func TestInfluxDbConnector(t *testing.T) {
 	t.Run("Read() with refresh", testReadWithRefreshFunc(params))
 }
 
+func TestInfluxDbConnectorQueries(t *testing.T) {
+	t.Cleanup(func() {
+		now = time.Now
+	})
+
+	defaultEpoch := time.Unix(1625439896, 0)
+
+	setEpochExpectedQueries := []string{
+		`from(bucket:"") |>
+		range(start: 2021-07-04T23:04:56Z, stop: 2021-07-07T23:04:56Z) |>
+		filter(fn: (r) => r["_measurement"] == "_measurement") |>
+		filter(fn: (r) => r["_field"] == "_value") |>
+		aggregateWindow(every: 2h0m0s, fn: mean, createEmpty: false)`,
+	}
+
+	t.Run("Read() set epoch", testQueriesFunc(defaultEpoch, 3*24*time.Hour, 2*time.Hour, setEpochExpectedQueries))
+
+	now = clockwork.NewFakeClockAt(time.Unix(1633421096, 0)).Now
+	zeroEpochExpectedQueries := []string{
+		`from(bucket:"") |>
+		range(start: 2021-09-28T08:04:56Z, stop: 2021-10-05T08:04:56Z) |>
+		filter(fn: (r) => r["_measurement"] == "_measurement") |>
+		filter(fn: (r) => r["_field"] == "_value") |>
+		aggregateWindow(every: 1h0m0s, fn: mean, createEmpty: false)`,
+		`from(bucket:"") |>
+		range(start: 2021-10-05T07:04:56Z, stop: 2021-10-12T08:04:56Z) |>
+		filter(fn: (r) => r["_measurement"] == "_measurement") |>
+		filter(fn: (r) => r["_field"] == "_value") |>
+		aggregateWindow(every: 1h0m0s, fn: mean, createEmpty: false)`,
+	}
+
+	t.Run("Read() zero epoch", testQueriesFunc(time.Time{}, 7*24*time.Hour, time.Hour, zeroEpochExpectedQueries))
+}
+
 func testInitFunc(params map[string]string) func(*testing.T) {
-	c := influxdb.NewInfluxDbConnector()
+	c := NewInfluxDbConnector()
 
 	return func(t *testing.T) {
 		var epoch time.Time
@@ -87,7 +126,7 @@ func testInitFunc(params map[string]string) func(*testing.T) {
 }
 
 func testReadFunc(params map[string]string) func(*testing.T) {
-	c := influxdb.NewInfluxDbConnector()
+	c := NewInfluxDbConnector()
 
 	mockQueryAPI := mockQueryAPI{}
 	mockClient := &mockClient{
@@ -105,20 +144,12 @@ func testReadFunc(params map[string]string) func(*testing.T) {
 		expectedResult := "query-result"
 
 		mockQueryAPI.setQueryRaw(func(ctx context.Context, query string, dialect *domain.Dialect) (string, error) {
-			assert.Equal(t, `
-		from(bucket:"") |>
-		range(start: 0001-01-01T00:00:00Z, stop: 0001-01-08T00:00:00Z) |>
-		filter(fn: (r) => r["_measurement"] == "_measurement") |>
-		filter(fn: (r) => r["_field"] == "_value") |>
-		aggregateWindow(every: 3600s, fn: mean, createEmpty: false)
-    `, query)
 			return expectedResult, nil
 		})
 
 		done := make(chan bool, 1)
 
 		err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
-			assert.Equal(t, expectedResult, string(data))
 			done <- true
 			return nil, nil
 		})
@@ -132,8 +163,60 @@ func testReadFunc(params map[string]string) func(*testing.T) {
 	}
 }
 
+func testQueriesFunc(epoch time.Time, period time.Duration, interval time.Duration, expectedQueries []string) func(*testing.T) {
+	params := map[string]string{
+		"url":              "fake-url-for-test",
+		"token":            "fake-token-for-test",
+		"refresh_interval": "250ms",
+	}
+
+	c := NewInfluxDbConnector()
+
+	mockQueryAPI := mockQueryAPI{}
+	mockClient := &mockClient{
+		queryAPIFunc: func(org string) api.QueryAPI {
+			return &mockQueryAPI
+		},
+	}
+	c.SetInfluxdbClient(mockClient)
+
+	return func(t *testing.T) {
+		expectedResult := "query-result"
+
+		isDone := false
+		numCalls := 0
+		mockQueryAPI.setQueryRaw(func(ctx context.Context, query string, dialect *domain.Dialect) (string, error) {
+			if isDone {
+				return "", nil
+			}
+			assertEqualQuery(t, expectedQueries[numCalls], query)
+			numCalls++
+			return expectedResult, nil
+		})
+
+		wg := sync.WaitGroup{}
+		wg.Add(len(expectedQueries))
+
+		err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+			if isDone {
+				return nil, nil
+			}
+			assert.Equal(t, expectedResult, string(data))
+			wg.Done()
+			return nil, nil
+		})
+		assert.NoError(t, err)
+
+		err = c.Init(epoch, period, interval, params)
+		if assert.NoError(t, err) {
+			wg.Wait()
+			isDone = true
+		}
+	}
+}
+
 func testReadWithRefreshFunc(params map[string]string) func(*testing.T) {
-	c := influxdb.NewInfluxDbConnector()
+	c := NewInfluxDbConnector()
 
 	mockQueryAPI := mockQueryAPI{}
 	mockClient := &mockClient{
@@ -171,4 +254,13 @@ func testReadWithRefreshFunc(params map[string]string) func(*testing.T) {
 			assert.Equal(t, 10, readCount)
 		}
 	}
+}
+
+func assertEqualQuery(t assert.TestingT, expectedQuery string, query string) bool {
+	return assert.Equal(t, cleanQuery(expectedQuery), cleanQuery(query))
+}
+
+func cleanQuery(query string) string {
+	trimmed := strings.TrimSpace(query)
+	return strings.ReplaceAll(trimmed, "\t", "")
 }

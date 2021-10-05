@@ -678,6 +678,8 @@ github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHW
 github.com/jmespath/go-jmespath/internal/testify v1.5.1/go.mod h1:L3OGu8Wl2/fWfCI6z80xFu9LTZmf1ZRjMHUOPmWr69U=
 github.com/jmoiron/sqlx v1.2.0/go.mod h1:1FEQNm3xlJgrMD+FBdI9+xvCksHtbpVBBw5dYhBSsks=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
+github.com/jonboulle/clockwork v0.2.2 h1:UOGuzwb1PwsrDAObMuhUnj0p5ULPj8V/xJ7Kx9qUBdQ=
+github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=
 github.com/jpillora/backoff v1.0.0/go.mod h1:J/6gKK9jxlEcS3zixgDgUAsiuZ7yrSoa/FX5e0EB2j4=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.7/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
@@ -1006,11 +1008,11 @@ github.com/spiceai/data-components-contrib v0.0.0-20210901070425-f99a2b678fa4/go
 github.com/spiceai/data-components-contrib v0.0.0-20210914102419-cfcf22c1f438/go.mod h1:v2nEPZGDQ7s5IQd/c3tgO7khDSbKmRJm4ry77zF5bAk=
 github.com/spiceai/data-components-contrib v0.0.0-20210917025245-ab0478df3b90/go.mod h1:5wRs4oYYczprCga+OwqSpEnCohbrNrpAcUykX7KPJDE=
 github.com/spiceai/data-components-contrib v0.0.0-20210917033326-1e1f750b08fe/go.mod h1:zwxV6F6ry1THkU10dBa2lF9k9nEwaXBlhJpoxEsrtIw=
+github.com/spiceai/data-components-contrib v0.0.0-20210927063826-7e7a998616f0/go.mod h1:OPMWWw556IFGqId8lr+rhxbDu75zAJyD5Qri0ItYcAQ=
 github.com/spiceai/spiceai v0.1.0-alpha.5-rc-spiced.0.20210831052121-80234a1fb51a/go.mod h1:pb+hKV5zvpFuKiLlKJmIUF0jkpeb/eTfhHLapttiVPk=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210914095457-91c82109b461/go.mod h1:SxCAf9FDi5GX8R22QKarckFsj3r1IDXWIqcmNs+B54c=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210917015218-a50887cec3e9/go.mod h1:nK2cyAhXDAcwqNvFrczDbsIHJqQAf6Hm+GMx36W6utI=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210917030658-b4df27a862b8/go.mod h1:ib07IwmmfLf+1hR0RXYDvAfHZ1jlc4QwqHWeikpTXIU=
-github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210924080330-e4e6de522889 h1:rvYWF2CkdlNJAWNbCFi8bykH+P85bR8h2pqf3nnfap4=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210924080330-e4e6de522889/go.mod h1:uzLr4559DOQXsBetuSkXJYXg2tC1bsI/nBCbrZ210ck=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210928064733-8a93c58a76a3 h1:9onufBxxKlw9BG5AtMhmKGGUys9+J8jtBPUjlHRfQiM=
 github.com/spiceai/spiceai v0.2.0-alpha-rc-spiced.0.20210928064733-8a93c58a76a3/go.mod h1:tgcoJEmidasLl0S4zOK0AGS4HsYiyHYkG0XrV5pjFNI=
