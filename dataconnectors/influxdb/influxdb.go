@@ -17,6 +17,10 @@ const (
 	InfluxDbConnectorName string = "influxdb"
 )
 
+var (
+	now = time.Now
+)
+
 type InfluxDbConnector struct {
 	client       influxdb2.Client
 	readHandlers []*func(data []byte, metadata map[string]string) ([]byte, error)
@@ -30,6 +34,7 @@ type InfluxDbConnector struct {
 	org             string
 	bucket          string
 	field           string
+	fn              string
 	measurement     string
 	refreshInterval time.Duration
 }
@@ -66,6 +71,13 @@ func (c *InfluxDbConnector) Init(epoch time.Time, period time.Duration, interval
 	} else {
 		// Default to _value
 		c.field = "_value"
+	}
+
+	if fn, ok := params["fn"]; ok {
+		c.fn = fn
+	} else {
+		// Default to "mean"
+		c.fn = "mean"
 	}
 
 	if measurement, ok := params["measurement"]; ok {
@@ -124,12 +136,28 @@ func (c *InfluxDbConnector) refreshData(epoch time.Time, period time.Duration, i
 	c.dataMutex.Lock()
 	defer c.dataMutex.Unlock()
 
-	periodStart := epoch
-	periodEnd := epoch.Add(period)
+	var periodStart time.Time
+	var periodEnd time.Time
 
-	if !c.lastFetchPeriodEnd.IsZero() && c.lastFetchPeriodEnd.After(epoch) {
-		// If we've already fetched, only fetch the difference with an interval overlap
-		periodStart = c.lastFetchPeriodEnd.Add(-interval)
+	if epoch.IsZero() {
+		// Epoch not set - sliding window from now
+		if c.lastFetchPeriodEnd.IsZero() {
+			// fetch period from now
+			periodStart = now().UTC().Add(-period)
+			periodEnd = periodStart.Add(period)
+		} else {
+			// If we've already fetched, only fetch the difference with an interval overlap
+			periodStart = c.lastFetchPeriodEnd.Add(-interval)
+			periodEnd = c.lastFetchPeriodEnd.Add(period)
+		}
+	} else {
+		// Epoch set - always same window
+		if !c.lastFetchPeriodEnd.IsZero() {
+			// already fetched this window
+			return nil
+		}
+		periodStart = epoch.UTC()
+		periodEnd = periodStart.Add(period)
 	}
 
 	if periodStart == periodEnd || periodStart.After(periodEnd) {
@@ -139,7 +167,6 @@ func (c *InfluxDbConnector) refreshData(epoch time.Time, period time.Duration, i
 
 	periodStartStr := periodStart.Format(time.RFC3339)
 	periodEndStr := periodEnd.Format(time.RFC3339)
-	intervalStr := fmt.Sprintf("%ds", int64(interval.Seconds()))
 
 	query := fmt.Sprintf(`
 		from(bucket:"%s") |>
@@ -147,7 +174,7 @@ func (c *InfluxDbConnector) refreshData(epoch time.Time, period time.Duration, i
 		filter(fn: (r) => r["_measurement"] == "%s") |>
 		filter(fn: (r) => r["_field"] == "%s") |>
 		aggregateWindow(every: %s, fn: mean, createEmpty: false)
-    `, c.bucket, periodStartStr, periodEndStr, c.measurement, c.field, intervalStr)
+    `, c.bucket, periodStartStr, periodEndStr, c.measurement, c.field, interval.String())
 
 	header := true
 	annotations := []domain.DialectAnnotations{"group", "datatype", "default"}
