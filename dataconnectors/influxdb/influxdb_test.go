@@ -103,7 +103,7 @@ func TestInfluxDbConnectorQueries(t *testing.T) {
 		filter(fn: (r) => r["_field"] == "_value") |>
 		aggregateWindow(every: 1h0m0s, fn: mean, createEmpty: false)`,
 		`from(bucket:"") |>
-		range(start: 2021-10-05T07:04:56Z, stop: 2021-10-12T08:04:56Z) |>
+		range(start: 2021-10-05T07:04:56Z, stop: 2021-10-05T08:04:56Z) |>
 		filter(fn: (r) => r["_measurement"] == "_measurement") |>
 		filter(fn: (r) => r["_field"] == "_value") |>
 		aggregateWindow(every: 1h0m0s, fn: mean, createEmpty: false)`,

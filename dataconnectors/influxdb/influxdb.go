@@ -141,17 +141,18 @@ func (c *InfluxDbConnector) refreshData(epoch time.Time, period time.Duration, i
 
 	if epoch.IsZero() {
 		// Epoch not set - sliding window from now
+		nowUtc := now().UTC()
 		if c.lastFetchPeriodEnd.IsZero() {
 			// fetch period from now
-			periodStart = now().UTC().Add(-period)
-			periodEnd = periodStart.Add(period)
+			periodStart = nowUtc.Add(-period)
+			periodEnd = nowUtc
 		} else {
-			// If we've already fetched, only fetch the difference with an interval overlap
+			// If we've already fetched, only fetch the difference with one interval overlap
 			periodStart = c.lastFetchPeriodEnd.Add(-interval)
-			periodEnd = c.lastFetchPeriodEnd.Add(period)
+			periodEnd = nowUtc
 		}
 	} else {
-		// Epoch set - always same window
+		// Epoch set - always same exact window
 		if !c.lastFetchPeriodEnd.IsZero() {
 			// already fetched this window
 			return nil
