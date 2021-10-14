@@ -7,14 +7,12 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/spiceai/spiceai/pkg/loggers"
 	"github.com/spiceai/spiceai/pkg/observations"
-	"github.com/spiceai/spiceai/pkg/state"
 	"github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
 	"go.uber.org/zap"
@@ -32,6 +30,9 @@ const (
 type CsvProcessor struct {
 	timeFormat string
 
+	measurements map[string]string
+	categories   map[string]string
+
 	dataMutex sync.RWMutex
 	data      []byte
 	dataHash  []byte
@@ -45,6 +46,9 @@ func (p *CsvProcessor) Init(params map[string]string, measurements map[string]st
 	if format, ok := params["time_format"]; ok {
 		p.timeFormat = format
 	}
+
+	p.measurements = measurements
+	p.categories = categories
 
 	return nil
 }
@@ -68,13 +72,18 @@ func (p *CsvProcessor) OnData(data []byte) ([]byte, error) {
 }
 
 func (p *CsvProcessor) GetObservations() ([]observations.Observation, error) {
+	if p.data == nil {
+		return nil, nil
+	}
+
 	p.dataMutex.Lock()
 	defer p.dataMutex.Unlock()
 
-	reader, err := p.getDataReader()
-	if err != nil {
-		return nil, err
+	if p.data == nil {
+		return nil, nil
 	}
+
+	reader := bytes.NewReader(p.data)
 	if reader == nil {
 		return nil, nil
 	}
@@ -89,206 +98,83 @@ func (p *CsvProcessor) GetObservations() ([]observations.Observation, error) {
 }
 
 func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observation, error) {
+	if len(p.measurements)+len(p.categories) == 0 {
+		return nil, nil
+	}
+
 	headers, lines, err := getCsvHeaderAndLines(reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to process csv: %s", err)
 	}
 
+	headersMap := make(map[string]int, len(headers))
+	for i, header := range headers {
+		headersMap[header] = i
+	}
+
+	tagsColumn := -1
+	for i, header := range headers {
+		if header == tagsColumnName {
+			tagsColumn = i
+			break
+		}
+	}
+
+	measurementMappings := getFieldMappings(p.measurements, headersMap)
+	categoriesMappings := getFieldMappings(p.categories, headersMap)
+
 	var newObservations []observations.Observation
 	for line, record := range lines {
+		// Process time
 		ts, err := time.ParseTime(record[0], p.timeFormat)
 		if err != nil {
 			log.Printf("ignoring invalid line %d - %v: %v", line+1, record, err)
 			continue
 		}
 
-		data := make(map[string]float64)
+		// Process tags
 		var tags []string
+		if tagsColumn >= 0 {
+			tags = strings.Split(record[tagsColumn], " ")
+		}
 
-		for col := 1; col < len(record); col++ {
+		// Process measurements
+		measurements := map[string]float64{}
+		for fieldName, col := range measurementMappings {
 			field := record[col]
-
-			if headers[col] == tagsColumnName && field != "" {
-				tags = strings.Split(field, " ")
-				continue
-			}
 
 			val, err := strconv.ParseFloat(field, 64)
 			if err != nil {
 				log.Printf("ignoring invalid field %d - %v: %v", line+1, field, err)
 				continue
 			}
-			data[headers[col]] = val
+
+			measurements[fieldName] = val
+		}
+
+		// Process categories
+		categories := map[string]string{}
+		for fieldName, col := range categoriesMappings {
+			categories[fieldName] = record[col]
 		}
 
 		observation := observations.Observation{
 			Time: ts.Unix(),
-			Data: data,
 			Tags: tags,
+		}
+
+		if len(measurements) > 0 {
+			observation.Data = measurements
+		}
+
+		if len(categories) > 0 {
+			observation.Categories = categories
 		}
 
 		newObservations = append(newObservations, observation)
 	}
 
 	return newObservations, nil
-}
-
-// Processes into State by field path
-// CSV headers are expected to be fully-qualified field names
-func (p *CsvProcessor) GetState(validFields []string) ([]*state.State, error) {
-	p.dataMutex.Lock()
-	defer p.dataMutex.Unlock()
-
-	reader, err := p.getDataReader()
-	if err != nil {
-		return nil, err
-	}
-	if reader == nil {
-		return nil, nil
-	}
-
-	headers, lines, err := getCsvHeaderAndLines(reader)
-	if err != nil {
-		return nil, fmt.Errorf("failed to process csv: %s", err)
-	}
-
-	if validFields != nil {
-		for i := 1; i < len(headers); i++ {
-			header := headers[i]
-			fields := validFields
-			found := false
-			for _, validField := range fields {
-				if validField == header {
-					found = true
-					break
-				}
-			}
-
-			if !found {
-				return nil, fmt.Errorf("unknown field '%s'", header)
-			}
-		}
-	}
-
-	columnToPath, columnToFieldName, err := getColumnMappings(headers)
-	if err != nil {
-		return nil, fmt.Errorf("failed to process csv: %s", err)
-	}
-
-	pathToObservations := make(map[string][]observations.Observation)
-	pathToFieldNames := make(map[string][]string)
-
-	for col, path := range columnToPath {
-		_, ok := pathToObservations[path]
-		if !ok {
-			pathToObservations[path] = make([]observations.Observation, 0)
-			pathToFieldNames[path] = make([]string, 0)
-		}
-		fieldName := columnToFieldName[col]
-
-		if fieldName == tagsColumnName {
-			continue
-		}
-
-		pathToFieldNames[path] = append(pathToFieldNames[path], fieldName)
-	}
-
-	zaplog.Sugar().Debugf("Read headers of %v", headers)
-
-	numDataFields := len(headers) - 1
-
-	// Map from path -> set of detected tags on that path
-	allTagData := make(map[string]map[string]bool)
-
-	for line, record := range lines {
-		ts, err := time.ParseTime(record[0], p.timeFormat)
-		if err != nil {
-			log.Printf("ignoring invalid line %d - %v: %v", line+1, record, err)
-			continue
-		}
-
-		lineData := make(map[string]map[string]float64, numDataFields)
-		tagData := make(map[string][]string)
-
-		for col := 1; col < len(record); col++ {
-			field := record[col]
-
-			if field == "" {
-				continue
-			}
-
-			fieldCol := col - 1
-			path := columnToPath[fieldCol]
-			fieldName := columnToFieldName[fieldCol]
-
-			if fieldName == tagsColumnName {
-				tagData[path] = strings.Split(field, " ")
-
-				for _, tagVal := range tagData[path] {
-					if _, ok := allTagData[path]; !ok {
-						allTagData[path] = make(map[string]bool)
-					}
-					allTagData[path][tagVal] = true
-				}
-				continue
-			}
-
-			val, err := strconv.ParseFloat(field, 64)
-			if err != nil {
-				log.Printf("ignoring invalid field %d - %v: %v", line+1, field, err)
-				continue
-			}
-
-			data := lineData[path]
-			if data == nil {
-				data = make(map[string]float64)
-				lineData[path] = data
-			}
-
-			data[fieldName] = val
-		}
-
-		if len(lineData) == 0 {
-			continue
-		}
-
-		for path, data := range lineData {
-			observation := &observations.Observation{
-				Time: ts.Unix(),
-				Data: data,
-				Tags: tagData[path],
-			}
-			obs := pathToObservations[path]
-			pathToObservations[path] = append(obs, *observation)
-		}
-	}
-
-	result := make([]*state.State, len(pathToObservations))
-
-	i := 0
-	for path, obs := range pathToObservations {
-		tags := make([]string, 0)
-		for tagVal := range allTagData[path] {
-			tags = append(tags, tagVal)
-		}
-		sort.Strings(tags)
-
-		fieldNames := pathToFieldNames[path]
-		result[i] = state.NewState(path, fieldNames, tags, obs)
-		i++
-	}
-
-	p.data = nil
-	return result, nil
-}
-
-func (p *CsvProcessor) getDataReader() (io.Reader, error) {
-	if p.data == nil {
-		return nil, nil
-	}
-
-	reader := bytes.NewReader(p.data)
-	return reader, nil
 }
 
 func getCsvHeaderAndLines(input io.Reader) ([]string, [][]string, error) {
@@ -333,4 +219,16 @@ func getColumnMappings(headers []string) ([]string, []string, error) {
 	}
 
 	return columnToPath, columnToFieldName, nil
+}
+
+func getFieldMappings(fields map[string]string, headers map[string]int) map[string]int {
+	mappings := make(map[string]int, len(fields))
+
+	for fieldName, dataName := range fields {
+		if val, ok := headers[dataName]; ok {
+			mappings[fieldName] = val
+		}
+	}
+
+	return mappings
 }

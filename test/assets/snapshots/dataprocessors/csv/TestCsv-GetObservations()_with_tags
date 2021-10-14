@@ -8,6 +8,7 @@
       (string) (len=4) "open": (float64) 16339.56,
       (string) (len=6) "volume": (float64) 274.42607
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) (len=2) {
       (string) (len=10) "elon_tweet",
       (string) (len=11) "market_open"
@@ -22,6 +23,7 @@
       (string) (len=4) "open": (float64) 16256.42,
       (string) (len=6) "volume": (float64) 110.91971
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) (len=1) {
       (string) (len=12) "market_close"
     }
@@ -35,7 +37,10 @@
       (string) (len=4) "open": (float64) 16303.88,
       (string) (len=6) "volume": (float64) 231.64805
     },
-    Tags: ([]string) <nil>
+    Categories: (map[string]string) <nil>,
+    Tags: ([]string) (len=1) {
+      (string) ""
+    }
   },
   (observations.Observation) {
     Time: (int64) 1605317400,
@@ -46,6 +51,7 @@
       (string) (len=4) "open": (float64) 16221.78,
       (string) (len=6) "volume": (float64) 135.86161
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) (len=11) {
       (string) (len=3) "use",
       (string) (len=5) "spice",
@@ -69,6 +75,9 @@
       (string) (len=4) "open": (float64) 16214.26,
       (string) (len=6) "volume": (float64) 164.32561
     },
-    Tags: ([]string) <nil>
+    Categories: (map[string]string) <nil>,
+    Tags: ([]string) (len=1) {
+      (string) ""
+    }
   }
 }

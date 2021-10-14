@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"os"
-	"sort"
 	"sync"
 	"testing"
 	"time"
@@ -50,44 +49,13 @@ func TestCsv(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	globalDataTags, err := os.ReadFile("../../test/assets/data/csv/global_tag_data.csv")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	globalFileConnector := file.NewFileConnector()
-
-	var globalData []byte
-	err = globalFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
-		globalData = data
-		wg.Done()
-		return nil, nil
-	})
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	wg.Add(1)
-
-	err = globalFileConnector.Init(epoch, period, interval, map[string]string{
-		"path":  "../../test/assets/data/csv/trader_input.csv",
-		"watch": "false",
-	})
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	wg.Wait()
-
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
 	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
-	t.Run("GetState()", testGetStateFunc(globalData))
-	t.Run("GetState() with tags", testGetStateTagsFunc(globalDataTags))
-	t.Run("GetState() called twice", testGetStateTwiceFunc(globalData))
-	t.Run("getColumnMappings()", testgetColumnMappingsFunc())
+
 }
 
 func BenchmarkGetObservations(b *testing.B) {
@@ -115,6 +83,38 @@ func BenchmarkGetObservations(b *testing.B) {
 	b.Run("GetObservations()", benchGetObservationsFunc(localFileConnector))
 }
 
+func TestGetFieldMappingsCsv(t *testing.T) {
+	headers := map[string]int{
+		"open":   10,
+		"high":   9,
+		"low":    8,
+		"extra":  7,
+		"close":  6,
+		"volume": 5,
+		"_tags":  4,
+	}
+
+	measurements := map[string]string{
+		"open":   "open",
+		"high":   "high",
+		"low":    "low",
+		"close":  "close",
+		"volume": "volume",
+	}
+
+	mappings := getFieldMappings(measurements, headers)
+
+	expectedMappings := map[string]int{
+		"open":   headers["open"],
+		"high":   headers["high"],
+		"low":    headers["low"],
+		"close":  headers["close"],
+		"volume": headers["volume"],
+	}
+
+	assert.Equal(t, expectedMappings, mappings)
+}
+
 // Tests "Init()"
 func testInitFunc() func(*testing.T) {
 	p := NewCsvProcessor()
@@ -134,8 +134,18 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			t.Fatal("no data")
 		}
 
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
+
+		categories := map[string]string{}
+
 		dp := NewCsvProcessor()
-		err := dp.Init(nil, nil, nil)
+		err := dp.Init(nil, measurements, categories)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -202,10 +212,16 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 			t.Fatal("no data")
 		}
 
+		measurements := map[string]string{
+			"val": "val",
+		}
+
+		categories := map[string]string{}
+
 		dp := NewCsvProcessor()
 		err = dp.Init(map[string]string{
 			"time_format": "2006-01-02 15:04:05-07:00",
-		}, nil, nil)
+		}, measurements, categories)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(localData)
@@ -236,8 +252,18 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 			t.Fatal("no data")
 		}
 
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
+
+		categories := map[string]string{}
+
 		dp := NewCsvProcessor()
-		err := dp.Init(nil, nil, nil)
+		err := dp.Init(nil, measurements, categories)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -271,8 +297,18 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 			t.Fatal("no data")
 		}
 
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
+
+		categories := map[string]string{}
+
 		dp := NewCsvProcessor()
-		err := dp.Init(nil, nil, nil)
+		err := dp.Init(nil, measurements, categories)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -306,172 +342,6 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		actualObservations2, err := dp.GetObservations()
 		assert.NoError(t, err)
 		assert.Nil(t, actualObservations2)
-	}
-}
-
-// Tests "GetState()"
-func testGetStateFunc(data []byte) func(*testing.T) {
-	return func(t *testing.T) {
-		if len(data) == 0 {
-			t.Fatal("no data")
-		}
-
-		dp := NewCsvProcessor()
-		err := dp.Init(nil, nil, nil)
-		assert.NoError(t, err)
-
-		_, err = dp.OnData(data)
-		assert.NoError(t, err)
-
-		actualState, err := dp.GetState(nil)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		assert.Equal(t, 2, len(actualState), "expected two state objects")
-
-		sort.Slice(actualState, func(i, j int) bool {
-			return actualState[i].Path() < actualState[j].Path()
-		})
-
-		assert.Equal(t, "coinbase.btcusd", actualState[0].Path(), "expected path incorrect")
-		assert.Equal(t, "local.portfolio", actualState[1].Path(), "expected path incorrect")
-
-		expectedFirstObservation := observations.Observation{
-			Time: 1626697480,
-			Data: map[string]float64{
-				"price": 31232.709090909084,
-			},
-		}
-
-		actualObservations := actualState[0].Observations()
-		assert.Equal(t, expectedFirstObservation, actualState[0].Observations()[0], "First Observation not correct")
-		assert.Equal(t, 57, len(actualObservations), "number of observations incorrect")
-
-		expectedObservations := make([]observations.Observation, 0)
-		assert.Equal(t, expectedObservations, actualState[1].Observations(), "Observations not correct")
-	}
-}
-
-// Tests "GetState()" with tag data
-func testGetStateTagsFunc(data []byte) func(*testing.T) {
-	return func(t *testing.T) {
-		if len(data) == 0 {
-			t.Fatal("no data")
-		}
-
-		dp := NewCsvProcessor()
-		err := dp.Init(nil, nil, nil)
-		assert.NoError(t, err)
-
-		_, err = dp.OnData(data)
-		assert.NoError(t, err)
-
-		actualState, err := dp.GetState(nil)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		assert.Equal(t, 5, len(actualState), "expected two state objects")
-
-		sort.Slice(actualState, func(i, j int) bool {
-			return actualState[i].Path() < actualState[j].Path()
-		})
-
-		assert.Equal(t, "bitmex.btcusd", actualState[0].Path(), "expected path incorrect")
-		assert.Equal(t, "bitthumb.btcusd", actualState[1].Path(), "expected path incorrect")
-		assert.Equal(t, "coinbase.btcusd", actualState[2].Path(), "expected path incorrect")
-		assert.Equal(t, "coinbase_pro.btcusd", actualState[3].Path(), "expected path incorrect")
-		assert.Equal(t, "local.btcusd", actualState[4].Path(), "expected path incorrect")
-
-		expectedFirstObservation := observations.Observation{
-			Time: 1605312000,
-			Data: map[string]float64{
-				"low": 16240,
-			},
-		}
-
-		actualObservations := actualState[0].Observations()
-		assert.Equal(t, expectedFirstObservation, actualState[0].Observations()[0], "First Observation not correct")
-		assert.Equal(t, 5, len(actualObservations), "number of observations incorrect")
-
-		testTime := time.Unix(1610057400, 0)
-		testTime = testTime.UTC()
-		for _, state := range actualState {
-			state.Time = testTime
-		}
-
-		snapshotter.SnapshotT(t, actualState)
-	}
-}
-
-// Tests "GetState()" called twice
-func testGetStateTwiceFunc(data []byte) func(*testing.T) {
-	return func(t *testing.T) {
-		if len(data) == 0 {
-			t.Fatal("no data")
-		}
-
-		dp := NewCsvProcessor()
-		err := dp.Init(nil, nil, nil)
-		assert.NoError(t, err)
-
-		_, err = dp.OnData(data)
-		assert.NoError(t, err)
-
-		actualState, err := dp.GetState(nil)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		assert.Equal(t, 2, len(actualState), "expected two state objects")
-
-		sort.Slice(actualState, func(i, j int) bool {
-			return actualState[i].Path() < actualState[j].Path()
-		})
-
-		assert.Equal(t, "coinbase.btcusd", actualState[0].Path(), "expected path incorrect")
-		assert.Equal(t, "local.portfolio", actualState[1].Path(), "expected path incorrect")
-
-		expectedFirstObservation := observations.Observation{
-			Time: 1626697480,
-			Data: map[string]float64{
-				"price": 31232.709090909084,
-			},
-		}
-
-		actualObservations := actualState[0].Observations()
-		assert.Equal(t, expectedFirstObservation, actualState[0].Observations()[0], "First Observation not correct")
-		assert.Equal(t, 57, len(actualObservations), "number of observations incorrect")
-
-		expectedObservations := make([]observations.Observation, 0)
-		assert.Equal(t, expectedObservations, actualState[1].Observations(), "Observations not correct")
-
-		actualState2, err := dp.GetState(nil)
-		assert.NoError(t, err)
-		assert.Nil(t, actualState2)
-	}
-}
-
-// Tests "getColumnMappings()"
-func testgetColumnMappingsFunc() func(*testing.T) {
-	return func(t *testing.T) {
-		headers := []string{"time", "local.portfolio.usd_balance", "local.portfolio.btc_balance", "coinbase.btcusd.price"}
-
-		colToPath, colToFieldName, err := getColumnMappings(headers)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		expectedColToPath := []string{"local.portfolio", "local.portfolio", "coinbase.btcusd"}
-		assert.Equal(t, expectedColToPath, colToPath, "column to path mapping incorrect")
-
-		expectedColToFieldName := []string{"usd_balance", "btc_balance", "price"}
-		assert.Equal(t, expectedColToFieldName, colToFieldName, "column to path mapping incorrect")
 	}
 }
 

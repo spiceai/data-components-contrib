@@ -32,24 +32,3 @@ An example payload with the observations schema looks like this:
 The values of the properties defined in data must be JSON numbers.
 
 The value of time must either be a Unix timestamp or a string conforming to RFC3339 i.e. 1985-04-12T23:20:50.52Z
-
-## More formats
-
-To extend the JsonProcessor to accept a new JSON format, fork this repo and create a folder in this directory. Implement this interface:
-
-```golang
-type JsonFormat interface {
-	GetSchema() *[]byte
-	GetObservations(data *[]byte) ([]observations.Observation, error)
-	GetState(data *[]byte, validFields *[]string) ([]*state.State, error)
-}
-```
-
-**GetSchema()** should return the [JSON Schema](https://json-schema.org/) of the new format, which is used during validation.
-
-**GetObservations()** returns the observations that Spice.ai will send to the AI Engine. Observations will only be for a single dataspace.
-
-**GetState()** returns the state that Spice.ai will send to the AI Engine.
-
-Update the [`NewDataProcessor`](https://github.com/spiceai/data-components-contrib/blob/trunk/dataprocessors/dataprocessor.go) switch statement to return the new processor.
-Submit a PR describing the change and which data source the new format will support.
