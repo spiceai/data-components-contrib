@@ -44,7 +44,7 @@ func NewJsonProcessor() *JsonProcessor {
 	return &JsonProcessor{}
 }
 
-func (p *JsonProcessor) Init(params map[string]string) error {
+func (p *JsonProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string) error {
 	// Default format if not specified in params
 	format := "default"
 

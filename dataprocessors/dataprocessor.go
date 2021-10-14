@@ -11,7 +11,7 @@ import (
 )
 
 type DataProcessor interface {
-	Init(params map[string]string) error
+	Init(params map[string]string, measurements map[string]string, categories map[string]string) error
 	OnData(data []byte) ([]byte, error)
 	GetObservations() ([]observations.Observation, error)
 	GetState(fields []string) ([]*state.State, error)
