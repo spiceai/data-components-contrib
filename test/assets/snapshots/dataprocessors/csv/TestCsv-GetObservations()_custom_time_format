@@ -4,6 +4,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -11,6 +12,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -18,6 +20,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -25,6 +28,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 45
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -32,6 +36,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -39,6 +44,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -46,6 +52,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 2.4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -53,6 +60,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -60,6 +68,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -67,6 +76,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 23
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -74,6 +84,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -81,6 +92,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 5
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -88,6 +100,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -95,6 +108,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -102,6 +116,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -109,6 +124,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 45
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -116,6 +132,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -123,6 +140,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -130,6 +148,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 2.4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -137,6 +156,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -144,6 +164,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -151,6 +172,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 23
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -158,6 +180,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -165,6 +188,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 5
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -172,6 +196,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -179,6 +204,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -186,6 +212,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -193,6 +220,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -200,6 +228,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -207,6 +236,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -214,6 +244,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 45
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -221,6 +252,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -228,6 +260,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -235,6 +268,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 2.4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -242,6 +276,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -249,6 +284,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -256,6 +292,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 23
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -263,6 +300,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -270,6 +308,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 5
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -277,6 +316,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -284,6 +324,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -291,6 +332,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -298,6 +340,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 45
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -305,6 +348,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -312,6 +356,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -319,6 +364,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 2.4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -326,6 +372,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -333,6 +380,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -340,6 +388,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 23
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -347,6 +396,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -354,6 +404,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 5
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -361,6 +412,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -368,6 +420,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -375,6 +428,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -382,6 +436,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 45
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -389,6 +444,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -396,6 +452,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -403,6 +460,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 2.4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -410,6 +468,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -417,6 +476,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -424,6 +484,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 23
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -431,6 +492,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -438,6 +500,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 5
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -445,6 +508,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -452,6 +516,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -459,6 +524,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -466,6 +532,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 45
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -473,6 +540,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -480,6 +548,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -487,6 +556,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 2.4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -494,6 +564,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 4
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -501,6 +572,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -508,6 +580,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 23
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -515,6 +588,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 34
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -522,6 +596,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 54.46
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -529,6 +604,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 3
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   },
   (observations.Observation) {
@@ -536,6 +612,7 @@
     Data: (map[string]float64) (len=1) {
       (string) (len=3) "val": (float64) 45
     },
+    Categories: (map[string]string) <nil>,
     Tags: ([]string) <nil>
   }
 }

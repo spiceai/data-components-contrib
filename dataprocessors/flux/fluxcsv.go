@@ -13,7 +13,6 @@ import (
 	flux_csv "github.com/influxdata/flux/csv"
 	"github.com/spiceai/spiceai/pkg/loggers"
 	"github.com/spiceai/spiceai/pkg/observations"
-	"github.com/spiceai/spiceai/pkg/state"
 	"github.com/spiceai/spiceai/pkg/util"
 	"go.uber.org/zap"
 )
@@ -36,7 +35,7 @@ func NewFluxCsvProcessor() *FluxCsvProcessor {
 	return &FluxCsvProcessor{}
 }
 
-func (p *FluxCsvProcessor) Init(params map[string]string) error {
+func (p *FluxCsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string) error {
 	return nil
 }
 
@@ -160,6 +159,7 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 							Data: rowData,
 							Tags: tagData,
 						}
+
 						tableObservations[i] = observation
 					}
 				}
@@ -185,9 +185,4 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 	p.data = nil
 
 	return newObservations, nil
-}
-
-func (p *FluxCsvProcessor) GetState(validFields []string) ([]*state.State, error) {
-	// TODO
-	return nil, nil
 }

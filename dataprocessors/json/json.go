@@ -1,17 +1,16 @@
 package json
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
-	"github.com/spiceai/data-components-contrib/dataprocessors/json/observation"
-	"github.com/spiceai/data-components-contrib/dataprocessors/json/tweet"
+	"github.com/spiceai/spiceai/pkg/api/observation"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/state"
 	"github.com/spiceai/spiceai/pkg/util"
-	"go.skia.org/infra/go/jsonschema"
 )
 
 const (
@@ -19,10 +18,12 @@ const (
 )
 
 type JsonProcessor struct {
-	data      []byte
+	measurements map[string]string
+	categories   map[string]string
+
 	dataMutex sync.RWMutex
+	data      []byte
 	dataHash  []byte
-	format    JsonFormat
 }
 
 type JsonFormat interface {
@@ -44,48 +45,14 @@ func NewJsonProcessor() *JsonProcessor {
 	return &JsonProcessor{}
 }
 
-func (p *JsonProcessor) Init(params map[string]string) error {
-	// Default format if not specified in params
-	format := "default"
-
-	if paramFormat, ok := params["format"]; ok {
-		format = paramFormat
-	}
-
-	switch format {
-	case "tweet":
-		p.format = &tweet.TweetJsonFormat{}
-	case "default":
-		p.format = &observation.ObservationJsonFormat{}
-	}
-
-	if p.format == nil {
-		return fmt.Errorf("unable to find json format '%s'", format)
-	}
+func (p *JsonProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string) error {
+	p.measurements = measurements
+	p.categories = categories
 
 	return nil
 }
 
 func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
-	if p.format == nil {
-		return nil, fmt.Errorf("json processor not initialized")
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-	schemaViolations, err := jsonschema.Validate(ctx, data, p.format.GetSchema())
-	if err != nil {
-		validationError := ""
-		if len(schemaViolations) > 0 {
-			validationError = schemaViolations[0]
-		}
-
-		return nil, &ValidationError{
-			message:         err.Error(),
-			validationError: validationError,
-		}
-	}
-
 	p.dataMutex.Lock()
 	defer p.dataMutex.Unlock()
 
@@ -104,6 +71,10 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 }
 
 func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
+	if p.data == nil {
+		return nil, nil
+	}
+
 	p.dataMutex.RLock()
 	defer p.dataMutex.RUnlock()
 
@@ -111,30 +82,73 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 		return nil, nil
 	}
 
-	observations, err := p.format.GetObservations(p.data)
+	var observationPoints []observation.Observation
+
+	err := json.Unmarshal(p.data, &observationPoints)
 	if err != nil {
 		return nil, err
 	}
 
-	p.data = nil
+	var newObservations []observations.Observation
+	for index, point := range observationPoints {
+		var ts int64
+		var err error
 
-	return observations, nil
-}
+		if point.Time.Integer != nil {
+			ts = *point.Time.Integer
+		} else if point.Time.String != nil {
+			var t time.Time
+			t, err = time.Parse(time.RFC3339, *point.Time.String)
+			if err != nil {
+				// This should never happen as the schema validation would have caught this
+				return nil, fmt.Errorf("observation %d time format is invalid: %s", index, *point.Time.String)
+			}
+			ts = t.Unix()
+		} else {
+			// This should never happen as the schema validation would have caught this
+			return nil, fmt.Errorf("observation %d did not include a time component", index)
+		}
 
-func (p *JsonProcessor) GetState(validFields []string) ([]*state.State, error) {
-	p.dataMutex.RLock()
-	defer p.dataMutex.RUnlock()
+		measurements := make(map[string]float64)
 
-	if p.data == nil {
-		return nil, nil
+		for _, key := range p.measurements {
+			if val, ok := point.Data[key]; ok {
+				if val.Float64 != nil {
+					measurements[key] = *val.Float64
+				} else {
+					measurements[key], err = strconv.ParseFloat(*val.String, 64)
+					if err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
+
+		categories := make(map[string]string)
+
+		for _, key := range p.categories {
+			if val, ok := point.Data[key]; ok {
+				categories[key] = *val.String
+			}
+		}
+
+		observation := observations.Observation{
+			Time: ts,
+			Tags: point.Tags,
+		}
+
+		if len(measurements) > 0 {
+			observation.Data = measurements
+		}
+
+		if len(categories) > 0 {
+			observation.Categories = categories
+		}
+
+		newObservations = append(newObservations, observation)
 	}
 
-	state, err := p.format.GetState(p.data, validFields)
-	if err != nil {
-		return nil, err
-	}
-
 	p.data = nil
 
-	return state, nil
+	return newObservations, nil
 }
