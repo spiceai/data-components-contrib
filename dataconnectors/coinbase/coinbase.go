@@ -2,6 +2,7 @@ package coinbase
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -17,6 +18,11 @@ type SubscribeRequest struct {
 	RequestType string   `json:"type,omitempty"`
 	ProductIds  []string `json:"product_ids,omitempty"`
 	Channels    []string `json:"channels,omitempty"`
+}
+
+type MessageHeaders struct {
+	MessageType string `json:"type,omitempty"`
+	Sequence    *int   `sequence:"type,omitempty"`
 }
 
 const (
@@ -37,7 +43,7 @@ func (c *CoinbaseConnector) Init(epoch time.Time, period time.Duration, interval
 		return errors.New("product_ids is required")
 	}
 
-	channels := []string{ "ticker", "heartbeat" }
+	channels := []string{"ticker", "heartbeat"}
 	productIds := strings.Split(pids, ",")
 
 	u := url.URL{Scheme: "wss", Host: "ws-feed.exchange.coinbase.com"}
@@ -50,8 +56,8 @@ func (c *CoinbaseConnector) Init(epoch time.Time, period time.Duration, interval
 
 	subReq := &SubscribeRequest{
 		RequestType: "subscribe",
-		ProductIds: productIds,
-		Channels: channels,
+		ProductIds:  productIds,
+		Channels:    channels,
 	}
 
 	log.Printf("subscribing to coinbase ticker data for '%s'", pids)
@@ -65,7 +71,7 @@ func (c *CoinbaseConnector) Init(epoch time.Time, period time.Duration, interval
 			_, message, err := wsClient.ReadMessage()
 			if err != nil {
 				return
-			}			
+			}
 			c.sendData(message)
 		}
 	}()
@@ -84,6 +90,21 @@ func (c *CoinbaseConnector) sendData(data []byte) {
 		return
 	}
 
+	var headers MessageHeaders
+	err := json.Unmarshal(data, &headers)
+	if err != nil {
+		log.Printf("invalid coinbase message received '%s': %s\n", string(data), err.Error())
+		return
+	}
+
+	if headers.MessageType == "subscription" {
+		log.Printf("coinbase connector subscribed to: %s\n", string(data))
+		return
+	}
+
+	if headers.MessageType == "heartbeat" {
+	}
+
 	metadata := map[string]string{}
 
 	errGroup, _ := errgroup.WithContext(context.Background())
@@ -100,7 +121,7 @@ func (c *CoinbaseConnector) sendData(data []byte) {
 		})
 	}
 
-	err := errGroup.Wait()
+	err = errGroup.Wait()
 	if err != nil {
 		log.Println(err.Error())
 	}
