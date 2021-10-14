@@ -4,6 +4,7 @@ Currently supported connectors:
 
 - [File](file/file.go)
 - [InfluxDB](influxdb/influxdb.go)
+- [Coinbase](coinbase/README.md)
 - [Twitter](twitter/twitter.go)
 
 ## Contribution guide
@@ -12,8 +13,8 @@ Writing a data connector means implementing the `DataConnector` interface define
 
 ```golang
 type DataConnector interface {
-	Init(Epoch time.Time, Period time.Duration, Interval time.Duration, params map[string]string) error
-	Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error
+    Init(Epoch time.Time, Period time.Duration, Interval time.Duration, params map[string]string) error
+    Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error
 }
 ```
 
