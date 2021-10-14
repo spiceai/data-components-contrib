@@ -11,15 +11,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/spiceai/spiceai/pkg/loggers"
 	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
-	"go.uber.org/zap"
-)
-
-var (
-	zaplog *zap.Logger = loggers.ZapLogger()
 )
 
 const (
@@ -164,7 +158,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		}
 
 		if len(measurements) > 0 {
-			observation.Data = measurements
+			observation.Measurements = measurements
 		}
 
 		if len(categories) > 0 {
@@ -199,26 +193,6 @@ func getCsvHeaderAndLines(input io.Reader) ([]string, [][]string, error) {
 	}
 
 	return headers, lines, nil
-}
-
-// Returns mapping of column index to path and field name
-func getColumnMappings(headers []string) ([]string, []string, error) {
-	numDataFields := len(headers) - 1
-
-	columnToPath := make([]string, numDataFields)
-	columnToFieldName := make([]string, numDataFields)
-
-	for i := 1; i < len(headers); i++ {
-		header := headers[i]
-		dotIndex := strings.LastIndex(header, ".")
-		if dotIndex == -1 {
-			return nil, nil, fmt.Errorf("header '%s' expected to be full-qualified", header)
-		}
-		columnToPath[i-1] = header[:dotIndex]
-		columnToFieldName[i-1] = header[dotIndex+1:]
-	}
-
-	return columnToPath, columnToFieldName, nil
 }
 
 func getFieldMappings(fields map[string]string, headers map[string]int) map[string]int {
