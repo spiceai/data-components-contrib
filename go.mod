@@ -13,7 +13,7 @@ require (
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/spiceai/spiceai v0.2.1-alpha-rc-spiced.0.20211014081001-f8a49b474218
+	github.com/spiceai/spiceai v0.2.1-alpha-rc-spiced.0.20211014094531-e5a53f0c5fe0
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
