@@ -103,7 +103,8 @@ func (c *CoinbaseConnector) sendData(data []byte) {
 	}
 
 	if headers.MessageType == "heartbeat" {
-		
+		log.Printf("coinbase connector heartbeat received: %s\n", string(data))
+		return
 	}
 
 	metadata := map[string]string{}

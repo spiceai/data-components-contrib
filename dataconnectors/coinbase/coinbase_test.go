@@ -37,7 +37,7 @@ func TestRead(t *testing.T) {
 	}
 
 	wg := sync.WaitGroup{}
-	wg.Add(10)
+	wg.Add(5)
 
 	var messages [][]byte
 
