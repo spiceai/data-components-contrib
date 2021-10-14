@@ -61,7 +61,7 @@ func testInitFunc() func(*testing.T) {
 	params := map[string]string{}
 
 	return func(t *testing.T) {
-		err := p.Init(params)
+		err := p.Init(params, nil, nil)
 		assert.NoError(t, err)
 	}
 }
@@ -74,7 +74,7 @@ func testInvalidInitFunc() func(*testing.T) {
 	params["format"] = "nonexist"
 
 	return func(t *testing.T) {
-		err := p.Init(params)
+		err := p.Init(params, nil, nil)
 		assert.Error(t, err)
 		assert.Equal(t, "unable to find json format 'nonexist'", err.Error())
 	}
@@ -88,7 +88,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -125,7 +125,7 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -157,7 +157,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -193,7 +193,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -249,7 +249,7 @@ func testOnDataInvalidSchema(data []byte, validationError string) func(*testing.
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)

@@ -122,7 +122,7 @@ func testInitFunc() func(*testing.T) {
 	params := map[string]string{}
 
 	return func(t *testing.T) {
-		err := p.Init(params)
+		err := p.Init(params, nil, nil)
 		assert.NoError(t, err)
 	}
 }
@@ -135,7 +135,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -205,7 +205,7 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 		dp := NewCsvProcessor()
 		err = dp.Init(map[string]string{
 			"time_format": "2006-01-02 15:04:05-07:00",
-		})
+		}, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(localData)
@@ -237,7 +237,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -272,7 +272,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -317,7 +317,7 @@ func testGetStateFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -362,7 +362,7 @@ func testGetStateTagsFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -415,7 +415,7 @@ func testGetStateTwiceFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -479,7 +479,7 @@ func testgetColumnMappingsFunc() func(*testing.T) {
 func benchGetObservationsFunc(c *file.FileConnector) func(*testing.B) {
 	return func(b *testing.B) {
 		dp := NewCsvProcessor()
-		err := dp.Init(nil)
+		err := dp.Init(nil, nil, nil)
 		if err != nil {
 			b.Error(err)
 		}
