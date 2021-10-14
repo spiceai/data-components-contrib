@@ -100,12 +100,10 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 			var t time.Time
 			t, err = time.Parse(time.RFC3339, *point.Time.String)
 			if err != nil {
-				// This should never happen as the schema validation would have caught this
 				return nil, fmt.Errorf("observation %d time format is invalid: %s", index, *point.Time.String)
 			}
 			ts = t.Unix()
 		} else {
-			// This should never happen as the schema validation would have caught this
 			return nil, fmt.Errorf("observation %d did not include a time component", index)
 		}
 
