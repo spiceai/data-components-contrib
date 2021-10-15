@@ -1,6 +1,7 @@
 ([]observations.Observation) (len=5) {
   (observations.Observation) {
     Time: (int64) 1605312000,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=5) "close": (float64) 16254.51,
       (string) (len=4) "high": (float64) 16339.6,
@@ -16,6 +17,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1605313800,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=5) "close": (float64) 16305,
       (string) (len=4) "high": (float64) 16305,
@@ -30,6 +32,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1605315600,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=5) "close": (float64) 16222.16,
       (string) (len=4) "high": (float64) 16303.88,
@@ -44,6 +47,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1605317400,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=5) "close": (float64) 16214.15,
       (string) (len=4) "high": (float64) 16246.92,
@@ -68,6 +72,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1605319200,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=5) "close": (float64) 16223.08,
       (string) (len=4) "high": (float64) 16234,

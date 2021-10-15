@@ -1,6 +1,7 @@
 ([]observations.Observation) (len=43) {
   (observations.Observation) {
     Time: (int64) 1605312000,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 806.42,
       (string) (len=6) "height": (float64) 29,
@@ -16,6 +17,7 @@
   },
   (observations.Observation) {
     Time: (int64) 84,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 85675.8,
       (string) (len=6) "height": (float64) 21,
@@ -92,6 +94,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1600121040,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 5723.42,
       (string) (len=6) "height": (float64) 6,
@@ -148,6 +151,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1617019594,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 55280.07,
       (string) (len=6) "height": (float64) 77,
@@ -242,6 +246,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1608586764,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 50225.29,
       (string) (len=6) "height": (float64) 2,
@@ -352,6 +357,7 @@
   },
   (observations.Observation) {
     Time: (int64) 66,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 26877.51,
       (string) (len=6) "height": (float64) 97,
@@ -433,6 +439,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1608919478,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 52954.36,
       (string) (len=6) "height": (float64) 10,
@@ -516,6 +523,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1622287821,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 16632.15,
       (string) (len=6) "height": (float64) 61,
@@ -570,6 +578,7 @@
   },
   (observations.Observation) {
     Time: (int64) 85,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 13584.51,
       (string) (len=6) "height": (float64) 92,
@@ -584,6 +593,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1613308755,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 50471.87,
       (string) (len=6) "height": (float64) 36,
@@ -617,6 +627,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1617219483,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 70472.85,
       (string) (len=6) "height": (float64) 60,
@@ -730,6 +741,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1606432823,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 25040.01,
       (string) (len=6) "height": (float64) 31,
@@ -832,6 +844,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1614791060,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 47259.35,
       (string) (len=6) "height": (float64) 87,
@@ -878,6 +891,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1628881563,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 80035.82,
       (string) (len=6) "height": (float64) 29,
@@ -959,6 +973,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1630472273,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 50667.38,
       (string) (len=6) "height": (float64) 61,
@@ -1024,6 +1039,7 @@
   },
   (observations.Observation) {
     Time: (int64) 25,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 23992.36,
       (string) (len=6) "height": (float64) 48,
@@ -1078,6 +1094,7 @@
   },
   (observations.Observation) {
     Time: (int64) 61,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 81098,
       (string) (len=6) "height": (float64) 61,
@@ -1120,6 +1137,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1624576649,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 34419.52,
       (string) (len=6) "height": (float64) 43,
@@ -1134,6 +1152,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1621042973,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 3733.87,
       (string) (len=6) "height": (float64) 23,
@@ -1228,6 +1247,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1627955069,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 55083.37,
       (string) (len=6) "height": (float64) 53,
@@ -1302,6 +1322,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1623755608,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 78734.04,
       (string) (len=6) "height": (float64) 59,
@@ -1333,6 +1354,7 @@
   },
   (observations.Observation) {
     Time: (int64) 9,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 65074.17,
       (string) (len=6) "height": (float64) 84,
@@ -1385,6 +1407,7 @@
   },
   (observations.Observation) {
     Time: (int64) 74,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 68838.07,
       (string) (len=6) "height": (float64) 99,
@@ -1449,6 +1472,7 @@
   },
   (observations.Observation) {
     Time: (int64) 40,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 26536,
       (string) (len=6) "height": (float64) 98,
@@ -1473,6 +1497,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1613525487,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 7445.69,
       (string) (len=6) "height": (float64) 28,
@@ -1490,6 +1515,7 @@
   },
   (observations.Observation) {
     Time: (int64) 64,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 48618.44,
       (string) (len=6) "height": (float64) 25,
@@ -1597,6 +1623,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1604120604,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 15287.28,
       (string) (len=6) "height": (float64) 6,
@@ -1673,6 +1700,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1604097627,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 50759.42,
       (string) (len=6) "height": (float64) 97,
@@ -1735,6 +1763,7 @@
   },
   (observations.Observation) {
     Time: (int64) 5,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 97957.4,
       (string) (len=6) "height": (float64) 55,
@@ -1806,6 +1835,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1623223829,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 64219.03,
       (string) (len=6) "height": (float64) 99,
@@ -1900,6 +1930,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1604622073,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 94929.32,
       (string) (len=6) "height": (float64) 47,
@@ -1981,6 +2012,7 @@
   },
   (observations.Observation) {
     Time: (int64) 2,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 49371.19,
       (string) (len=6) "height": (float64) 9,
@@ -2084,6 +2116,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1612730263,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 29806.52,
       (string) (len=6) "height": (float64) 28,
@@ -2154,6 +2187,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1631022711,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 49727.06,
       (string) (len=6) "height": (float64) 37,
@@ -2192,6 +2226,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1619646514,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 66531.98,
       (string) (len=6) "height": (float64) 89,
@@ -2232,6 +2267,7 @@
   },
   (observations.Observation) {
     Time: (int64) 65,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 55207.77,
       (string) (len=6) "height": (float64) 91,
@@ -2336,6 +2372,7 @@
   },
   (observations.Observation) {
     Time: (int64) 9,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 67160.35,
       (string) (len=6) "height": (float64) 56,
@@ -2428,6 +2465,7 @@
   },
   (observations.Observation) {
     Time: (int64) 41,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 48022.74,
       (string) (len=6) "height": (float64) 55,
@@ -2457,6 +2495,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1610495569,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 77100.18,
       (string) (len=6) "height": (float64) 23,
@@ -2561,6 +2600,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1603538489,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 57391.29,
       (string) (len=6) "height": (float64) 7,
@@ -2606,6 +2646,7 @@
   },
   (observations.Observation) {
     Time: (int64) 27,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 10663.97,
       (string) (len=6) "height": (float64) 99,
@@ -2690,6 +2731,7 @@
   },
   (observations.Observation) {
     Time: (int64) 67,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 80336.6,
       (string) (len=6) "height": (float64) 5,
@@ -2743,6 +2785,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1631499271,
+    Data: (map[string]float64) <nil>,
     Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 21052.59,
       (string) (len=6) "height": (float64) 81,
