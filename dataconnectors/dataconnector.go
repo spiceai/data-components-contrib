@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/spiceai/data-components-contrib/dataconnectors/coinbase"
 	"github.com/spiceai/data-components-contrib/dataconnectors/file"
 	"github.com/spiceai/data-components-contrib/dataconnectors/influxdb"
 	"github.com/spiceai/data-components-contrib/dataconnectors/twitter"
@@ -16,6 +17,8 @@ type DataConnector interface {
 
 func NewDataConnector(name string) (DataConnector, error) {
 	switch name {
+	case coinbase.CoinbaseConnectorName:
+		return coinbase.NewCoinbaseConnector(), nil
 	case file.FileConnectorName:
 		return file.NewFileConnector(), nil
 	case influxdb.InfluxDbConnectorName:
