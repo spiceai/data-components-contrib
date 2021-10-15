@@ -150,8 +150,6 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 			t.Fatal("no data")
 		}
 
-		t.SkipNow()
-
 		measurements := map[string]string{
 			"population": "population",
 		}
@@ -173,7 +171,16 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 			return
 		}
 
-		assert.Equal(t, expectedFirstPuppyObservation, actualObservations[0], "First Observation not correct")
+		expectedPuppyObservation := observations.Observation{
+			Time: 980393406,
+			Measurements: map[string]float64{
+				"population": 4,
+			},
+			Categories: map[string]string{"city": "Villarreal"},
+			Tags:       []string{"est", "do", "cupidatat", "ullamco", "voluptate"},
+		}
+
+		assert.Equal(t, expectedPuppyObservation, actualObservations[0], "First Observation not correct")
 
 		snapshotter.SnapshotT(t, actualObservations)
 	}
@@ -226,8 +233,6 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
 		}
-
-		t.SkipNow()
 
 		measurements := map[string]string{
 			"ave_weight": "ave_weight",
