@@ -16,3 +16,9 @@ func testNewDataConnectorUnknownFunc() func(*testing.T) {
 		assert.Error(t, err)
 	}
 }
+
+func TestCoinbaseFactory(t *testing.T) {
+	c, err := NewDataConnector("coinbase")
+	assert.NoError(t, err)
+	assert.NotNil(t, c)
+}
