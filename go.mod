@@ -11,7 +11,7 @@ require (
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/spiceai/spiceai v0.2.1-alpha-rc-spiced.0.20211014094531-e5a53f0c5fe0
+	github.com/spiceai/spiceai v0.2.1-alpha-rc-spiced.0.20211015023415-6b33504a8a88
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect

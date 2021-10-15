@@ -1,7 +1,7 @@
 ([]observations.Observation) (len=1) {
   (observations.Observation) {
     Time: (int64) 1605312000,
-    Data: (map[string]float64) (len=5) {
+    Measurements: (map[string]float64) (len=5) {
       (string) (len=7) "eventId": (float64) 806.42,
       (string) (len=6) "height": (float64) 29,
       (string) (len=6) "rating": (float64) 86,
