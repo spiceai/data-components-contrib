@@ -109,8 +109,8 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 
 		measurements := make(map[string]float64)
 
-		for _, key := range p.measurements {
-			if val, ok := point.Data[key]; ok {
+		for key, selector := range p.measurements {
+			if val, ok := point.Data[selector]; ok {
 				if val.Float64 != nil {
 					measurements[key] = *val.Float64
 				} else {
@@ -124,8 +124,8 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 
 		categories := make(map[string]string)
 
-		for _, key := range p.categories {
-			if val, ok := point.Data[key]; ok {
+		for key, selector := range p.categories {
+			if val, ok := point.Data[selector]; ok {
 				categories[key] = *val.String
 			}
 		}
