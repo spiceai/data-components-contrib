@@ -57,13 +57,13 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1629159360,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"usage_idle": 99.56272495215877,
 			},
 			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
 		}
 		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
-		assert.Equal(t, expectedFirstObservation.Data, actualObservations[0].Data, "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Measurements, actualObservations[0].Measurements, "First Observation not correct")
 		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
 		expectedObservationsBytes, err := os.ReadFile("../../test/assets/data/json/TestFlux-GetObservations()-expected_observations.json")
@@ -81,7 +81,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		for idx, expectedObservation := range expectedObservations {
 			assert.Equal(t, expectedObservation.Time, actualObservations[idx].Time)
-			assert.Equal(t, expectedObservation.Data, actualObservations[idx].Data)
+			assert.Equal(t, expectedObservation.Measurements, actualObservations[idx].Measurements)
 			assert.ElementsMatch(t, expectedObservation.Tags, actualObservations[idx].Tags)
 		}
 	}
@@ -108,13 +108,13 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1629159360,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"usage_idle": 99.56272495215877,
 			},
 			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
 		}
 		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
-		assert.Equal(t, expectedFirstObservation.Data, actualObservations[0].Data, "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Measurements, actualObservations[0].Measurements, "First Observation not correct")
 		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
 		actualObservations2, err := dp.GetObservations()
@@ -144,13 +144,13 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1629159360,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"usage_idle": 99.56272495215877,
 			},
 			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
 		}
 		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
-		assert.Equal(t, expectedFirstObservation.Data, actualObservations[0].Data, "First Observation not correct")
+		assert.Equal(t, expectedFirstObservation.Measurements, actualObservations[0].Measurements, "First Observation not correct")
 		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
 		_, err = dp.OnData(data)

@@ -81,7 +81,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1605312000,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"eventId": 806.42,
 				"height":  29,
 				"rating":  86,
@@ -124,7 +124,7 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1605312000,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"eventId": 806.42,
 				"rating":  86,
 				"target":  42,
@@ -204,7 +204,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1605312000,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"eventId": 806.42,
 				"height":  29,
 				"rating":  86,
@@ -248,7 +248,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1605312000,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"eventId": 806.42,
 				"height":  29,
 				"rating":  86,

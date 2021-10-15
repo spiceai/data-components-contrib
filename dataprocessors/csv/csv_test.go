@@ -159,7 +159,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1605312000,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"open":   16339.56,
 				"high":   16339.6,
 				"low":    16240,
@@ -235,7 +235,7 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1547575074,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"val": 34,
 			},
 		}
@@ -274,7 +274,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1605312000,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"open":   16339.56,
 				"high":   16339.6,
 				"low":    16240,
@@ -319,7 +319,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 
 		expectedFirstObservation := observations.Observation{
 			Time: 1605312000,
-			Data: map[string]float64{
+			Measurements: map[string]float64{
 				"open":   16339.56,
 				"high":   16339.6,
 				"low":    16240,

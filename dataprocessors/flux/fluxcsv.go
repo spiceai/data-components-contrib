@@ -155,9 +155,9 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 						}
 
 						observation := observations.Observation{
-							Time: times.Value(i) / int64(time.Second),
-							Data: rowData,
-							Tags: tagData,
+							Time:         times.Value(i) / int64(time.Second),
+							Measurements: rowData,
+							Tags:         tagData,
 						}
 
 						tableObservations[i] = observation

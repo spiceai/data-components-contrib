@@ -136,7 +136,7 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 		}
 
 		if len(measurements) > 0 {
-			observation.Data = measurements
+			observation.Measurements = measurements
 		}
 
 		if len(categories) > 0 {
