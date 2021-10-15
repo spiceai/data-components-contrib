@@ -97,7 +97,7 @@ func (c *CoinbaseConnector) sendData(data []byte) {
 		return
 	}
 
-	if headers.MessageType == "subscription" {
+	if headers.MessageType == "subscriptions" {
 		log.Printf("coinbase connector subscribed to: %s\n", string(data))
 		return
 	}

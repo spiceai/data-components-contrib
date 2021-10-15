@@ -1,17 +1,13 @@
 ([]observations.Observation) (len=1) {
   (observations.Observation) {
-    Time: (int64) 1605312000,
-    Measurements: (map[string]float64) (len=5) {
-      (string) (len=7) "eventId": (float64) 806.42,
-      (string) (len=6) "height": (float64) 29,
-      (string) (len=6) "rating": (float64) 86,
-      (string) (len=5) "speed": (float64) 15,
-      (string) (len=6) "target": (float64) 42
+    Time: (int64) 996272905,
+    Measurements: (map[string]float64) (len=2) {
+      (string) (len=11) "reply_count": (float64) 34,
+      (string) (len=13) "retweet_count": (float64) 743
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) (len=2) {
-      (string) (len=8) "testTagA",
-      (string) (len=8) "testTagB"
-    }
+    Categories: (map[string]string) (len=1) {
+      (string) (len=4) "lang": (string) (len=2) "en"
+    },
+    Tags: ([]string) <nil>
   }
 }

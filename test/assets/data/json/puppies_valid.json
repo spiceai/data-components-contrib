@@ -1,0 +1,226 @@
+[
+    {
+        "time": "2001-01-25T03:30:06.644Z",
+        "city": "Villarreal",
+        "population": 4,
+        "ave_weight": 8.39,
+        "_tags": "est do cupidatat ullamco voluptate"
+    },
+    {
+        "time": "1982-03-30T16:03:01.622Z",
+        "city": "Ypsilanti",
+        "population": 1,
+        "ave_weight": 2.37,
+        "_tags": "duis esse sit eu laborum"
+    },
+    {
+        "time": "2004-11-09T20:47:50.574Z",
+        "city": "Carrsville",
+        "population": 5,
+        "ave_weight": 0.47,
+        "_tags": "occaecat fugiat eu commodo voluptate"
+    },
+    {
+        "time": "2018-11-25T03:10:20.267Z",
+        "city": "Coaldale",
+        "population": 9,
+        "ave_weight": 6.51,
+        "_tags": "labore nostrud nostrud voluptate consectetur"
+    },
+    {
+        "time": "2015-05-24T16:15:27.927Z",
+        "city": "Caln",
+        "population": 5,
+        "ave_weight": 5.29,
+        "_tags": "proident consequat nisi velit nisi"
+    },
+    {
+        "time": "1993-12-15T15:21:52.936Z",
+        "city": "Tivoli",
+        "population": 3,
+        "ave_weight": 7.93,
+        "_tags": "quis anim ad aliquip aliquip"
+    },
+    {
+        "time": "2012-06-30T13:31:51.750Z",
+        "city": "Kylertown",
+        "population": 8,
+        "ave_weight": 6.76,
+        "_tags": "ut tempor sit tempor labore"
+    },
+    {
+        "time": "1999-12-20T22:19:57.075Z",
+        "city": "Alderpoint",
+        "population": 7,
+        "ave_weight": 3.23,
+        "_tags": "proident consequat irure est proident"
+    },
+    {
+        "time": "2002-04-09T21:57:58.509Z",
+        "city": "Levant",
+        "population": 10,
+        "ave_weight": 3.05,
+        "_tags": "deserunt ipsum enim est consequat"
+    },
+    {
+        "time": "1991-05-23T19:25:18.917Z",
+        "city": "Zeba",
+        "population": 6,
+        "ave_weight": 8.53,
+        "_tags": "dolor non nostrud ad tempor"
+    },
+    {
+        "time": "2010-02-10T16:02:50.489Z",
+        "city": "Clayville",
+        "population": 0,
+        "ave_weight": 7.02,
+        "_tags": "ad id esse eu pariatur"
+    },
+    {
+        "time": "2000-03-15T16:49:44.364Z",
+        "city": "Dixonville",
+        "population": 1,
+        "ave_weight": 9.27,
+        "_tags": "minim non tempor duis sint"
+    },
+    {
+        "time": "2021-05-19T18:48:37.463Z",
+        "city": "Valle",
+        "population": 5,
+        "ave_weight": 4.91,
+        "_tags": "cillum voluptate consequat magna laboris"
+    },
+    {
+        "time": "2020-12-08T21:31:02.316Z",
+        "city": "Hegins",
+        "population": 6,
+        "ave_weight": 2.44,
+        "_tags": "ea dolor id eu proident"
+    },
+    {
+        "time": "1981-09-22T18:11:40.565Z",
+        "city": "Florence",
+        "population": 2,
+        "ave_weight": 9.85,
+        "_tags": "velit ullamco officia ex est"
+    },
+    {
+        "time": "2018-07-21T20:10:59.049Z",
+        "city": "Fairfield",
+        "population": 9,
+        "ave_weight": 3.16,
+        "_tags": "ullamco exercitation non duis amet"
+    },
+    {
+        "time": "2016-05-23T05:11:25.169Z",
+        "city": "Barstow",
+        "population": 3,
+        "ave_weight": 1.45,
+        "_tags": "et commodo enim fugiat et"
+    },
+    {
+        "time": "1975-04-29T22:03:35.468Z",
+        "city": "Farmington",
+        "population": 7,
+        "ave_weight": 8.31,
+        "_tags": "labore mollit aliquip proident eiusmod"
+    },
+    {
+        "time": "1977-07-10T08:56:01.466Z",
+        "city": "Hannasville",
+        "population": 0,
+        "ave_weight": 9.04,
+        "_tags": "qui consequat elit commodo voluptate"
+    },
+    {
+        "time": "2021-06-23T03:48:03.549Z",
+        "city": "Clara",
+        "population": 7,
+        "ave_weight": 3.92,
+        "_tags": "laborum et cillum qui reprehenderit"
+    },
+    {
+        "time": "1989-07-20T01:10:54.486Z",
+        "city": "Rodman",
+        "population": 4,
+        "ave_weight": 3.66,
+        "_tags": "cupidatat magna deserunt in aliquip"
+    },
+    {
+        "time": "1990-07-05T10:51:20.617Z",
+        "city": "Ola",
+        "population": 1,
+        "ave_weight": 8.82,
+        "_tags": "tempor ex Lorem do consequat"
+    },
+    {
+        "time": "1982-10-18T12:12:50.629Z",
+        "city": "Darlington",
+        "population": 9,
+        "ave_weight": 6.47,
+        "_tags": "aliquip voluptate veniam amet fugiat"
+    },
+    {
+        "time": "2003-03-15T02:31:50.230Z",
+        "city": "Siglerville",
+        "population": 9,
+        "ave_weight": 3.33,
+        "_tags": "ut dolore officia veniam veniam"
+    },
+    {
+        "time": "1986-04-05T07:16:03.409Z",
+        "city": "Skyland",
+        "population": 4,
+        "ave_weight": 4.05,
+        "_tags": "quis veniam aliqua fugiat dolore"
+    },
+    {
+        "time": "1996-06-13T02:41:32.473Z",
+        "city": "Cetronia",
+        "population": 3,
+        "ave_weight": 0.97,
+        "_tags": "id adipisicing excepteur dolore sunt"
+    },
+    {
+        "time": "1989-01-25T21:00:13.018Z",
+        "city": "Madaket",
+        "population": 10,
+        "ave_weight": 9.93,
+        "_tags": "nisi elit nulla in in"
+    },
+    {
+        "time": "2016-08-15T05:33:47.602Z",
+        "city": "Longbranch",
+        "population": 1,
+        "ave_weight": 5.91,
+        "_tags": "mollit ipsum sunt reprehenderit est"
+    },
+    {
+        "time": "2015-01-13T05:49:29.337Z",
+        "city": "Cumminsville",
+        "population": 4,
+        "ave_weight": 7.59,
+        "_tags": "aliquip sunt nostrud esse nisi"
+    },
+    {
+        "time": "2016-02-04T21:39:36.898Z",
+        "city": "Shrewsbury",
+        "population": 10,
+        "ave_weight": 4.96,
+        "_tags": "Lorem qui commodo irure labore"
+    },
+    {
+        "time": "1973-07-04T22:11:55.150Z",
+        "city": "Snowville",
+        "population": 7,
+        "ave_weight": 1.57,
+        "_tags": "fugiat eiusmod est labore amet"
+    },
+    {
+        "time": "2001-07-27T22:28:25.252Z",
+        "city": "Kidder",
+        "population": 8,
+        "ave_weight": 8.36,
+        "_tags": "culpa nisi aute esse officia"
+    }
+]
