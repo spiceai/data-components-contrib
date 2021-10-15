@@ -1,7 +1,7 @@
 [
     {
         "coordinates": null,
-        "created_at": "Thu Sep 30 12:36:31 +0000 2021",
+        "time": "2001-07-27T22:28:25.252Z",
         "current_user_retweet": null,
         "entities": {
             "hashtags": [
@@ -41,8 +41,8 @@
         "lang": "en",
         "possibly_sensitive": false,
         "quote_count": 0,
-        "reply_count": 0,
-        "retweet_count": 0,
+        "reply_count": 34,
+        "retweet_count": 743,
         "retweeted": false,
         "retweeted_status": null,
         "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",

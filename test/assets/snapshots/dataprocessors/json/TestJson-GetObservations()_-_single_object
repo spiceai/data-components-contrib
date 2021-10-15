@@ -1,0 +1,19 @@
+([]observations.Observation) (len=1) {
+  (observations.Observation) {
+    Time: (int64) 980393406,
+    Measurements: (map[string]float64) (len=2) {
+      (string) (len=10) "ave_weight": (float64) 8.39,
+      (string) (len=10) "population": (float64) 4
+    },
+    Categories: (map[string]string) (len=1) {
+      (string) (len=4) "city": (string) (len=10) "Villarreal"
+    },
+    Tags: ([]string) (len=5) {
+      (string) (len=3) "est",
+      (string) (len=2) "do",
+      (string) (len=9) "cupidatat",
+      (string) (len=7) "ullamco",
+      (string) (len=9) "voluptate"
+    }
+  }
+}

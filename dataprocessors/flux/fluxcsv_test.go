@@ -66,7 +66,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		assert.Equal(t, expectedFirstObservation.Measurements, actualObservations[0].Measurements, "First Observation not correct")
 		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
 
-		expectedObservationsBytes, err := os.ReadFile("../../test/assets/data/json/TestFlux-GetObservations()-expected_observations.json")
+		expectedObservationsBytes, err := os.ReadFile("../../test/assets/data/json/observations_TestFlux-GetObservations()-expected_observations.json")
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -25,6 +25,7 @@ require (
 	cloud.google.com/go v0.95.0 // indirect
 	cloud.google.com/go/bigtable v1.6.0 // indirect
 	github.com/Azure/go-autorest/autorest v0.11.12 // indirect
+	github.com/Jeffail/gabs v1.4.0 // indirect
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20210922070358-ec7aeb577330 // indirect
 	github.com/aws/aws-sdk-go v1.35.18 // indirect
