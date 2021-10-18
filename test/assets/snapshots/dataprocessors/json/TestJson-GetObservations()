@@ -1,6 +1,6 @@
 ([]observations.Observation) (len=32) {
   (observations.Observation) {
-    Time: (int64) 980393406,
+    Time: (int64) 1561427263,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 8.39,
       (string) (len=10) "population": (float64) 4
