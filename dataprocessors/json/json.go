@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -161,12 +160,12 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 	}
 
 	if val, ok := item["tags"]; ok {
-		var tags string
+		var tags []string
 		err = json.Unmarshal(val, &tags)
 		if err != nil {
 			return nil, err
 		}
-		observation.Tags = strings.Split(tags, " ")
+		observation.Tags = tags
 	}
 
 	if len(measurements) > 0 {
