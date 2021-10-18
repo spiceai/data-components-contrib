@@ -160,7 +160,7 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 		Time: t.Unix(),
 	}
 
-	if val, ok := item["_tags"]; ok {
+	if val, ok := item["tags"]; ok {
 		var tags string
 		err = json.Unmarshal(val, &tags)
 		if err != nil {
