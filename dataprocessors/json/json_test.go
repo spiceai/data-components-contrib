@@ -7,31 +7,11 @@ import (
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
-	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
 	snapshotter                   = cupaloy.New(cupaloy.SnapshotSubdirectory("../../test/assets/snapshots/dataprocessors/json"))
-	expectedFirstPuppyObservation = observations.Observation{
-		Time: 980393406,
-		Measurements: map[string]float64{
-			"ave_weight": 8.39,
-			"population": 4,
-		},
-		Categories: map[string]string{"city": "Villarreal"},
-		Tags:       []string{"est", "do", "cupidatat", "ullamco", "voluptate"},
-	}
-	expectedFirstTweetObservation = observations.Observation{
-		Time: 996272905,
-		Measurements: map[string]float64{
-			"reply_count":   34,
-			"retweet_count": 743,
-		},
-		Categories: map[string]string{
-			"lang": "en",
-		},
-	}
 )
 
 func TestJson(t *testing.T) {
@@ -102,8 +82,6 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			return
 		}
 
-		assert.Equal(t, expectedFirstPuppyObservation, actualObservations[0], "First Observation not correct")
-
 		snapshotter.SnapshotT(t, actualObservations)
 	}
 }
@@ -137,8 +115,6 @@ func testGetObservationsSomeDataPointsFunc(data []byte) func(*testing.T) {
 			return
 		}
 
-		assert.Equal(t, expectedFirstTweetObservation, actualObservations[0], "First Observation not correct")
-
 		snapshotter.SnapshotT(t, actualObservations)
 	}
 }
@@ -171,16 +147,6 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 			return
 		}
 
-		expectedPuppyObservation := observations.Observation{
-			Time: 980393406,
-			Measurements: map[string]float64{
-				"population": 4,
-			},
-			Categories: map[string]string{"city": "Villarreal"},
-			Tags:       []string{"est", "do", "cupidatat", "ullamco", "voluptate"},
-		}
-
-		assert.Equal(t, expectedPuppyObservation, actualObservations[0], "First Observation not correct")
 
 		snapshotter.SnapshotT(t, actualObservations)
 	}
@@ -253,7 +219,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		actualObservations, err := dp.GetObservations()
 		assert.NoError(t, err)
 
-		assert.Equal(t, expectedFirstPuppyObservation, actualObservations[0], "First Observation not correct")
+		snapshotter.SnapshotT(t, actualObservations)
 
 		actualObservations2, err := dp.GetObservations()
 		assert.NoError(t, err)
@@ -287,7 +253,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		actualObservations, err := dp.GetObservations()
 		assert.NoError(t, err)
 
-		assert.Equal(t, expectedFirstPuppyObservation, actualObservations[0], "First Observation not correct")
+		snapshotter.SnapshotT(t, actualObservations)
 
 		reader := bytes.NewReader(data)
 		buffer := new(bytes.Buffer)

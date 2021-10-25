@@ -44,20 +44,27 @@ func TestRead(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(5)
 
-	var tweets []twitter.Tweet
+	var allTweets []twitter.Tweet
+	tweetsMutex := sync.RWMutex{}
 
 	err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
 		if assert.Equal(t, metadata["type"], "tweet") {
-			var tweets []*twitter.Tweet
+			var tweets []twitter.Tweet
 			err := json.Unmarshal(data, &tweets)
 			if assert.NoError(t, err) {
+				tweetsMutex.Lock()
 				for _, tweet := range tweets {
+					if len(tweets) > 5 {
+						continue
+					}
 					t.Logf("tweet: %s\n", tweet.Text)
-					tweets = append(tweets, tweet)
+					allTweets = append(allTweets, tweet)
+					wg.Done()
 				}
+				
+				tweetsMutex.Unlock()
 			}
 		}
-		wg.Done()
 		return nil, nil
 	})
 	assert.NoError(t, err)
@@ -69,7 +76,7 @@ func TestRead(t *testing.T) {
 
 	wg.Wait()
 
-	assert.Len(t, tweets, 5)
+	assert.Len(t, allTweets, 5)
 }
 
 func getAuthParams() map[string]string {

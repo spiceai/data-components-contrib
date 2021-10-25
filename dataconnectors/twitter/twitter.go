@@ -60,6 +60,14 @@ func (c *TwitterConnector) Init(epoch time.Time, period time.Duration, interval 
 	// Twitter client
 	c.client = twitter.NewClient(httpClient)
 
+	verifyParams := &twitter.AccountVerifyParams{}
+	user, _, err := c.client.Accounts.VerifyCredentials(verifyParams)
+	if err != nil {
+		return fmt.Errorf("failed to verify credentials: %s", err.Error())
+	}
+
+	log.Println(fmt.Sprintf("twitter data connector: verified credentials for %s", aurora.BrightBlue(user.ScreenName)))
+
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
 		c.sendData(tweet)
@@ -71,9 +79,10 @@ func (c *TwitterConnector) Init(epoch time.Time, period time.Duration, interval 
 	}
 	stream, err := c.client.Streams.Filter(filterParams)
 	if err != nil {
-		log.Fatalln(err.Error())
+		return fmt.Errorf("failed to start stream with filter %s: %s", aurora.BrightBlue(filter), err.Error())
 	}
-	log.Println(aurora.Green(fmt.Sprintf("started reading twitter stream with filter: %s", filter)))
+
+	log.Println(aurora.Green(fmt.Sprintf("started reading twitter stream with filter %s", aurora.BrightBlue(filter))))
 
 	go demux.HandleChan(stream.Messages)
 
