@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/logrusorgru/aurora"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -23,6 +24,24 @@ type SubscribeRequest struct {
 type MessageHeaders struct {
 	MessageType string `json:"type,omitempty"`
 	Sequence    *int   `sequence:"type,omitempty"`
+}
+
+type Subscriptions struct {
+	Type     string    `json:"type"`    
+	Channels []Channel `json:"channels"`
+}
+
+type Channel struct {
+	Name       string   `json:"name"`       
+	ProductIDS []string `json:"product_ids"`
+}
+
+type Heartbeat struct {
+	Type        string `json:"type"`         
+	LastTradeID int64  `json:"last_trade_id"`
+	ProductID   string `json:"product_id"`   
+	Sequence    int64  `json:"sequence"`     
+	Time        string `json:"time"`         
 }
 
 const (
@@ -60,7 +79,7 @@ func (c *CoinbaseConnector) Init(epoch time.Time, period time.Duration, interval
 		Channels:    channels,
 	}
 
-	log.Printf("subscribing to coinbase ticker data for '%s'", pids)
+	log.Printf("coinbase connector subscribing to ticker data for %s", aurora.BrightBlue(pids))
 	err = wsClient.WriteJSON(subReq)
 	if err != nil {
 		return fmt.Errorf("error subscribing to %s for channels %s: %w", pids, channels, err)
@@ -93,17 +112,31 @@ func (c *CoinbaseConnector) sendData(data []byte) {
 	var headers MessageHeaders
 	err := json.Unmarshal(data, &headers)
 	if err != nil {
-		log.Printf("invalid coinbase message received '%s': %s\n", string(data), err.Error())
+		log.Printf("invalid coinbase message received '%s': %s", string(data), err.Error())
 		return
 	}
 
 	if headers.MessageType == "subscriptions" {
-		log.Printf("coinbase connector subscribed to: %s\n", string(data))
+		var subscriptions Subscriptions
+		err := json.Unmarshal(data, &subscriptions)
+		if err != nil {
+			log.Printf("coinbase connector error reading subscriptions: %s", err.Error())
+			return
+		}
+		for _, subscription := range subscriptions.Channels {
+			log.Printf("coinbase connector subscribed to %s for %s", aurora.BrightBlue(subscription.Name), aurora.BrightBlue(strings.Join(subscription.ProductIDS, ",")))
+		}
 		return
 	}
 
 	if headers.MessageType == "heartbeat" {
-		log.Printf("coinbase connector heartbeat received: %s\n", string(data))
+		var heartbeat Heartbeat
+		err := json.Unmarshal(data, &heartbeat)
+		if err != nil {
+			log.Printf("coinbase connector error reading heartbeat: %s", err.Error())
+			return
+		}
+		log.Printf("coinbase connector received %s for %s with sequence id %d", aurora.BrightBlue(heartbeat.Type), aurora.BrightBlue(heartbeat.ProductID), heartbeat.Sequence)
 		return
 	}
 

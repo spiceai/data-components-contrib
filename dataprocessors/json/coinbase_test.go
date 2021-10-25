@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCoinbaseTicket(t *testing.T) {
+func TestCoinbaseTicker(t *testing.T) {
 	dpParams := map[string]string{}
 	measurements := map[string]string{
 		"price":     "price",
