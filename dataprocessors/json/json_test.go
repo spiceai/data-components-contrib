@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	snapshotter                   = cupaloy.New(cupaloy.SnapshotSubdirectory("../../test/assets/snapshots/dataprocessors/json"))
+	snapshotter = cupaloy.New(cupaloy.SnapshotSubdirectory("../../test/assets/snapshots/dataprocessors/json"))
 )
 
 func TestJson(t *testing.T) {
@@ -146,7 +146,6 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 			t.Error(err)
 			return
 		}
-
 
 		snapshotter.SnapshotT(t, actualObservations)
 	}

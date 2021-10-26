@@ -22,7 +22,7 @@ const (
 )
 
 type CsvProcessor struct {
-	timeFormat string
+	timeFormat   string
 	timeSelector string
 
 	measurements map[string]string

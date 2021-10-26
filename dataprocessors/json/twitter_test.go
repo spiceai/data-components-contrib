@@ -11,19 +11,19 @@ import (
 
 func TestTwitterTweets(t *testing.T) {
 	processorParams := map[string]string{
-		"time_format": "Mon Jan 02 15:04:05 -0700 2006",
+		"time_format":   "Mon Jan 02 15:04:05 -0700 2006",
 		"time_selector": "created_at",
 	}
 
 	measurements := map[string]string{
 		"favorite_count": "favorite_count",
-		"quote_count": "quote_count",
-        "reply_count": "reply_count",
-        "retweet_count": "retweet_count",
+		"quote_count":    "quote_count",
+		"reply_count":    "reply_count",
+		"retweet_count":  "retweet_count",
 	}
 
 	categories := map[string]string{
-		"lang": "lang",
+		"lang":         "lang",
 		"filter_level": "filter_level",
 	}
 
@@ -42,7 +42,7 @@ func TestTwitterTweets(t *testing.T) {
 		"consumer_secret": "change_me",
 		"access_token":    "change_me",
 		"access_secret":   "change_me",
-		"filter": "i",
+		"filter":          "i",
 	}
 
 	if connectorParams["consumer_key"] == "change_me" {
@@ -84,7 +84,7 @@ func TestTwitterTweets(t *testing.T) {
 	assert.Len(t, observations, 5)
 
 	for _, o := range observations {
-		assert.Greater(t, o.Time, time.Now().Add(-time.Second * 5), "invalid time")
+		assert.Greater(t, o.Time, time.Now().Add(-time.Second*5), "invalid time")
 		assert.GreaterOrEqual(t, o.Measurements["favorite_count"], 0.0, "invalid favorite_count")
 		assert.GreaterOrEqual(t, o.Measurements["quote_count"], 0.0, "invalid quote_count")
 		assert.GreaterOrEqual(t, o.Measurements["reply_count"], 0.0, "invalid reply_count")

@@ -41,7 +41,7 @@ func (p *JsonProcessor) Init(params map[string]string, measurements map[string]s
 	} else {
 		p.timeSelector = "time"
 	}
-	
+
 	p.measurements = measurements
 	p.categories = categories
 
