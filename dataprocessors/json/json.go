@@ -19,6 +19,7 @@ const (
 
 type JsonProcessor struct {
 	timeFormat   string
+	timeSelector string
 	measurements map[string]string
 	categories   map[string]string
 
@@ -35,6 +36,12 @@ func (p *JsonProcessor) Init(params map[string]string, measurements map[string]s
 	if val, ok := params["time_format"]; ok {
 		p.timeFormat = val
 	}
+	if selector, ok := params["time_selector"]; ok && selector != "" {
+		p.timeSelector = selector
+	} else {
+		p.timeSelector = "time"
+	}
+	
 	p.measurements = measurements
 	p.categories = categories
 
@@ -116,7 +123,12 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 }
 
 func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.RawMessage) (*observations.Observation, error) {
-	t, err := unmarshalTime(p.timeFormat, item["time"])
+	timeValue, ok := item[p.timeSelector]
+	if !ok {
+		return nil, fmt.Errorf("time field with selector '%s' does not exist in the message", p.timeSelector)
+	}
+
+	t, err := unmarshalTime(p.timeFormat, timeValue)
 	if err != nil {
 		return nil, err
 	}

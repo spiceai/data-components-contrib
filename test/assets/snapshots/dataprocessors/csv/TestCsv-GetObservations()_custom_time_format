@@ -1,618 +1,618 @@
-([]observations.Observation) (len=77) {
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1405524959,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1574287726,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1603529402,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 45
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1595807633,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1559557172,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 2.4
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1574287953,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1617849056,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1547575221,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 23
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1550460496,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 5
-    },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
-  },
-  (observations.Observation) {
-    Time: (int64) 1536626152,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+[
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 34
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1405524959,
+    "Measurements": {
+      "val": 54.46
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1574287726,
+    "Measurements": {
+      "val": 3
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1603529402,
+    "Measurements": {
+      "val": 45
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1595807633,
+    "Measurements": {
+      "val": 34
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1559557172,
+    "Measurements": {
+      "val": 3
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 2.4
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1574287953,
+    "Measurements": {
+      "val": 4
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1617849056,
+    "Measurements": {
+      "val": 34
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1547575221,
+    "Measurements": {
+      "val": 23
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 4
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1550460496,
+    "Measurements": {
+      "val": 5
+    },
+    "Categories": null,
+    "Tags": null
+  },
+  {
+    "Time": 1536626152,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1552999318,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
+  {
+    "Time": 1552999318,
+    "Measurements": {
+      "val": 54.46
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1593692288,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 45
+  {
+    "Time": 1593692288,
+    "Measurements": {
+      "val": 45
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1567535861,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1567535861,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 2.4
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 2.4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1559557172,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1559557172,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 23
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 23
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1197295014,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1197295014,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1595807633,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 5
+  {
+    "Time": 1595807633,
+    "Measurements": {
+      "val": 5
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1372805194,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1372805194,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1206658576,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
+  {
+    "Time": 1206658576,
+    "Measurements": {
+      "val": 54.46
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1197295014,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1197295014,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1206658576,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1206658576,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1223695126,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
+  {
+    "Time": 1223695126,
+    "Measurements": {
+      "val": 54.46
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1197295014,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 45
+  {
+    "Time": 1197295014,
+    "Measurements": {
+      "val": 45
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1206670373,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1206670373,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1385452011,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1385452011,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575221,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 2.4
+  {
+    "Time": 1547575221,
+    "Measurements": {
+      "val": 2.4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1197295014,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1197295014,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1197295014,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1197295014,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 23
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 23
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1550460496,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1550460496,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1206670373,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 5
+  {
+    "Time": 1206670373,
+    "Measurements": {
+      "val": 5
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1552999318,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
+  {
+    "Time": 1552999318,
+    "Measurements": {
+      "val": 54.46
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1197295014,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1197295014,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1593692288,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 45
+  {
+    "Time": 1593692288,
+    "Measurements": {
+      "val": 45
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1567535861,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1567535861,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 2.4
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 2.4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1337885580,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1337885580,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1523637859,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1523637859,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1547575074,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 23
+  {
+    "Time": 1547575074,
+    "Measurements": {
+      "val": 23
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1491044460,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1491044460,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402718467,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 5
+  {
+    "Time": 1402718467,
+    "Measurements": {
+      "val": 5
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402954004,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1402954004,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402954139,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
+  {
+    "Time": 1402954139,
+    "Measurements": {
+      "val": 54.46
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609598,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1402609598,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609670,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 45
+  {
+    "Time": 1402609670,
+    "Measurements": {
+      "val": 45
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609742,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1402609742,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402954098,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1402954098,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1406680213,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 2.4
+  {
+    "Time": 1406680213,
+    "Measurements": {
+      "val": 2.4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402718010,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1402718010,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1441273701,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1441273701,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609579,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 23
+  {
+    "Time": 1402609579,
+    "Measurements": {
+      "val": 23
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609694,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1402609694,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1216128531,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 5
+  {
+    "Time": 1216128531,
+    "Measurements": {
+      "val": 5
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609616,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1402609616,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1500625053,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
+  {
+    "Time": 1500625053,
+    "Measurements": {
+      "val": 54.46
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402954185,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1402954185,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609683,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 45
+  {
+    "Time": 1402609683,
+    "Measurements": {
+      "val": 45
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402954055,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1402954055,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402954161,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1402954161,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1216128531,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 2.4
+  {
+    "Time": 1216128531,
+    "Measurements": {
+      "val": 2.4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1278097514,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 4
+  {
+    "Time": 1278097514,
+    "Measurements": {
+      "val": 4
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1216128531,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1216128531,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1502282628,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 23
+  {
+    "Time": 1502282628,
+    "Measurements": {
+      "val": 23
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609755,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 34
+  {
+    "Time": 1402609755,
+    "Measurements": {
+      "val": 34
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402954076,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 54.46
+  {
+    "Time": 1402954076,
+    "Measurements": {
+      "val": 54.46
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1402609727,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 3
+  {
+    "Time": 1402609727,
+    "Measurements": {
+      "val": 3
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   },
-  (observations.Observation) {
-    Time: (int64) 1243376609,
-    Measurements: (map[string]float64) (len=1) {
-      (string) (len=3) "val": (float64) 45
+  {
+    "Time": 1243376609,
+    "Measurements": {
+      "val": 45
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) <nil>
+    "Categories": null,
+    "Tags": null
   }
-}
+]

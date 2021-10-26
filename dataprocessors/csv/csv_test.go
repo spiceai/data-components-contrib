@@ -2,6 +2,7 @@ package csv
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"os"
 	"sync"
@@ -174,7 +175,12 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
-		snapshotter.SnapshotT(t, actualObservations)
+		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		snapshotter.SnapshotT(t, observationsJson)
 	}
 }
 
@@ -241,7 +247,12 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 		}
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
-		snapshotter.SnapshotT(t, actualObservations)
+		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		snapshotter.SnapshotT(t, observationsJson)
 	}
 }
 

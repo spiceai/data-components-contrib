@@ -1,83 +1,83 @@
-([]observations.Observation) (len=5) {
-  (observations.Observation) {
-    Time: (int64) 1605312000,
-    Measurements: (map[string]float64) (len=5) {
-      (string) (len=5) "close": (float64) 16254.51,
-      (string) (len=4) "high": (float64) 16339.6,
-      (string) (len=3) "low": (float64) 16240,
-      (string) (len=4) "open": (float64) 16339.56,
-      (string) (len=6) "volume": (float64) 274.42607
+[
+  {
+    "Time": 1605312000,
+    "Measurements": {
+      "close": 16254.51,
+      "high": 16339.6,
+      "low": 16240,
+      "open": 16339.56,
+      "volume": 274.42607
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) (len=2) {
-      (string) (len=10) "elon_tweet",
-      (string) (len=11) "market_open"
-    }
+    "Categories": null,
+    "Tags": [
+      "elon_tweet",
+      "market_open"
+    ]
   },
-  (observations.Observation) {
-    Time: (int64) 1605313800,
-    Measurements: (map[string]float64) (len=5) {
-      (string) (len=5) "close": (float64) 16305,
-      (string) (len=4) "high": (float64) 16305,
-      (string) (len=3) "low": (float64) 16248.6,
-      (string) (len=4) "open": (float64) 16256.42,
-      (string) (len=6) "volume": (float64) 110.91971
+  {
+    "Time": 1605313800,
+    "Measurements": {
+      "close": 16305,
+      "high": 16305,
+      "low": 16248.6,
+      "open": 16256.42,
+      "volume": 110.91971
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) (len=1) {
-      (string) (len=12) "market_close"
-    }
+    "Categories": null,
+    "Tags": [
+      "market_close"
+    ]
   },
-  (observations.Observation) {
-    Time: (int64) 1605315600,
-    Measurements: (map[string]float64) (len=5) {
-      (string) (len=5) "close": (float64) 16222.16,
-      (string) (len=4) "high": (float64) 16303.88,
-      (string) (len=3) "low": (float64) 16210.99,
-      (string) (len=4) "open": (float64) 16303.88,
-      (string) (len=6) "volume": (float64) 231.64805
+  {
+    "Time": 1605315600,
+    "Measurements": {
+      "close": 16222.16,
+      "high": 16303.88,
+      "low": 16210.99,
+      "open": 16303.88,
+      "volume": 231.64805
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) (len=1) {
-      (string) ""
-    }
+    "Categories": null,
+    "Tags": [
+      ""
+    ]
   },
-  (observations.Observation) {
-    Time: (int64) 1605317400,
-    Measurements: (map[string]float64) (len=5) {
-      (string) (len=5) "close": (float64) 16214.15,
-      (string) (len=4) "high": (float64) 16246.92,
-      (string) (len=3) "low": (float64) 16200.01,
-      (string) (len=4) "open": (float64) 16221.78,
-      (string) (len=6) "volume": (float64) 135.86161
+  {
+    "Time": 1605317400,
+    "Measurements": {
+      "close": 16214.15,
+      "high": 16246.92,
+      "low": 16200.01,
+      "open": 16221.78,
+      "volume": 135.86161
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) (len=11) {
-      (string) (len=3) "use",
-      (string) (len=5) "spice",
-      (string) (len=2) "ai",
-      (string) (len=3) "for",
-      (string) (len=3) "all",
-      (string) (len=4) "your",
-      (string) (len=11) "intelligent",
-      (string) (len=4) "time",
-      (string) (len=6) "series",
-      (string) (len=3) "app",
-      (string) (len=6) "needs!"
-    }
+    "Categories": null,
+    "Tags": [
+      "use",
+      "spice",
+      "ai",
+      "for",
+      "all",
+      "your",
+      "intelligent",
+      "time",
+      "series",
+      "app",
+      "needs!"
+    ]
   },
-  (observations.Observation) {
-    Time: (int64) 1605319200,
-    Measurements: (map[string]float64) (len=5) {
-      (string) (len=5) "close": (float64) 16223.08,
-      (string) (len=4) "high": (float64) 16234,
-      (string) (len=3) "low": (float64) 16175.62,
-      (string) (len=4) "open": (float64) 16214.26,
-      (string) (len=6) "volume": (float64) 164.32561
+  {
+    "Time": 1605319200,
+    "Measurements": {
+      "close": 16223.08,
+      "high": 16234,
+      "low": 16175.62,
+      "open": 16214.26,
+      "volume": 164.32561
     },
-    Categories: (map[string]string) <nil>,
-    Tags: ([]string) (len=1) {
-      (string) ""
-    }
+    "Categories": null,
+    "Tags": [
+      ""
+    ]
   }
-}
+]
