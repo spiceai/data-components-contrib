@@ -12,7 +12,7 @@ import (
 	"sync"
 
 	"github.com/spiceai/spiceai/pkg/observations"
-	"github.com/spiceai/spiceai/pkg/time"
+	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
 )
 
@@ -22,7 +22,8 @@ const (
 )
 
 type CsvProcessor struct {
-	timeFormat string
+	timeFormat   string
+	timeSelector string
 
 	measurements map[string]string
 	categories   map[string]string
@@ -39,6 +40,11 @@ func NewCsvProcessor() *CsvProcessor {
 func (p *CsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string) error {
 	if format, ok := params["time_format"]; ok {
 		p.timeFormat = format
+	}
+	if selector, ok := params["time_selector"]; ok && selector != "" {
+		p.timeSelector = selector
+	} else {
+		p.timeSelector = "time"
 	}
 
 	p.measurements = measurements
@@ -101,17 +107,21 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		return nil, fmt.Errorf("failed to process csv: %s", err)
 	}
 
+	timeCol := -1
+	tagsCol := -1
 	headersMap := make(map[string]int, len(headers))
 	for i, header := range headers {
 		headersMap[header] = i
+		if timeCol < 0 && header == p.timeSelector {
+			timeCol = i
+		}
+		if tagsCol < 0 && header == tagsColumnName {
+			tagsCol = i
+		}
 	}
 
-	tagsColumn := -1
-	for i, header := range headers {
-		if header == tagsColumnName {
-			tagsColumn = i
-			break
-		}
+	if timeCol < 0 {
+		return nil, fmt.Errorf("time header '%s' not found", p.timeSelector)
 	}
 
 	measurementMappings := getFieldMappings(p.measurements, headersMap)
@@ -120,7 +130,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 	var newObservations []observations.Observation
 	for line, record := range lines {
 		// Process time
-		ts, err := time.ParseTime(record[0], p.timeFormat)
+		ts, err := spice_time.ParseTime(record[timeCol], p.timeFormat)
 		if err != nil {
 			log.Printf("ignoring invalid line %d - %v: %v", line+1, record, err)
 			continue
@@ -128,8 +138,8 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 
 		// Process tags
 		var tags []string
-		if tagsColumn >= 0 {
-			tags = strings.Split(record[tagsColumn], " ")
+		if tagsCol >= 0 {
+			tags = strings.Split(record[tagsCol], " ")
 		}
 
 		// Process measurements
@@ -185,11 +195,6 @@ func getCsvHeaderAndLines(input io.Reader) ([]string, [][]string, error) {
 
 	if len(headers) <= 1 || len(lines) == 0 {
 		return nil, nil, errors.New("no data")
-	}
-
-	// Temporary restriction until mapped fields are supported
-	if headers[0] != "time" {
-		return nil, nil, errors.New("first column must be 'time'")
 	}
 
 	return headers, lines, nil

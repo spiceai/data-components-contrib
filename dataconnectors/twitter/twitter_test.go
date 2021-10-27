@@ -61,7 +61,7 @@ func TestRead(t *testing.T) {
 					allTweets = append(allTweets, tweet)
 					wg.Done()
 				}
-				
+
 				tweetsMutex.Unlock()
 			}
 		}

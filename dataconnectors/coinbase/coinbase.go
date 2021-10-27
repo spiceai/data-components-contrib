@@ -27,21 +27,21 @@ type MessageHeaders struct {
 }
 
 type Subscriptions struct {
-	Type     string    `json:"type"`    
+	Type     string    `json:"type"`
 	Channels []Channel `json:"channels"`
 }
 
 type Channel struct {
-	Name       string   `json:"name"`       
+	Name       string   `json:"name"`
 	ProductIDS []string `json:"product_ids"`
 }
 
 type Heartbeat struct {
-	Type        string `json:"type"`         
+	Type        string `json:"type"`
 	LastTradeID int64  `json:"last_trade_id"`
-	ProductID   string `json:"product_id"`   
-	Sequence    int64  `json:"sequence"`     
-	Time        string `json:"time"`         
+	ProductID   string `json:"product_id"`
+	Sequence    int64  `json:"sequence"`
+	Time        string `json:"time"`
 }
 
 const (
