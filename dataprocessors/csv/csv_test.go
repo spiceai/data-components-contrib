@@ -147,6 +147,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		tags := []string{
 			"_tags",
+			"tag1",
 		}
 
 		dp := NewCsvProcessor()
@@ -174,7 +175,11 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		}
 
 		if len(actualObservations[0].Tags) > 0 {
-			expectedFirstObservation.Tags = []string{"elon_tweet", "market_open"}
+			expectedFirstObservation.Tags = []string{
+				"elon_tweet",
+				"market_open",
+				"tagA",
+			}
 		}
 
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
