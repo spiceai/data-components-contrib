@@ -37,7 +37,7 @@ func NewCsvProcessor() *CsvProcessor {
 	return &CsvProcessor{}
 }
 
-func (p *CsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string) error {
+func (p *CsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
 	if format, ok := params["time_format"]; ok {
 		p.timeFormat = format
 	}

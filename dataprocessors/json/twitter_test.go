@@ -28,7 +28,7 @@ func TestTwitterTweets(t *testing.T) {
 	}
 
 	dp := NewJsonProcessor()
-	err := dp.Init(processorParams, measurements, categories)
+	err := dp.Init(processorParams, measurements, categories, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
