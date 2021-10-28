@@ -55,8 +55,7 @@
     Categories: (map[string]string) (len=1) {
       (string) (len=4) "city": (string) (len=6) "Lodoga"
     },
-    Tags: ([]string) (len=5) {
-      (string) (len=9) "consequat",
+    Tags: ([]string) (len=4) {
       (string) (len=9) "consequat",
       (string) (len=8) "deserunt",
       (string) (len=4) "esse",
@@ -151,11 +150,10 @@
     Categories: (map[string]string) (len=1) {
       (string) (len=4) "city": (string) (len=6) "Chapin"
     },
-    Tags: ([]string) (len=5) {
+    Tags: ([]string) (len=4) {
       (string) (len=8) "pariatur",
       (string) (len=6) "fugiat",
       (string) (len=9) "consequat",
-      (string) (len=6) "fugiat",
       (string) (len=13) "reprehenderit"
     }
   },
@@ -247,11 +245,9 @@
     Categories: (map[string]string) (len=1) {
       (string) (len=4) "city": (string) (len=5) "Shaft"
     },
-    Tags: ([]string) (len=5) {
+    Tags: ([]string) (len=3) {
       (string) (len=4) "amet",
       (string) (len=7) "eiusmod",
-      (string) (len=4) "amet",
-      (string) (len=4) "amet",
       (string) (len=6) "mollit"
     }
   },
@@ -343,11 +339,10 @@
     Categories: (map[string]string) (len=1) {
       (string) (len=4) "city": (string) (len=7) "Gilmore"
     },
-    Tags: ([]string) (len=5) {
+    Tags: ([]string) (len=4) {
       (string) (len=10) "incididunt",
       (string) (len=4) "enim",
       (string) (len=9) "cupidatat",
-      (string) (len=4) "esse",
       (string) (len=4) "esse"
     }
   },
@@ -455,12 +450,11 @@
     Categories: (map[string]string) (len=1) {
       (string) (len=4) "city": (string) (len=10) "Wattsville"
     },
-    Tags: ([]string) (len=5) {
+    Tags: ([]string) (len=4) {
       (string) (len=4) "elit",
       (string) (len=6) "mollit",
       (string) (len=7) "officia",
-      (string) (len=2) "do",
-      (string) (len=7) "officia"
+      (string) (len=2) "do"
     }
   },
   (observations.Observation) {
@@ -503,8 +497,7 @@
     Categories: (map[string]string) (len=1) {
       (string) (len=4) "city": (string) (len=6) "Tedrow"
     },
-    Tags: ([]string) (len=5) {
-      (string) (len=4) "nisi",
+    Tags: ([]string) (len=4) {
       (string) (len=4) "nisi",
       (string) (len=2) "et",
       (string) (len=4) "amet",

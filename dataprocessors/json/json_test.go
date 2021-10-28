@@ -48,7 +48,7 @@ func testInitFunc() func(*testing.T) {
 	params := map[string]string{}
 
 	return func(t *testing.T) {
-		err := p.Init(params, nil, nil)
+		err := p.Init(params, nil, nil, nil)
 		assert.NoError(t, err)
 	}
 }
@@ -69,8 +69,14 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
+		tags := []string {
+			"t1",
+			"tags",
+			"_tags",
+		}
+
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories)
+		err := dp.Init(nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -102,8 +108,12 @@ func testGetObservationsSomeDataPointsFunc(data []byte) func(*testing.T) {
 			"lang": "lang",
 		}
 
+		tags := []string {
+			"tags",
+		}
+
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories)
+		err := dp.Init(nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -134,8 +144,12 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
+		tags := []string {
+			"tags",
+		}
+
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories)
+		err := dp.Init(nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -167,8 +181,12 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 			"favorite_count": "favorite_count",
 		}
 
+		tags := []string {
+			"tags",
+		}
+
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories)
+		err := dp.Init(nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -208,8 +226,12 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
+		tags := []string {
+			"tags",
+		}
+
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories)
+		err := dp.Init(nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -242,8 +264,12 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
+		tags := []string{
+			"tags",
+		}
+
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories)
+		err := dp.Init(nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)

@@ -21,7 +21,7 @@ func TestCoinbaseTicker(t *testing.T) {
 	}
 
 	dp := NewJsonProcessor()
-	err := dp.Init(dpParams, measurements, categories)
+	err := dp.Init(dpParams, measurements, categories, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

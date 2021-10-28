@@ -27,6 +27,7 @@ type CsvProcessor struct {
 
 	measurements map[string]string
 	categories   map[string]string
+	tags []string
 
 	dataMutex sync.RWMutex
 	data      []byte
@@ -37,7 +38,7 @@ func NewCsvProcessor() *CsvProcessor {
 	return &CsvProcessor{}
 }
 
-func (p *CsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string) error {
+func (p *CsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
 	if format, ok := params["time_format"]; ok {
 		p.timeFormat = format
 	}
@@ -49,6 +50,7 @@ func (p *CsvProcessor) Init(params map[string]string, measurements map[string]st
 
 	p.measurements = measurements
 	p.categories = categories
+	p.tags = tags
 
 	return nil
 }
@@ -98,7 +100,8 @@ func (p *CsvProcessor) GetObservations() ([]observations.Observation, error) {
 }
 
 func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observation, error) {
-	if len(p.measurements)+len(p.categories) == 0 {
+	numTags := len(p.tags)
+	if len(p.measurements)+len(p.categories)+numTags == 0 {
 		return nil, nil
 	}
 
@@ -108,15 +111,18 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 	}
 
 	timeCol := -1
-	tagsCol := -1
+	tagsCol := make([]int, 0, numTags)
 	headersMap := make(map[string]int, len(headers))
 	for i, header := range headers {
 		headersMap[header] = i
 		if timeCol < 0 && header == p.timeSelector {
 			timeCol = i
 		}
-		if tagsCol < 0 && header == tagsColumnName {
-			tagsCol = i
+		for _, tag := range p.tags {
+			if header == tag {
+				tagsCol = append(tagsCol, i)
+				break
+			}
 		}
 	}
 
@@ -138,8 +144,15 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 
 		// Process tags
 		var tags []string
-		if tagsCol >= 0 {
-			tags = strings.Split(record[tagsCol], " ")
+		tagsMap := make(map[string]bool, numTags)
+		for _, col := range tagsCol {
+			field := record[col]
+			for _, tag := range strings.Split(field, " ") {
+				if tag != "" && !tagsMap[tag] {
+					tags = append(tags, tag)
+					tagsMap[tag] = true
+				}
+			}
 		}
 
 		// Process measurements

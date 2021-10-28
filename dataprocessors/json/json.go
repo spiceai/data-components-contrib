@@ -20,8 +20,10 @@ const (
 type JsonProcessor struct {
 	timeFormat   string
 	timeSelector string
+
 	measurements map[string]string
 	categories   map[string]string
+	tags []string
 
 	dataMutex    sync.RWMutex
 	data         [][]byte
@@ -32,7 +34,7 @@ func NewJsonProcessor() *JsonProcessor {
 	return &JsonProcessor{}
 }
 
-func (p *JsonProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string) error {
+func (p *JsonProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
 	if val, ok := params["time_format"]; ok {
 		p.timeFormat = val
 	}
@@ -44,6 +46,7 @@ func (p *JsonProcessor) Init(params map[string]string, measurements map[string]s
 
 	p.measurements = measurements
 	p.categories = categories
+	p.tags = tags
 
 	return nil
 }
@@ -171,14 +174,42 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 		Time: t.Unix(),
 	}
 
-	if val, ok := item["tags"]; ok {
-		var tags []string
-		err = json.Unmarshal(val, &tags)
+	var tags []string
+	tagsMap := map[string]bool{}
+
+	for _, tag := range p.tags {
+		val, ok := item[tag]
+		if !ok {
+			continue
+		}
+
+		if tag == "_tags" || tag == "tags" {
+			var strs []string
+			err = json.Unmarshal(val, &strs)
+			if err != nil {
+				return nil, err
+			}
+			for _, str := range strs {
+				if _, ok := tagsMap[str]; !ok {
+					tags = append(tags, str)
+					tagsMap[str] = true
+				}
+			}
+			continue
+		}
+
+		var str string
+		err = json.Unmarshal(val, &str)
 		if err != nil {
 			return nil, err
 		}
-		observation.Tags = tags
+		if _, ok := tagsMap[str]; !ok {
+			tags = append(tags, str)
+			tagsMap[str] = true
+		}
 	}
+	
+	observation.Tags = tags
 
 	if len(measurements) > 0 {
 		observation.Measurements = measurements
