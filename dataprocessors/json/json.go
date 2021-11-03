@@ -21,6 +21,7 @@ type JsonProcessor struct {
 	timeFormat   string
 	timeSelector string
 
+	identifiers map[string]string
 	measurements map[string]string
 	categories   map[string]string
 	tags []string
@@ -34,7 +35,7 @@ func NewJsonProcessor() *JsonProcessor {
 	return &JsonProcessor{}
 }
 
-func (p *JsonProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
+func (p *JsonProcessor) Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
 	if val, ok := params["time_format"]; ok {
 		p.timeFormat = val
 	}

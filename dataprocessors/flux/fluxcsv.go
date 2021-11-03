@@ -35,7 +35,7 @@ func NewFluxCsvProcessor() *FluxCsvProcessor {
 	return &FluxCsvProcessor{}
 }
 
-func (p *FluxCsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
+func (p *FluxCsvProcessor) Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
 	return nil
 }
 
