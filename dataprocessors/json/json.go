@@ -45,6 +45,7 @@ func (p *JsonProcessor) Init(params map[string]string, identifiers map[string]st
 		p.timeSelector = "time"
 	}
 
+	p.identifiers = identifiers
 	p.measurements = measurements
 	p.categories = categories
 	p.tags = tags
@@ -137,6 +138,25 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 		return nil, err
 	}
 
+	identifiers := make(map[string]string)
+
+	for fieldName, selector := range p.identifiers {
+		if val, ok := item[selector]; ok {
+			var jsonVal interface{}
+			err = json.Unmarshal(val, &jsonVal)
+			if err != nil {
+				return nil, err
+			}
+			if str, ok := jsonVal.(string); ok {
+				identifiers[fieldName] = str
+			} else if num, ok := jsonVal.(float64); ok {
+				identifiers[fieldName] = strconv.FormatFloat(num, 'f', -1, 64)
+			} else {
+				return nil, fmt.Errorf("identifier field '%s' is not a a valid id (string or number)", fieldName)
+			}
+		}
+	}
+
 	measurements := make(map[string]float64)
 
 	for fieldName, selector := range p.measurements {
@@ -211,6 +231,10 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 	}
 	
 	observation.Tags = tags
+
+	if len(identifiers) > 0 {
+		observation.Identifiers = identifiers
+	}
 
 	if len(measurements) > 0 {
 		observation.Measurements = measurements

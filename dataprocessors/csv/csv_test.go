@@ -52,6 +52,7 @@ func TestCsv(t *testing.T) {
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
+	t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
 	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
@@ -123,7 +124,7 @@ func testInitFunc() func(*testing.T) {
 	params := map[string]string{}
 
 	return func(t *testing.T) {
-		err := p.Init(params, nil, nil, nil)
+		err := p.Init(params, nil, nil, nil, nil)
 		assert.NoError(t, err)
 	}
 }
@@ -151,7 +152,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil, measurements, categories, tags)
+		err := dp.Init(nil, nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -236,7 +237,7 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 		dp := NewCsvProcessor()
 		err = dp.Init(map[string]string{
 			"time_format": "2006-01-02 15:04:05-07:00",
-		}, measurements, categories, nil)
+		}, nil, measurements, categories, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(localData)
@@ -254,6 +255,68 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 				"val": 34,
 			},
 		}
+		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+
+		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		snapshotter.SnapshotT(t, observationsJson)
+	}
+}
+
+// Tests "GetObservations()" identifiers
+func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		data, err := os.ReadFile("../../test/assets/data/csv/btcusd_ticks.csv")
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		identifiers := map[string]string{
+			"tick_id":   "tick_id",
+		}
+
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
+
+		dp := NewCsvProcessor()
+		err = dp.Init(nil, identifiers, measurements, nil, nil)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualObservations, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		expectedFirstObservation := observations.Observation{
+			Time: 1605312000,
+			Identifiers: map[string]string{
+				"tick_id": "1",
+			},
+			Measurements: map[string]float64{
+				"open":   16339.56,
+				"high":   16339.6,
+				"low":    16240,
+				"close":  16254.51,
+				"volume": 274.42607,
+			},
+		}
+
 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
 
 		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
@@ -283,7 +346,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		categories := map[string]string{}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil, measurements, categories, nil)
+		err := dp.Init(nil, nil, measurements, categories, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -328,7 +391,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		categories := map[string]string{}
 
 		dp := NewCsvProcessor()
-		err := dp.Init(nil, measurements, categories, nil)
+		err := dp.Init(nil, nil, measurements, categories, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -369,7 +432,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 func benchGetObservationsFunc(c *file.FileConnector) func(*testing.B) {
 	return func(b *testing.B) {
 		dp := NewCsvProcessor()
-		err := dp.Init(nil, nil, nil, nil)
+		err := dp.Init(nil, nil, nil, nil, nil)
 		if err != nil {
 			b.Error(err)
 		}

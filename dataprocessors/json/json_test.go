@@ -33,6 +33,7 @@ func TestJson(t *testing.T) {
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations() - array", testGetObservationsFunc(puppies))
 	t.Run("GetObservations() - single object", testGetObservationsFunc(puppy))
+	t.Run("GetObservations() -- with selected identifiers", testGetObservationsSelectedIdentifiersFunc(puppies))
 	t.Run("GetObservations() -- with selected measurements", testGetObservationsSelectedMeasurementsFunc(puppies))
 	t.Run("GetObservations() -- with a string value for some data points", testGetObservationsSomeDataPointsFunc(tweets))
 	t.Run("GetObservations() -- with an invalid string value for some data points", testGetObservationsInvalidStringFunc(tweets))
@@ -48,7 +49,7 @@ func testInitFunc() func(*testing.T) {
 	params := map[string]string{}
 
 	return func(t *testing.T) {
-		err := p.Init(params, nil, nil, nil)
+		err := p.Init(params, nil, nil, nil, nil)
 		assert.NoError(t, err)
 	}
 }
@@ -76,7 +77,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories, tags)
+		err := dp.Init(nil, nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -113,7 +114,47 @@ func testGetObservationsSomeDataPointsFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories, tags)
+		err := dp.Init(nil, nil, measurements, categories, tags)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualObservations, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		snapshotter.SnapshotT(t, actualObservations)
+	}
+}
+
+// Tests "GetObservations()" with selected identifiers
+func testGetObservationsSelectedIdentifiersFunc(data []byte) func(*testing.T) {
+	return func(t *testing.T) {
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		identifiers := map[string]string{
+			"population_id": "population",
+		}
+
+		measurements := map[string]string{
+			"population": "population",
+		}
+
+		categories := map[string]string{
+			"city": "city",
+		}
+
+		tags := []string {
+			"tags",
+		}
+
+		dp := NewJsonProcessor()
+		err := dp.Init(nil, identifiers, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -149,7 +190,7 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories, tags)
+		err := dp.Init(nil, nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -186,7 +227,7 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories, tags)
+		err := dp.Init(nil, nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -231,7 +272,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories, tags)
+		err := dp.Init(nil, nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -269,7 +310,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		}
 
 		dp := NewJsonProcessor()
-		err := dp.Init(nil, measurements, categories, tags)
+		err := dp.Init(nil, nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)

@@ -1,6 +1,7 @@
 ([]observations.Observation) (len=1) {
   (observations.Observation) {
     Time: (int64) 980393406,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 8.39,
       (string) (len=10) "population": (float64) 4

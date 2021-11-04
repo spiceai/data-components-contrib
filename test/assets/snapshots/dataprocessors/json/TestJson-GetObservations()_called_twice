@@ -1,6 +1,7 @@
 ([]observations.Observation) (len=32) {
   (observations.Observation) {
     Time: (int64) 1561427263,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 0.48,
       (string) (len=10) "population": (float64) 4
@@ -18,6 +19,7 @@
   },
   (observations.Observation) {
     Time: (int64) 176118546,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 4.75,
       (string) (len=10) "population": (float64) 3
@@ -35,6 +37,7 @@
   },
   (observations.Observation) {
     Time: (int64) 827250315,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 8.89,
       (string) (len=10) "population": (float64) 2
@@ -52,6 +55,7 @@
   },
   (observations.Observation) {
     Time: (int64) 727486518,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 0.01,
       (string) (len=10) "population": (float64) 9
@@ -68,6 +72,7 @@
   },
   (observations.Observation) {
     Time: (int64) 753860873,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 0.87,
       (string) (len=10) "population": (float64) 10
@@ -85,6 +90,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1527610307,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 3.57,
       (string) (len=10) "population": (float64) 2
@@ -102,6 +108,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1487273981,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 6.92,
       (string) (len=10) "population": (float64) 0
@@ -119,6 +126,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1323597224,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 8.37,
       (string) (len=10) "population": (float64) 8
@@ -136,6 +144,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1203152430,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 2.89,
       (string) (len=10) "population": (float64) 6
@@ -153,6 +162,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1081471571,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 0.48,
       (string) (len=10) "population": (float64) 5
@@ -169,6 +179,7 @@
   },
   (observations.Observation) {
     Time: (int64) 341744119,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 4.91,
       (string) (len=10) "population": (float64) 6
@@ -186,6 +197,7 @@
   },
   (observations.Observation) {
     Time: (int64) 931232333,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 8.72,
       (string) (len=10) "population": (float64) 8
@@ -203,6 +215,7 @@
   },
   (observations.Observation) {
     Time: (int64) 502998006,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 2.65,
       (string) (len=10) "population": (float64) 10
@@ -220,6 +233,7 @@
   },
   (observations.Observation) {
     Time: (int64) 39328803,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 1.08,
       (string) (len=10) "population": (float64) 7
@@ -237,6 +251,7 @@
   },
   (observations.Observation) {
     Time: (int64) 580577796,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 1.59,
       (string) (len=10) "population": (float64) 9
@@ -254,6 +269,7 @@
   },
   (observations.Observation) {
     Time: (int64) 856208880,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 6.78,
       (string) (len=10) "population": (float64) 5
@@ -269,6 +285,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1063662202,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 4.21,
       (string) (len=10) "population": (float64) 6
@@ -286,6 +303,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1488729261,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 3.95,
       (string) (len=10) "population": (float64) 5
@@ -303,6 +321,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1440551722,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 2.77,
       (string) (len=10) "population": (float64) 4
@@ -320,6 +339,7 @@
   },
   (observations.Observation) {
     Time: (int64) 118930222,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 4.14,
       (string) (len=10) "population": (float64) 2
@@ -337,6 +357,7 @@
   },
   (observations.Observation) {
     Time: (int64) 427628854,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 2.53,
       (string) (len=10) "population": (float64) 4
@@ -354,6 +375,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1248330537,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 9.91,
       (string) (len=10) "population": (float64) 4
@@ -370,6 +392,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1295078526,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 4.37,
       (string) (len=10) "population": (float64) 4
@@ -387,6 +410,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1296734891,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 8.06,
       (string) (len=10) "population": (float64) 2
@@ -404,6 +428,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1346120032,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 5.35,
       (string) (len=10) "population": (float64) 1
@@ -421,6 +446,7 @@
   },
   (observations.Observation) {
     Time: (int64) 611453571,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 7.51,
       (string) (len=10) "population": (float64) 6
@@ -438,6 +464,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1315989272,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 1.78,
       (string) (len=10) "population": (float64) 0
@@ -455,6 +482,7 @@
   },
   (observations.Observation) {
     Time: (int64) 541264041,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 2.82,
       (string) (len=10) "population": (float64) 1
@@ -472,6 +500,7 @@
   },
   (observations.Observation) {
     Time: (int64) 887175702,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 0.38,
       (string) (len=10) "population": (float64) 2
@@ -488,6 +517,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1184173344,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 2.81,
       (string) (len=10) "population": (float64) 2
@@ -505,6 +535,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1418146896,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 1.57,
       (string) (len=10) "population": (float64) 9
@@ -522,6 +553,7 @@
   },
   (observations.Observation) {
     Time: (int64) 1563961927,
+    Identifiers: (map[string]string) <nil>,
     Measurements: (map[string]float64) (len=2) {
       (string) (len=10) "ave_weight": (float64) 2.39,
       (string) (len=10) "population": (float64) 10
