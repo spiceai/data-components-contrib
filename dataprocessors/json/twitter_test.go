@@ -42,10 +42,10 @@ func TestTwitterTweets(t *testing.T) {
 	var interval time.Duration
 
 	connectorParams := map[string]string{
-		"consumer_key":    "MOUuNLkNv6Wviv4QYqu4MFEZC",
-		"consumer_secret": "oy8JXZxAz5YqIdJh2jLkQFVt706e5yJPyy5cBTWhjOwDTgOBpO",
-		"access_token":    "314363554-cDw6uZNkpPn0Q2c3iw6AAmNzbHzGTQ589sh1wGst",
-		"access_secret":   "p9fHbiEu1ScpJCDHXZ5K3uruLUvgya4ZHxV9QwUuRvqjD",
+		"consumer_key":    "change_me",
+		"consumer_secret": "change_me",
+		"access_token":    "change_me",
+		"access_secret":   "change_me",
 		"filter":          "i",
 	}
 
