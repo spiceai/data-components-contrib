@@ -51,8 +51,8 @@ func TestCoinbaseTicker(t *testing.T) {
 		defer messageMutex.Unlock()
 		if readCount < 5 {
 			d, err := dp.OnData(data)
-			defer wg.Done()
 			readCount++
+			wg.Done()
 			return d, err
 		}
 		readCount++
