@@ -50,6 +50,7 @@ func TestCoinbaseTicker(t *testing.T) {
 		messageMutex.Lock()
 		defer messageMutex.Unlock()
 		if readCount < 5 {
+			t.Logf("readCount: %d\n", readCount)
 			d, err := dp.OnData(data)
 			readCount++
 			wg.Done()
@@ -62,7 +63,6 @@ func TestCoinbaseTicker(t *testing.T) {
 	err = dc.Init(epoch, period, interval, params)
 	if err != nil {
 		t.Fatal(err)
-		return
 	}
 
 	wg.Wait()
