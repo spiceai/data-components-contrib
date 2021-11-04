@@ -62,6 +62,7 @@ func TestCoinbaseTicker(t *testing.T) {
 	err = dc.Init(epoch, period, interval, params)
 	if err != nil {
 		t.Fatal(err)
+		return
 	}
 
 	wg.Wait()
