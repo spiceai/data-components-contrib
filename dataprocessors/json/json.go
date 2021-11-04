@@ -21,10 +21,10 @@ type JsonProcessor struct {
 	timeFormat   string
 	timeSelector string
 
-	identifiers map[string]string
+	identifiers  map[string]string
 	measurements map[string]string
 	categories   map[string]string
-	tags []string
+	tags         []string
 
 	dataMutex    sync.RWMutex
 	data         [][]byte
@@ -229,7 +229,7 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 			tagsMap[str] = true
 		}
 	}
-	
+
 	observation.Tags = tags
 
 	if len(identifiers) > 0 {

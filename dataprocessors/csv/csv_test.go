@@ -279,7 +279,7 @@ func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
 		}
 
 		identifiers := map[string]string{
-			"tick_id":   "tick_id",
+			"tick_id": "tick_id",
 		}
 
 		measurements := map[string]string{

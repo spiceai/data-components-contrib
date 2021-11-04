@@ -70,7 +70,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
-		tags := []string {
+		tags := []string{
 			"t1",
 			"tags",
 			"_tags",
@@ -109,7 +109,7 @@ func testGetObservationsSomeDataPointsFunc(data []byte) func(*testing.T) {
 			"lang": "lang",
 		}
 
-		tags := []string {
+		tags := []string{
 			"tags",
 		}
 
@@ -149,7 +149,7 @@ func testGetObservationsSelectedIdentifiersFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
-		tags := []string {
+		tags := []string{
 			"tags",
 		}
 
@@ -185,7 +185,7 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
-		tags := []string {
+		tags := []string{
 			"tags",
 		}
 
@@ -222,7 +222,7 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 			"favorite_count": "favorite_count",
 		}
 
-		tags := []string {
+		tags := []string{
 			"tags",
 		}
 
@@ -267,7 +267,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 			"city": "city",
 		}
 
-		tags := []string {
+		tags := []string{
 			"tags",
 		}
 
