@@ -1,7 +1,7 @@
 package coinbase_test
 
 import (
-	"log"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -41,10 +41,19 @@ func TestRead(t *testing.T) {
 
 	var messages [][]byte
 
+	readMutex := sync.Mutex{}
+	messageCount := 0
 	err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
-		log.Printf("message: %s\n", string(data))
-		messages = append(messages, data)
-		wg.Done()
+		readMutex.Lock()
+		defer readMutex.Unlock()
+		
+		if messageCount < 5 { 
+			fmt.Printf("message: %s\n", string(data))
+			messages = append(messages, data)
+			defer wg.Done()
+			messageCount++
+			return nil, nil
+		}
 		return nil, nil
 	})
 	assert.NoError(t, err)

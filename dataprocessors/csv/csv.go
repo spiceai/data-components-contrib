@@ -25,9 +25,10 @@ type CsvProcessor struct {
 	timeFormat   string
 	timeSelector string
 
+	identifiers  map[string]string
 	measurements map[string]string
 	categories   map[string]string
-	tags []string
+	tags         []string
 
 	dataMutex sync.RWMutex
 	data      []byte
@@ -38,7 +39,7 @@ func NewCsvProcessor() *CsvProcessor {
 	return &CsvProcessor{}
 }
 
-func (p *CsvProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
+func (p *CsvProcessor) Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
 	if format, ok := params["time_format"]; ok {
 		p.timeFormat = format
 	}
@@ -48,6 +49,7 @@ func (p *CsvProcessor) Init(params map[string]string, measurements map[string]st
 		p.timeSelector = "time"
 	}
 
+	p.identifiers = identifiers
 	p.measurements = measurements
 	p.categories = categories
 	p.tags = tags
@@ -101,7 +103,7 @@ func (p *CsvProcessor) GetObservations() ([]observations.Observation, error) {
 
 func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observation, error) {
 	numTags := len(p.tags)
-	if len(p.measurements)+len(p.categories)+numTags == 0 {
+	if len(p.identifiers)+len(p.measurements)+len(p.categories)+numTags == 0 {
 		return nil, nil
 	}
 
@@ -130,6 +132,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		return nil, fmt.Errorf("time header '%s' not found", p.timeSelector)
 	}
 
+	identifierMappings := getFieldMappings(p.identifiers, headersMap)
 	measurementMappings := getFieldMappings(p.measurements, headersMap)
 	categoriesMappings := getFieldMappings(p.categories, headersMap)
 
@@ -142,17 +145,10 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 			continue
 		}
 
-		// Process tags
-		var tags []string
-		tagsMap := make(map[string]bool, numTags)
-		for _, col := range tagsCol {
-			field := record[col]
-			for _, tag := range strings.Split(field, " ") {
-				if tag != "" && !tagsMap[tag] {
-					tags = append(tags, tag)
-					tagsMap[tag] = true
-				}
-			}
+		// Process identifiers
+		identifiers := map[string]string{}
+		for fieldName, col := range identifierMappings {
+			identifiers[fieldName] = record[col]
 		}
 
 		// Process measurements
@@ -175,9 +171,26 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 			categories[fieldName] = record[col]
 		}
 
+		// Process tags
+		var tags []string
+		tagsMap := make(map[string]bool, numTags)
+		for _, col := range tagsCol {
+			field := record[col]
+			for _, tag := range strings.Split(field, " ") {
+				if tag != "" && !tagsMap[tag] {
+					tags = append(tags, tag)
+					tagsMap[tag] = true
+				}
+			}
+		}
+
 		observation := observations.Observation{
 			Time: ts.Unix(),
 			Tags: tags,
+		}
+
+		if len(identifiers) > 0 {
+			observation.Identifiers = identifiers
 		}
 
 		if len(measurements) > 0 {

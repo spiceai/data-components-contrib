@@ -15,6 +15,10 @@ func TestTwitterTweets(t *testing.T) {
 		"time_selector": "created_at",
 	}
 
+	identifiers := map[string]string{
+		"id": "id_str",
+	}
+
 	measurements := map[string]string{
 		"favorite_count": "favorite_count",
 		"quote_count":    "quote_count",
@@ -28,7 +32,7 @@ func TestTwitterTweets(t *testing.T) {
 	}
 
 	dp := NewJsonProcessor()
-	err := dp.Init(processorParams, measurements, categories, nil)
+	err := dp.Init(processorParams, identifiers, measurements, categories, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +88,8 @@ func TestTwitterTweets(t *testing.T) {
 	assert.Len(t, observations, 5)
 
 	for _, o := range observations {
-		assert.Greater(t, o.Time, time.Now().Add(-time.Second*5), "invalid time")
+		assert.Greater(t, o.Time, time.Now().Add(-time.Second*30).Unix(), "invalid time") // 30 seconds buffer for clock skew
+		assert.NotEmpty(t, o.Identifiers["id"], "invalid id")
 		assert.GreaterOrEqual(t, o.Measurements["favorite_count"], 0.0, "invalid favorite_count")
 		assert.GreaterOrEqual(t, o.Measurements["quote_count"], 0.0, "invalid quote_count")
 		assert.GreaterOrEqual(t, o.Measurements["reply_count"], 0.0, "invalid reply_count")

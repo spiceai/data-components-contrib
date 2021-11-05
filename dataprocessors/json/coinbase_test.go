@@ -11,6 +11,11 @@ import (
 
 func TestCoinbaseTicker(t *testing.T) {
 	dpParams := map[string]string{}
+
+	identifiers := map[string]string{
+		"trade_id": "trade_id",
+	}
+
 	measurements := map[string]string{
 		"price":     "price",
 		"last_size": "last_size",
@@ -21,7 +26,7 @@ func TestCoinbaseTicker(t *testing.T) {
 	}
 
 	dp := NewJsonProcessor()
-	err := dp.Init(dpParams, measurements, categories, nil)
+	err := dp.Init(dpParams, identifiers, measurements, categories, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,9 +50,10 @@ func TestCoinbaseTicker(t *testing.T) {
 		messageMutex.Lock()
 		defer messageMutex.Unlock()
 		if readCount < 5 {
+			t.Logf("readCount: %d\n", readCount)
 			d, err := dp.OnData(data)
-			wg.Done()
 			readCount++
+			wg.Done()
 			return d, err
 		}
 		readCount++

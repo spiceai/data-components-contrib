@@ -28,7 +28,7 @@ func testInitFunc() func(*testing.T) {
 	params := map[string]string{}
 
 	return func(t *testing.T) {
-		err := p.Init(params, nil, nil, nil)
+		err := p.Init(params, nil, nil, nil, nil)
 		assert.NoError(t, err)
 	}
 }
@@ -43,7 +43,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		dp := NewFluxCsvProcessor()
 		err := dp.Init(map[string]string{
 			"field": "_value",
-		}, nil, nil, nil)
+		}, nil, nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -97,7 +97,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		dp := NewFluxCsvProcessor()
 		err := dp.Init(map[string]string{
 			"field": "_value",
-		}, nil, nil, nil)
+		}, nil, nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)
@@ -133,7 +133,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		dp := NewFluxCsvProcessor()
 		err := dp.Init(map[string]string{
 			"field": "_value",
-		}, nil, nil, nil)
+		}, nil, nil, nil, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)

@@ -21,9 +21,10 @@ type JsonProcessor struct {
 	timeFormat   string
 	timeSelector string
 
+	identifiers  map[string]string
 	measurements map[string]string
 	categories   map[string]string
-	tags []string
+	tags         []string
 
 	dataMutex    sync.RWMutex
 	data         [][]byte
@@ -34,7 +35,7 @@ func NewJsonProcessor() *JsonProcessor {
 	return &JsonProcessor{}
 }
 
-func (p *JsonProcessor) Init(params map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
+func (p *JsonProcessor) Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
 	if val, ok := params["time_format"]; ok {
 		p.timeFormat = val
 	}
@@ -44,6 +45,7 @@ func (p *JsonProcessor) Init(params map[string]string, measurements map[string]s
 		p.timeSelector = "time"
 	}
 
+	p.identifiers = identifiers
 	p.measurements = measurements
 	p.categories = categories
 	p.tags = tags
@@ -136,6 +138,25 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 		return nil, err
 	}
 
+	identifiers := make(map[string]string)
+
+	for fieldName, selector := range p.identifiers {
+		if val, ok := item[selector]; ok {
+			var jsonVal interface{}
+			err = json.Unmarshal(val, &jsonVal)
+			if err != nil {
+				return nil, err
+			}
+			if str, ok := jsonVal.(string); ok {
+				identifiers[fieldName] = str
+			} else if num, ok := jsonVal.(float64); ok {
+				identifiers[fieldName] = strconv.FormatFloat(num, 'f', -1, 64)
+			} else {
+				return nil, fmt.Errorf("identifier field '%s' is not a a valid id (string or number)", fieldName)
+			}
+		}
+	}
+
 	measurements := make(map[string]float64)
 
 	for fieldName, selector := range p.measurements {
@@ -208,8 +229,12 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 			tagsMap[str] = true
 		}
 	}
-	
+
 	observation.Tags = tags
+
+	if len(identifiers) > 0 {
+		observation.Identifiers = identifiers
+	}
 
 	if len(measurements) > 0 {
 		observation.Measurements = measurements
