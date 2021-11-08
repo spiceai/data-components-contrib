@@ -52,6 +52,7 @@ func TestCsv(t *testing.T) {
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
+	t.Run("GetObservations() dirty data", testGetObservationsDirtyDataFunc())
 	t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
 	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
@@ -153,6 +154,76 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		dp := NewCsvProcessor()
 		err := dp.Init(nil, nil, measurements, categories, tags)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualObservations, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		expectedFirstObservation := observations.Observation{
+			Time: 1605312000,
+			Measurements: map[string]float64{
+				"open":   16339.56,
+				"high":   16339.6,
+				"low":    16240,
+				"close":  16254.51,
+				"volume": 274.42607,
+			},
+		}
+
+		if len(actualObservations[0].Tags) > 0 {
+			expectedFirstObservation.Tags = []string{
+				"elon_tweet",
+				"market_open",
+				"tagA",
+			}
+		}
+
+		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+
+		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		snapshotter.SnapshotT(t, observationsJson)
+	}
+}
+
+// Tests "GetObservations()" - dirty data
+func testGetObservationsDirtyDataFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		data, err := os.ReadFile("../../test/assets/data/csv/dirty_data.csv")
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
+
+		categories := map[string]string{}
+
+		tags := []string{
+			"_tags",
+			"tag1",
+		}
+
+		dp := NewCsvProcessor()
+		err = dp.Init(nil, nil, measurements, categories, tags)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(data)

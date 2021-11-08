@@ -155,14 +155,14 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		measurements := map[string]float64{}
 		for fieldName, col := range measurementMappings {
 			field := record[col]
-
-			val, err := strconv.ParseFloat(field, 64)
-			if err != nil {
-				log.Printf("ignoring invalid field %d - %v: %v", line+1, field, err)
-				continue
+			if field != "" {
+				val, err := strconv.ParseFloat(field, 64)
+				if err != nil {
+					log.Printf("csv processor: ignoring invalid field value '%s' on line %d: %s", field, line+1, err.Error())
+					continue
+				}
+				measurements[fieldName] = val
 			}
-
-			measurements[fieldName] = val
 		}
 
 		// Process categories
