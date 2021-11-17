@@ -1,0 +1,88 @@
+[
+  {
+    "Time": 1605312000,
+    "Identifiers": null,
+    "Measurements": {
+      "close": 16254.51,
+      "high": 16339.6,
+      "low": 16240,
+      "open": 16339.56,
+      "volume": 274.42607
+    },
+    "Categories": null,
+    "Tags": [
+      "elon_tweet",
+      "market_open",
+      "tagA"
+    ]
+  },
+  {
+    "Time": 1605313800,
+    "Identifiers": null,
+    "Measurements": {
+      "close": 16305,
+      "high": 16305,
+      "open": 16256.42,
+      "volume": 110.91971
+    },
+    "Categories": null,
+    "Tags": [
+      "market_close",
+      "tagB"
+    ]
+  },
+  {
+    "Time": 1605315600,
+    "Identifiers": null,
+    "Measurements": {
+      "close": 16222.16,
+      "high": 16303.88,
+      "low": 16210.99,
+      "open": 16303.88,
+      "volume": 231.64805
+    },
+    "Categories": null,
+    "Tags": [
+      "tagA"
+    ]
+  },
+  {
+    "Time": 1605317400,
+    "Identifiers": null,
+    "Measurements": {
+      "close": 16214.15,
+      "high": 16246.92,
+      "low": 16200.01,
+      "open": 16221.78,
+      "volume": 135.86161
+    },
+    "Categories": null,
+    "Tags": [
+      "use",
+      "spice",
+      "ai",
+      "for",
+      "all",
+      "your",
+      "intelligent",
+      "time",
+      "series",
+      "app",
+      "needs!"
+    ]
+  },
+  {
+    "Time": 1605319200,
+    "Identifiers": null,
+    "Measurements": {
+      "close": 16223.08,
+      "high": 16234,
+      "low": 16175.62,
+      "open": 16214.26
+    },
+    "Categories": null,
+    "Tags": [
+      "tagC"
+    ]
+  }
+]
