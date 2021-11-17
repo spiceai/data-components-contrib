@@ -183,8 +183,7 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 
 	for fieldName, selector := range p.categories {
 		if val, ok := item[selector]; ok {
-			var str string
-			err = json.Unmarshal(val, &str)
+			str, err := unmarshalString(val)
 			if err != nil {
 				return nil, err
 			}
@@ -270,4 +269,23 @@ func unmarshalTime(timeFormat string, data []byte) (*time.Time, error) {
 	}
 
 	return nil, errors.New("did not include a time component")
+}
+
+func unmarshalString(val json.RawMessage) (string, error) {
+	var str string
+	err := json.Unmarshal(val, &str);
+	if err == nil {
+		return str, err
+	}
+	var i int64
+	err = json.Unmarshal(val, &i);
+	if err == nil {
+		return strconv.FormatInt(i, 10), err
+	}
+	var f float64
+	err = json.Unmarshal(val, &f);
+	if err == nil {
+		return strconv.FormatFloat(f, 'f', -1, 64), err
+	}
+	return "", fmt.Errorf("value is not a valid string or number")
 }

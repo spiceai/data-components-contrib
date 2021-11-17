@@ -2,6 +2,7 @@ package json
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"os"
 	"testing"
@@ -219,7 +220,7 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 		}
 
 		categories := map[string]string{
-			"favorite_count": "favorite_count",
+			"favorited": "favorited",
 		}
 
 		tags := []string{
@@ -236,7 +237,7 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 		_, err = dp.GetObservations()
 		assert.Error(t, err)
 
-		assert.Equal(t, "error unmarshaling item 0: json: cannot unmarshal number into Go value of type string", err.Error())
+		assert.Equal(t, "error unmarshaling item 0: value is not a valid string or number", err.Error())
 	}
 }
 
@@ -334,5 +335,32 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		actualObservations2, err := dp.GetObservations()
 		assert.NoError(t, err)
 		assert.Nil(t, actualObservations2)
+	}
+}
+
+func TestUnmarshalString(t *testing.T) {
+	t.Run("string value", testUnmarshalStringFunc("test-string", "test-string"))
+	t.Run("int value", testUnmarshalStringFunc(int(123), "123"))
+	t.Run("int64 value", testUnmarshalStringFunc(int64(123), "123"))
+	t.Run("float64 value", testUnmarshalStringFunc(float64(123.123), "123.123"))
+}
+
+func testUnmarshalStringFunc(jsonVal interface{}, expected string) func(*testing.T) {
+	return func(t *testing.T) {
+		data, err := json.Marshal(jsonVal)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var val json.RawMessage
+		err = json.Unmarshal(data, &val)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		actual, err := unmarshalString(val)
+		assert.NoError(t, err)
+
+		assert.Equal(t, expected, actual)
 	}
 }
