@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spiceai/data-components-contrib/dataprocessors/conv"
 	"github.com/spiceai/spiceai/pkg/observations"
 	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
@@ -169,7 +170,7 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 				if strErr != nil {
 					return nil, err
 				}
-				m, err = strconv.ParseFloat(str, 64)
+				m, err = conv.ParseMeasurement(str)
 				if err != nil {
 					return nil, err
 				}
