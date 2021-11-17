@@ -273,17 +273,17 @@ func unmarshalTime(timeFormat string, data []byte) (*time.Time, error) {
 
 func unmarshalString(val json.RawMessage) (string, error) {
 	var str string
-	err := json.Unmarshal(val, &str);
+	err := json.Unmarshal(val, &str)
 	if err == nil {
 		return str, err
 	}
 	var i int64
-	err = json.Unmarshal(val, &i);
+	err = json.Unmarshal(val, &i)
 	if err == nil {
 		return strconv.FormatInt(i, 10), err
 	}
 	var f float64
-	err = json.Unmarshal(val, &f);
+	err = json.Unmarshal(val, &f)
 	if err == nil {
 		return strconv.FormatFloat(f, 'f', -1, 64), err
 	}
