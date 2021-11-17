@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"strconv"
 	"strings"
 	"sync"
 
+	"github.com/spiceai/data-components-contrib/dataprocessors/conv"
 	"github.com/spiceai/spiceai/pkg/observations"
 	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
@@ -156,7 +156,7 @@ func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observa
 		for fieldName, col := range measurementMappings {
 			field := record[col]
 			if field != "" {
-				val, err := strconv.ParseFloat(field, 64)
+				val, err := conv.ParseMeasurement(field)
 				if err != nil {
 					log.Printf("csv processor: ignoring invalid field value '%s' on line %d: %s", field, line+1, err.Error())
 					continue

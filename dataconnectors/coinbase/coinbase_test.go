@@ -46,8 +46,8 @@ func TestRead(t *testing.T) {
 	err := c.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
 		readMutex.Lock()
 		defer readMutex.Unlock()
-		
-		if messageCount < 5 { 
+
+		if messageCount < 5 {
 			fmt.Printf("message: %s\n", string(data))
 			messages = append(messages, data)
 			defer wg.Done()
