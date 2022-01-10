@@ -3,6 +3,7 @@
 Currently supported connectors:
 
 - [File](file/file.go)
+- [HTTP](http/http.go)
 - [InfluxDB](influxdb/influxdb.go)
 - [Coinbase](coinbase/README.md)
 - [Twitter](twitter/twitter.go)
