@@ -19,7 +19,7 @@ The result can be processed with a [data processor](../../dataprocessors/README.
 dataspaces:
   - from: spiceai
     name: gasfees
-    fields:
+    measurements:
       - name: slow
       - name: normal
       - name: fast
