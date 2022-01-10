@@ -29,7 +29,7 @@ func NewHttpConnector() *HttpConnector {
 	return &HttpConnector{}
 }
 
-func (c *HttpConnector) Init(epoch time.Time, period time.Duration, interval time.Duration, params map[string]string) error {
+func (con *HttpConnector) Init(epoch time.Time, period time.Duration, interval time.Duration, params map[string]string) error {
 	urlParam := params["url"]
 	if urlParam == "" {
 		return errors.New("url is required")
@@ -63,37 +63,37 @@ func (c *HttpConnector) Init(epoch time.Time, period time.Duration, interval tim
 		}
 	}
 
-	c.client = &http.Client{
+	con.client = &http.Client{
 		Timeout: timeout,
 	}
 
-	c.request = &http.Request{
+	con.request = &http.Request{
 		Method: method,
 		URL:    url,
 	}
 
 	if pollingInterval <= 0 {
-		err = c.doRequest()
+		err = con.doRequest()
 		if err != nil {
 			log.Printf("Http connector request error: %s", err)
 		}
 		return nil
 	}
 
-	c.requestTicker = time.NewTicker(pollingInterval)
-	c.stop = make(chan bool)
+	con.requestTicker = time.NewTicker(pollingInterval)
+	con.stop = make(chan bool)
 
 	go func() {
-		err = c.doRequest()
+		err = con.doRequest()
 		if err != nil {
 			log.Printf("Http connector %s: %s", url, aurora.BrightRed(err))
 		}
 		for {
 			select {
-			case <-c.stop:
+			case <-con.stop:
 				return
-			case <-c.requestTicker.C:
-				err := c.doRequest()
+			case <-con.requestTicker.C:
+				err := con.doRequest()
 				if err != nil {
 					log.Printf("Http connector %s: %s\n", url, aurora.BrightRed(err))
 				}
@@ -104,14 +104,14 @@ func (c *HttpConnector) Init(epoch time.Time, period time.Duration, interval tim
 	return nil
 }
 
-func (c *HttpConnector) Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error {
-	c.readHandlers = append(c.readHandlers, &handler)
+func (con *HttpConnector) Read(handler func(data []byte, metadata map[string]string) ([]byte, error)) error {
+	con.readHandlers = append(con.readHandlers, &handler)
 	return nil
 }
 
-func (c *HttpConnector) doRequest() error {
+func (con *HttpConnector) doRequest() error {
 	startTime := time.Now()
-	response, err := c.client.Do(c.request)
+	response, err := con.client.Do(con.request)
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
@@ -138,7 +138,7 @@ func (c *HttpConnector) doRequest() error {
 	metadata["content_encoding"] = response.Header.Get("Content-Encoding")
 	metadata["duration_ms"] = fmt.Sprintf("%d", duration.Milliseconds())
 
-	for _, handler := range c.readHandlers {
+	for _, handler := range con.readHandlers {
 		_, err := (*handler)(body, metadata)
 		if err != nil {
 			return fmt.Errorf("failed to process response: %w", err)
