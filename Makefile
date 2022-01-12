@@ -8,6 +8,10 @@ build:
 test:
 	go test ./...
 
+.PHONY: update-snapshots
+update-snapshots:
+	UPDATE_SNAPSHOTS=true go test ./...
+
 .PHONY: generate-acknowledgements
 generate-acknowledgements:
 	echo -e "# Open Source Acknowledgements\n\nSpice.ai would like to acknowledge the following open source projects for making this project possible:\n\nGo Modules\n" > ACKNOWLEDGEMENTS.md

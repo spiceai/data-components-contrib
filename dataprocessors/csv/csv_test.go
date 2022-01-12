@@ -1,7 +1,6 @@
 package csv
 
 import (
-	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -167,15 +166,17 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 
 		fields := []arrow.Field{
 			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
-			{Name: "open", Type: arrow.PrimitiveTypes.Float64},
-			{Name: "high", Type: arrow.PrimitiveTypes.Float64},
-			{Name: "low", Type: arrow.PrimitiveTypes.Float64},
-			{Name: "close", Type: arrow.PrimitiveTypes.Float64},
-			{Name: "volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
 		}
-		for _, col := range actualRecord.Columns() {
-			if col.DataType() == arrow.BinaryTypes.String {
-				fields = append(fields, arrow.Field{Name: "_tags", Type: arrow.BinaryTypes.String})
+		with_tags := false
+		for _, field := range actualRecord.Schema().Fields() {
+			if field.Name == "tags" {
+				fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
+				with_tags = true
 				break
 			}
 		}
@@ -188,60 +189,20 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
-		if len(fields) > 6 {
-			recordBuilder.Field(6).(*array.StringBuilder).AppendValues([]string{"tagA"}, nil)
+		if with_tags {
+			listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+			valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+			listBuilder.Append(true)
+			valueBuilder.Append("elon_tweet")
+			valueBuilder.Append("market_open")
+			valueBuilder.Append("tagA")
 		}
 
 		expectedRecord := recordBuilder.NewRecord()
 		defer expectedRecord.Release()
 
-		fmt.Println("---TEST---")
-		fmt.Println(expectedRecord)
-		fmt.Println(actualRecord.NewSlice(0, 1))
-		// if expectedRecord.NumCols() != actualRecord.NumCols() {
-		// 	fmt.Println("NumCols diff")
-		// 	fmt.Println(expectedRecord.NumCols())
-		// 	fmt.Println(actualRecord.NumCols())
-		// }
-		// if expectedRecord.NumRows() != actualRecord.NumRows() {
-		// 	fmt.Println("NumRows diff")
-		// }
-		// for i := range expectedRecord.Columns() {
-		// 	lc := expectedRecord.Column(i)
-		// 	rc := actualRecord.Column(i)
-		// 	if !array.ArrayEqual(lc, rc) {
-		// 		fmt.Printf("Col %s diff\n", expectedRecord.ColumnName(i))
-		// 	}
-		// }
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
-
-		// expectedFirstObservation := observations.Observation{
-		// 	Time: 1605312000,
-		// 	Measurements: map[string]float64{
-		// 		"open":   16339.56,
-		// 		"high":   16339.6,
-		// 		"low":    16240,
-		// 		"close":  16254.51,
-		// 		"volume": 274.42607,
-		// 	},
-		// }
-
-		// if len(actualObservations[0].Tags) > 0 {
-		// 	expectedFirstObservation.Tags = []string{
-		// 		"elon_tweet",
-		// 		"market_open",
-		// 		"tagA",
-		// 	}
-		// }
-
-		// assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
-
-		// observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-		// if err != nil {
-		// 	t.Fatal(err)
-		// }
-
-		// snapshotter.SnapshotT(t, observationsJson)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
