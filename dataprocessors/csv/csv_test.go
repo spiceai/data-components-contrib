@@ -1,7 +1,6 @@
 package csv
 
 import (
-	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -53,7 +52,7 @@ func TestCsv(t *testing.T) {
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
 	t.Run("GetObservations() dirty data", testGetObservationsDirtyDataFunc())
-	// t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
+	t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
 	// t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
 	// t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
@@ -173,11 +172,11 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
 		}
-		with_tags := false
+		withTags := false
 		for _, field := range actualRecord.Schema().Fields() {
 			if field.Name == "tags" {
 				fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
-				with_tags = true
+				withTags = true
 				break
 			}
 		}
@@ -190,7 +189,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
-		if with_tags {
+		if withTags {
 			listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
 			valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
 			listBuilder.Append(true)
@@ -254,14 +253,7 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
-		}
-		with_tags := false
-		for _, field := range actualRecord.Schema().Fields() {
-			if field.Name == "tags" {
-				fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
-				with_tags = true
-				break
-			}
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
 		pool := memory.NewGoAllocator()
 		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
@@ -272,19 +264,15 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
-		if with_tags {
-			listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
-			valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
-			listBuilder.Append(true)
-			valueBuilder.Append("elon_tweet")
-			valueBuilder.Append("market_open")
-			valueBuilder.Append("tagA")
-		}
+		listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+		listBuilder.Append(true)
+		valueBuilder.Append("elon_tweet")
+		valueBuilder.Append("market_open")
+		valueBuilder.Append("tagA")
 
 		expectedRecord := recordBuilder.NewRecord()
 		defer expectedRecord.Release()
-
-		fmt.Println(actualRecord)
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
 		snapshotter.SnapshotT(t, actualRecord)
@@ -363,67 +351,70 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 // 	}
 // }
 
-// // Tests "GetObservations()" identifiers
-// func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
-// 	return func(t *testing.T) {
-// 		data, err := os.ReadFile("../../test/assets/data/csv/btcusd_ticks.csv")
-// 		if err != nil {
-// 			t.Fatal(err.Error())
-// 		}
+// Tests "GetObservations()" identifiers
+func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		data, err := os.ReadFile("../../test/assets/data/csv/btcusd_ticks.csv")
+		if err != nil {
+			t.Fatal(err.Error())
+		}
 
-// 		if len(data) == 0 {
-// 			t.Fatal("no data")
-// 		}
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
 
-// 		identifiers := map[string]string{
-// 			"tick_id": "tick_id",
-// 		}
+		identifiers := map[string]string{
+			"tick_id": "tick_id",
+		}
 
-// 		measurements := map[string]string{
-// 			"open":   "open",
-// 			"high":   "high",
-// 			"low":    "low",
-// 			"close":  "close",
-// 			"volume": "volume",
-// 		}
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
 
-// 		dp := NewCsvProcessor()
-// 		err = dp.Init(nil, identifiers, measurements, nil, nil)
-// 		assert.NoError(t, err)
+		dp := NewCsvProcessor()
+		err = dp.Init(nil, identifiers, measurements, nil, nil)
+		assert.NoError(t, err)
 
-// 		_, err = dp.OnData(data)
-// 		assert.NoError(t, err)
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
 
-// 		actualObservations, err := dp.GetObservations()
-// 		if err != nil {
-// 			t.Error(err)
-// 			return
-// 		}
+		actualRecord, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
 
-// 		expectedFirstObservation := observations.Observation{
-// 			Time: 1605312000,
-// 			Identifiers: map[string]string{
-// 				"tick_id": "1",
-// 			},
-// 			Measurements: map[string]float64{
-// 				"open":   16339.56,
-// 				"high":   16339.6,
-// 				"low":    16240,
-// 				"close":  16254.51,
-// 				"volume": 274.42607,
-// 			},
-// 		}
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "id.tick_id", Type: arrow.BinaryTypes.String},
+		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		recordBuilder.Field(6).(*array.StringBuilder).AppendValues([]string{"1"}, nil)
 
-// 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-// 		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
-
-// 		snapshotter.SnapshotT(t, observationsJson)
-// 	}
-// }
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
+	}
+}
 
 // // Tests "GetObservations()" called twice
 // func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {

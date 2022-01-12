@@ -147,13 +147,13 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 			switch {
 			case identifiersMap[header]:
 				fields[i].Name = fmt.Sprintf("id.%s", header)
-				fields[i].Type = arrow.PrimitiveTypes.Float64
+				fields[i].Type = arrow.BinaryTypes.String
 			case measurementsMap[header]:
 				fields[i].Name = fmt.Sprintf("measure.%s", header)
 				fields[i].Type = arrow.PrimitiveTypes.Float64
 			case categoriesMap[header]:
 				fields[i].Name = fmt.Sprintf("cat.%s", header)
-				fields[i].Type = arrow.PrimitiveTypes.Float64
+				fields[i].Type = arrow.BinaryTypes.String
 			case tagsMap[header]:
 				tagColumns = append(tagColumns, i)
 				fields[i].Name = fmt.Sprintf("tag.%s", header)
