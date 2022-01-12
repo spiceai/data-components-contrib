@@ -1,6 +1,8 @@
 package csv
 
 import (
+	"bytes"
+	"io"
 	"os"
 	"sync"
 	"testing"
@@ -56,66 +58,34 @@ func TestCsv(t *testing.T) {
 	// t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
-	// t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
+	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
 
 }
 
-// func BenchmarkGetObservations(b *testing.B) {
-// 	epoch := time.Unix(1605312000, 0)
-// 	period := 7 * 24 * time.Hour
-// 	interval := time.Hour
+func BenchmarkGetObservations(b *testing.B) {
+	epoch := time.Unix(1605312000, 0)
+	period := 7 * 24 * time.Hour
+	interval := time.Hour
 
-// 	localFileConnector := file.NewFileConnector()
+	localFileConnector := file.NewFileConnector()
 
-// 	err := localFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
-// 		return nil, nil
-// 	})
-// 	if err != nil {
-// 		b.Fatal(err.Error())
-// 	}
+	err := localFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+		return nil, nil
+	})
+	if err != nil {
+		b.Fatal(err.Error())
+	}
 
-// 	err = localFileConnector.Init(epoch, period, interval, map[string]string{
-// 		"path":  "../../test/assets/data/csv/COINBASE_BTCUSD, 30.csv",
-// 		"watch": "false",
-// 	})
-// 	if err != nil {
-// 		b.Error(err)
-// 	}
+	err = localFileConnector.Init(epoch, period, interval, map[string]string{
+		"path":  "../../test/assets/data/csv/COINBASE_BTCUSD, 30.csv",
+		"watch": "false",
+	})
+	if err != nil {
+		b.Error(err)
+	}
 
-// 	b.Run("GetObservations()", benchGetObservationsFunc(localFileConnector))
-// }
-
-// func TestGetFieldMappingsCsv(t *testing.T) {
-// 	headers := map[string]int{
-// 		"open":   10,
-// 		"high":   9,
-// 		"low":    8,
-// 		"extra":  7,
-// 		"close":  6,
-// 		"volume": 5,
-// 		"_tags":  4,
-// 	}
-
-// 	measurements := map[string]string{
-// 		"open":   "open",
-// 		"high":   "high",
-// 		"low":    "low",
-// 		"close":  "close",
-// 		"volume": "volume",
-// 	}
-
-// 	mappings := getFieldMappings(measurements, headers)
-
-// 	expectedMappings := map[string]int{
-// 		"open":   headers["open"],
-// 		"high":   headers["high"],
-// 		"low":    headers["low"],
-// 		"close":  headers["close"],
-// 		"volume": headers["volume"],
-// 	}
-
-// 	assert.Equal(t, expectedMappings, mappings)
-// }
+	b.Run("GetObservations()", benchGetObservationsFunc(localFileConnector))
+}
 
 // Tests "Init()"
 func testInitFunc() func(*testing.T) {
@@ -472,75 +442,86 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 	}
 }
 
-// // Tests "GetObservations()" updated with same data
-// func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
-// 	return func(t *testing.T) {
-// 		if len(data) == 0 {
-// 			t.Fatal("no data")
-// 		}
+// Tests "GetObservations()" updated with same data
+func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
+	return func(t *testing.T) {
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
 
-// 		measurements := map[string]string{
-// 			"open":   "open",
-// 			"high":   "high",
-// 			"low":    "low",
-// 			"close":  "close",
-// 			"volume": "volume",
-// 		}
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
 
-// 		categories := map[string]string{}
+		categories := map[string]string{}
 
-// 		dp := NewCsvProcessor()
-// 		err := dp.Init(nil, nil, measurements, categories, nil)
-// 		assert.NoError(t, err)
+		dp := NewCsvProcessor()
+		err := dp.Init(nil, nil, measurements, categories, nil)
+		assert.NoError(t, err)
 
-// 		_, err = dp.OnData(data)
-// 		assert.NoError(t, err)
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
 
-// 		actualObservations, err := dp.GetObservations()
-// 		assert.NoError(t, err)
+		actualRecord, err := dp.GetObservations()
+		assert.NoError(t, err)
 
-// 		expectedFirstObservation := observations.Observation{
-// 			Time: 1605312000,
-// 			Measurements: map[string]float64{
-// 				"open":   16339.56,
-// 				"high":   16339.6,
-// 				"low":    16240,
-// 				"close":  16254.51,
-// 				"volume": 274.42607,
-// 			},
-// 		}
-// 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
 
-// 		reader := bytes.NewReader(data)
-// 		buffer := new(bytes.Buffer)
-// 		_, err = io.Copy(buffer, reader)
-// 		if err != nil {
-// 			t.Error(err)
-// 		}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-// 		_, err = dp.OnData(buffer.Bytes())
-// 		assert.NoError(t, err)
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
 
-// 		actualObservations2, err := dp.GetObservations()
-// 		assert.NoError(t, err)
-// 		assert.Nil(t, actualObservations2)
-// 	}
-// }
+		reader := bytes.NewReader(data)
+		buffer := new(bytes.Buffer)
+		_, err = io.Copy(buffer, reader)
+		if err != nil {
+			t.Error(err)
+		}
 
-// // Benchmark "GetObservations()"
-// func benchGetObservationsFunc(c *file.FileConnector) func(*testing.B) {
-// 	return func(b *testing.B) {
-// 		dp := NewCsvProcessor()
-// 		err := dp.Init(nil, nil, nil, nil, nil)
-// 		if err != nil {
-// 			b.Error(err)
-// 		}
+		_, err = dp.OnData(buffer.Bytes())
+		assert.NoError(t, err)
 
-// 		for i := 0; i < 10; i++ {
-// 			_, err := dp.GetObservations()
-// 			if err != nil {
-// 				b.Fatal(err.Error())
-// 			}
-// 		}
-// 	}
-// }
+		actualRecord2, err := dp.GetObservations()
+		assert.NoError(t, err)
+		assert.Nil(t, actualRecord2)
+	}
+}
+
+// Benchmark "GetObservations()"
+func benchGetObservationsFunc(c *file.FileConnector) func(*testing.B) {
+	return func(b *testing.B) {
+		dp := NewCsvProcessor()
+		err := dp.Init(nil, nil, nil, nil, nil)
+		if err != nil {
+			b.Error(err)
+		}
+
+		for i := 0; i < 10; i++ {
+			_, err := dp.GetObservations()
+			if err != nil {
+				b.Fatal(err.Error())
+			}
+		}
+	}
+}
