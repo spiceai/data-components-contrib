@@ -7,9 +7,6 @@ import (
 	"fmt"
 	"strings"
 
-	// "io"
-	// "log"
-	// "strings"
 	"sync"
 
 	"github.com/apache/arrow/go/arrow"
@@ -172,7 +169,9 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 	}
 
 	schema := arrow.NewSchema(fields, nil)
-	arrowReader := arrow_csv.NewReader(bytes.NewBuffer(data), schema, arrow_csv.WithHeader(true), arrow_csv.WithChunk(-1))
+	arrowReader := arrow_csv.NewReader(
+		bytes.NewBuffer(data), schema, arrow_csv.WithHeader(true), arrow_csv.WithChunk(-1),
+		arrow_csv.WithNullReader(false))
 	defer arrowReader.Release()
 
 	arrowReader.Next()
@@ -231,22 +230,3 @@ func getCsvHeader(input []byte) ([]string, error) {
 
 	return headers, nil
 }
-
-// func getCsvHeaderAndLines(input io.Reader) ([]string, [][]string, error) {
-// 	reader := csv.NewReader(input)
-// 	headers, err := reader.Read()
-// 	if err != nil {
-// 		return nil, nil, errors.New("failed to read header")
-// 	}
-
-// 	lines, err := reader.ReadAll()
-// 	if err != nil {
-// 		return nil, nil, errors.New("failed to read lines")
-// 	}
-
-// 	if len(headers) <= 1 || len(lines) == 0 {
-// 		return nil, nil, errors.New("no data")
-// 	}
-
-// 	return headers, lines, nil
-// }

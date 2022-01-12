@@ -1,6 +1,7 @@
 package csv
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -51,7 +52,7 @@ func TestCsv(t *testing.T) {
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
-	// t.Run("GetObservations() dirty data", testGetObservationsDirtyDataFunc())
+	t.Run("GetObservations() dirty data", testGetObservationsDirtyDataFunc())
 	// t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
 	// t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
@@ -207,74 +208,88 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 }
 
 // Tests "GetObservations()" - dirty data
-// func testGetObservationsDirtyDataFunc() func(*testing.T) {
-// 	return func(t *testing.T) {
-// 		data, err := os.ReadFile("../../test/assets/data/csv/dirty_data.csv")
-// 		if err != nil {
-// 			t.Fatal(err.Error())
-// 		}
+func testGetObservationsDirtyDataFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		data, err := os.ReadFile("../../test/assets/data/csv/dirty_data.csv")
+		if err != nil {
+			t.Fatal(err.Error())
+		}
 
-// 		if len(data) == 0 {
-// 			t.Fatal("no data")
-// 		}
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
 
-// 		measurements := map[string]string{
-// 			"open":   "open",
-// 			"high":   "high",
-// 			"low":    "low",
-// 			"close":  "close",
-// 			"volume": "volume",
-// 		}
+		measurements := map[string]string{
+			"open":   "open",
+			"high":   "high",
+			"low":    "low",
+			"close":  "close",
+			"volume": "volume",
+		}
 
-// 		categories := map[string]string{}
+		categories := map[string]string{}
 
-// 		tags := []string{
-// 			"_tags",
-// 			"tag1",
-// 		}
+		tags := []string{
+			"_tags",
+			"tag1",
+		}
 
-// 		dp := NewCsvProcessor()
-// 		err = dp.Init(nil, nil, measurements, categories, tags)
-// 		assert.NoError(t, err)
+		dp := NewCsvProcessor()
+		err = dp.Init(nil, nil, measurements, categories, tags)
+		assert.NoError(t, err)
 
-// 		_, err = dp.OnData(data)
-// 		assert.NoError(t, err)
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
 
-// 		actualObservations, err := dp.GetObservations()
-// 		if err != nil {
-// 			t.Error(err)
-// 			return
-// 		}
+		actualRecord, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
 
-// 		expectedFirstObservation := observations.Observation{
-// 			Time: 1605312000,
-// 			Measurements: map[string]float64{
-// 				"open":   16339.56,
-// 				"high":   16339.6,
-// 				"low":    16240,
-// 				"close":  16254.51,
-// 				"volume": 274.42607,
-// 			},
-// 		}
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+		}
+		with_tags := false
+		for _, field := range actualRecord.Schema().Fields() {
+			if field.Name == "tags" {
+				fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
+				with_tags = true
+				break
+			}
+		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		if with_tags {
+			listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+			valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+			listBuilder.Append(true)
+			valueBuilder.Append("elon_tweet")
+			valueBuilder.Append("market_open")
+			valueBuilder.Append("tagA")
+		}
 
-// 		if len(actualObservations[0].Tags) > 0 {
-// 			expectedFirstObservation.Tags = []string{
-// 				"elon_tweet",
-// 				"market_open",
-// 				"tagA",
-// 			}
-// 		}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-// 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		fmt.Println(actualRecord)
 
-// 		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
-
-// 		snapshotter.SnapshotT(t, observationsJson)
-// 	}
-// }
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
+	}
+}
 
 // // Tests "GetObservations() - custom time format"
 // func testGetObservationsCustomTimeFunc() func(*testing.T) {
