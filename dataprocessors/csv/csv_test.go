@@ -55,7 +55,7 @@ func TestCsv(t *testing.T) {
 	t.Run("GetObservations()", testGetObservationsFunc(localData))
 	t.Run("GetObservations() dirty data", testGetObservationsDirtyDataFunc())
 	t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
-	// t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
+	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
 	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
 	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
 	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
@@ -172,7 +172,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		defer expectedRecord.Release()
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
-		snapshotter.SnapshotT(t, actualRecord)
+		// snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
@@ -245,81 +245,82 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 		defer expectedRecord.Release()
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
-		snapshotter.SnapshotT(t, actualRecord)
+		// snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// // Tests "GetObservations() - custom time format"
-// func testGetObservationsCustomTimeFunc() func(*testing.T) {
-// 	return func(t *testing.T) {
-// 		epoch := time.Date(2006, 1, 1, 0, 0, 0, 0, time.UTC)
-// 		period := 7 * 24 * time.Hour
-// 		interval := 24 * time.Hour
+// Tests "GetObservations() - custom time format"
+func testGetObservationsCustomTimeFunc() func(*testing.T) {
+	return func(t *testing.T) {
+		epoch := time.Date(2006, 1, 1, 0, 0, 0, 0, time.UTC)
+		period := 7 * 24 * time.Hour
+		interval := 24 * time.Hour
 
-// 		var wg sync.WaitGroup
+		var wg sync.WaitGroup
 
-// 		localFileConnector := file.NewFileConnector()
+		localFileConnector := file.NewFileConnector()
 
-// 		var localData []byte
-// 		err := localFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
-// 			localData = data
-// 			wg.Done()
-// 			return nil, nil
-// 		})
-// 		if err != nil {
-// 			t.Fatal(err.Error())
-// 		}
-// 		wg.Add(1)
+		var localData []byte
+		err := localFileConnector.Read(func(data []byte, metadata map[string]string) ([]byte, error) {
+			localData = data
+			wg.Done()
+			return nil, nil
+		})
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+		wg.Add(1)
 
-// 		err = localFileConnector.Init(epoch, period, interval, map[string]string{
-// 			"path":  "../../test/assets/data/csv/custom_time.csv",
-// 			"watch": "false",
-// 		})
-// 		if err != nil {
-// 			t.Fatal(err.Error())
-// 		}
+		err = localFileConnector.Init(epoch, period, interval, map[string]string{
+			"path":  "../../test/assets/data/csv/custom_time.csv",
+			"watch": "false",
+		})
+		if err != nil {
+			t.Fatal(err.Error())
+		}
 
-// 		if len(localData) == 0 {
-// 			t.Fatal("no data")
-// 		}
+		if len(localData) == 0 {
+			t.Fatal("no data")
+		}
 
-// 		measurements := map[string]string{
-// 			"val": "val",
-// 		}
+		measurements := map[string]string{
+			"val": "val",
+		}
 
-// 		categories := map[string]string{}
+		categories := map[string]string{}
 
-// 		dp := NewCsvProcessor()
-// 		err = dp.Init(map[string]string{
-// 			"time_format": "2006-01-02 15:04:05-07:00",
-// 		}, nil, measurements, categories, nil)
-// 		assert.NoError(t, err)
+		dp := NewCsvProcessor()
+		err = dp.Init(map[string]string{
+			"time_format": "2006-01-02 15:04:05-07:00",
+		}, nil, measurements, categories, nil)
+		assert.NoError(t, err)
 
-// 		_, err = dp.OnData(localData)
-// 		assert.NoError(t, err)
+		_, err = dp.OnData(localData)
+		assert.NoError(t, err)
 
-// 		actualObservations, err := dp.GetObservations()
-// 		if err != nil {
-// 			t.Error(err)
-// 			return
-// 		}
+		actualRecord, err := dp.GetObservations()
+		if err != nil {
+			t.Error(err)
+			return
+		}
 
-// 		expectedFirstObservation := observations.Observation{
-// 			Time: 1547575074,
-// 			Measurements: map[string]float64{
-// 				"val": 34,
-// 			},
-// 		}
-// 		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.val", Type: arrow.PrimitiveTypes.Float64},
+		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1547575074}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{34}, nil)
 
-// 		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-// 		snapshotter.SnapshotT(t, observationsJson)
-// 	}
-// }
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
+	}
+}
 
 // Tests "GetObservations()" identifiers
 func testGetObservationsWithIdentifiersFunc() func(*testing.T) {

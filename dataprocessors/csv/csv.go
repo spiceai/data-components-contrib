@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 
 	"sync"
@@ -14,8 +15,7 @@ import (
 	arrow_csv "github.com/apache/arrow/go/arrow/csv"
 	"github.com/apache/arrow/go/arrow/memory"
 
-	// "github.com/spiceai/data-components-contrib/dataprocessors/conv"
-	// spice_time "github.com/spiceai/spiceai/pkg/time"
+	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
 )
 
@@ -142,7 +142,11 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 		if timeCol < 0 && header == p.timeSelector {
 			timeCol = i
 			fields[i].Name = header
-			fields[i].Type = arrow.PrimitiveTypes.Int64
+			if p.timeFormat != "" {
+				fields[i].Type = arrow.BinaryTypes.String
+			} else {
+				fields[i].Type = arrow.PrimitiveTypes.Int64
+			}
 		} else {
 			switch {
 			case identifiersMap[header]:
@@ -185,9 +189,27 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 		record.Schema().Fields()[i].Name = field.Name
 	}
 
+	pool := memory.NewGoAllocator()
+	if p.timeFormat != "" {
+		timeBuilder := array.NewInt64Builder(pool)
+		tagCol := record.Columns()[timeCol].(*array.String)
+		for i := 0; i < int(record.NumRows()); i++ {
+			time, err := spice_time.ParseTime(tagCol.Value(i), p.timeFormat)
+			if err != nil {
+				log.Printf("ignoring invalid line %d (%v): %v", i+1, tagCol.Value(i), err)
+				timeBuilder.Append(0)
+				continue
+			} else {
+				timeBuilder.Append(time.Unix())
+			}
+		}
+		new_fields := append([]arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}, fields[1:]...)
+		new_columns := append([]array.Interface{timeBuilder.NewArray()}, record.Columns()[1:]...)
+		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
+	}
+
 	if len(tagColumns) > 0 {
 		// Aggregating tags
-		pool := memory.NewGoAllocator()
 		tagListBuilder := array.NewListBuilder(pool, arrow.BinaryTypes.String)
 		tagValueBuilder := tagListBuilder.ValueBuilder().(*array.StringBuilder)
 		defer tagListBuilder.Release()
@@ -213,7 +235,7 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 		}
 		new_fields = append(new_fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
 		new_columns = append(new_columns, tagListBuilder.NewArray())
-		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, int64(tagListBuilder.Len()))
+		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
 	}
 
 	p.currentRecord = record
