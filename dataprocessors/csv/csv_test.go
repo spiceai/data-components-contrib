@@ -1,8 +1,6 @@
 package csv
 
 import (
-	"bytes"
-	"io"
 	"os"
 	"sync"
 	"testing"
@@ -132,7 +130,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		defer expectedRecord.Release()
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
-		// snapshotter.SnapshotT(t, actualRecord)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
@@ -205,7 +203,7 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 		defer expectedRecord.Release()
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
-		// snapshotter.SnapshotT(t, actualRecord)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
@@ -453,14 +451,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
 
-		reader := bytes.NewReader(data)
-		buffer := new(bytes.Buffer)
-		_, err = io.Copy(buffer, reader)
-		if err != nil {
-			t.Error(err)
-		}
-
-		_, err = dp.OnData(buffer.Bytes())
+		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
 		actualRecord2, err := dp.GetObservations()

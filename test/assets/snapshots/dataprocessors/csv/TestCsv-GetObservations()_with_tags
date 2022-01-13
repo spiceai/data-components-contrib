@@ -8,7 +8,7 @@
     - measure.close: type=float64
     - measure.volume: type=float64
     - tags: type=list<item: utf8, nullable>
-  rows: 0
+  rows: 5
   col[0][time]: [1605312000 1605313800 1605315600 1605317400 1605319200]
   col[1][measure.open]: [16339.56 16256.42 16303.88 16221.78 16214.26]
   col[2][measure.high]: [16339.6 16305 16303.88 16246.92 16234]
