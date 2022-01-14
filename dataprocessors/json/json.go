@@ -109,7 +109,7 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *JsonProcessor) GetObservations() (array.Record, error) {
+func (p *JsonProcessor) GetRecord() (array.Record, error) {
 	if p.data == nil {
 		return nil, nil
 	}

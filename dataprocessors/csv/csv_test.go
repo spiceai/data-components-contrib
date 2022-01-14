@@ -27,22 +27,22 @@ func TestCsv(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
-	t.Run("GetObservations()", testGetObservationsFunc(localData))
-	t.Run("GetObservations() dirty data", testGetObservationsDirtyDataFunc())
-	t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
-	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
-	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
-	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
-	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
+	t.Run("GetRecord()", testGetRecordFunc(localData))
+	t.Run("GetRecord() dirty data", testGetRecordDirtyDataFunc())
+	t.Run("GetRecord() identifiers", testGetRecordWithIdentifiersFunc())
+	t.Run("GetRecord() custom time format", testGetRecordCustomTimeFunc())
+	t.Run("GetRecord() with tags", testGetRecordFunc(localDataTags))
+	t.Run("GetRecord() called twice", testGetRecordTwiceFunc(localData))
+	t.Run("GetRecord() updated with same data", testGetRecordSameDataFunc(localData))
 
 }
 
-func BenchmarkGetObservations(b *testing.B) {
+func BenchmarkGetRecord(b *testing.B) {
 	data, err := os.ReadFile("../../test/assets/data/csv/COINBASE_BTCUSD, 30.csv")
 	if err != nil {
 		b.Error(err)
 	}
-	b.Run("GetObservations()", benchGetObservationsFunc(data))
+	b.Run("GetRecord()", benchGetRecordFunc(data))
 }
 
 // Tests "Init()"
@@ -57,8 +57,8 @@ func testInitFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()"
-func testGetObservationsFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()"
+func testGetRecordFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -86,7 +86,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
@@ -134,8 +134,8 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()" - dirty data
-func testGetObservationsDirtyDataFunc() func(*testing.T) {
+// Tests "GetRecord()" - dirty data
+func testGetRecordDirtyDataFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		data, err := os.ReadFile("../../test/assets/data/csv/dirty_data.csv")
 		if err != nil {
@@ -168,7 +168,7 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
@@ -207,8 +207,8 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations() - custom time format"
-func testGetObservationsCustomTimeFunc() func(*testing.T) {
+// Tests "GetRecord() - custom time format"
+func testGetRecordCustomTimeFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		epoch := time.Date(2006, 1, 1, 0, 0, 0, 0, time.UTC)
 		period := 7 * 24 * time.Hour
@@ -256,7 +256,7 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 		_, err = dp.OnData(localData)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
@@ -280,8 +280,8 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()" identifiers
-func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
+// Tests "GetRecord()" identifiers
+func testGetRecordWithIdentifiersFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		data, err := os.ReadFile("../../test/assets/data/csv/btcusd_ticks.csv")
 		if err != nil {
@@ -311,7 +311,7 @@ func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
@@ -345,8 +345,8 @@ func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()" called twice
-func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" called twice
+func testGetRecordTwiceFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -369,7 +369,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
 		fields := []arrow.Field{
@@ -395,14 +395,14 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
 
-		actualRecord2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
 		assert.Nil(t, actualRecord2)
 	}
 }
 
-// Tests "GetObservations()" updated with same data
-func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" updated with same data
+func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -425,7 +425,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
 		fields := []arrow.Field{
@@ -454,14 +454,14 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
 		assert.Nil(t, actualRecord2)
 	}
 }
 
-// Benchmark "GetObservations()"
-func benchGetObservationsFunc(data []byte) func(*testing.B) {
+// Benchmark "GetRecord()"
+func benchGetRecordFunc(data []byte) func(*testing.B) {
 	return func(b *testing.B) {
 		measurements := map[string]string{
 			"open":   "open",
@@ -480,7 +480,7 @@ func benchGetObservationsFunc(data []byte) func(*testing.B) {
 
 		for i := 0; i < 10; i++ {
 			dp.OnData(data)
-			_, err := dp.GetObservations()
+			_, err := dp.GetRecord()
 			if err != nil {
 				b.Fatal(err.Error())
 			}

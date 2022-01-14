@@ -14,7 +14,7 @@ Writing a data processor means implementing the `DataProcessor` interface define
 type DataProcessor interface {
 	Init(params map[string]string) error
 	OnData(data []byte) ([]byte, error)
-	GetObservations() ([]observations.Observation, error)
+	GetRecord() (arrow.Record, error)
 	GetState(fields *[]string) ([]*state.State, error)
 }
 ```

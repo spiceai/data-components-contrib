@@ -80,7 +80,7 @@ func (p *CsvProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *CsvProcessor) GetObservations() (array.Record, error) {
+func (p *CsvProcessor) GetRecord() (array.Record, error) {
 	if p.data == nil {
 		return nil, nil
 	}

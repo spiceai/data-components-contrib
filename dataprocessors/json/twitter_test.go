@@ -82,7 +82,7 @@ func TestTwitterTweets(t *testing.T) {
 
 	wg.Wait()
 
-	record, err := dp.GetObservations()
+	record, err := dp.GetRecord()
 	if err != nil {
 		t.Fatal(err)
 	}

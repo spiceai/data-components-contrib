@@ -59,7 +59,7 @@ func (p *FluxCsvProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *FluxCsvProcessor) GetObservations() (array.Record, error) {
+func (p *FluxCsvProcessor) GetRecord() (array.Record, error) {
 	p.dataMutex.Lock()
 	defer p.dataMutex.Unlock()
 

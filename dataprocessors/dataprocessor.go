@@ -12,7 +12,7 @@ import (
 type DataProcessor interface {
 	Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error
 	OnData(data []byte) ([]byte, error)
-	GetObservations() (array.Record, error)
+	GetRecord() (array.Record, error)
 }
 
 func NewDataProcessor(name string) (DataProcessor, error) {

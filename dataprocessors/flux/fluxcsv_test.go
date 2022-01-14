@@ -20,9 +20,9 @@ func TestFlux(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
-	t.Run("GetObservations() -o observations.json", testGetObservationsFunc(data))
-	t.Run("GetObservations() called twice -o observations.json", testGetObservationsTwiceFunc(data))
-	t.Run("GetObservations() same data -o observations.json", testGetObservationsSameDataFunc(data))
+	t.Run("GetRecord() -o observations.json", testGetRecordFunc(data))
+	t.Run("GetRecord() called twice -o observations.json", testGetRecordTwiceFunc(data))
+	t.Run("GetRecord() same data -o observations.json", testGetRecordSameDataFunc(data))
 }
 
 // Tests "Init()"
@@ -37,8 +37,8 @@ func testInitFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()"
-func testGetObservationsFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()"
+func testGetRecordFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -53,7 +53,7 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
@@ -83,8 +83,8 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations() called twice"
-func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord() called twice"
+func testGetRecordTwiceFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -97,7 +97,7 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
 		fields := []arrow.Field{
@@ -121,14 +121,14 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 
 		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
 
-		actualRecord2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
 		assert.Nil(t, actualRecord2)
 	}
 }
 
-// Tests "GetObservations() updated with same data"
-func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord() updated with same data"
+func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -143,7 +143,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
 		fields := []arrow.Field{
@@ -170,7 +170,7 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualRecord2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
 		assert.Nil(t, actualRecord2)
 	}
