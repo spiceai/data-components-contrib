@@ -84,13 +84,13 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetObservations()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
@@ -121,13 +121,13 @@ func testGetObservationsSomeDataPointsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetObservations()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
@@ -161,13 +161,13 @@ func testGetObservationsSelectedIdentifiersFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetObservations()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
@@ -197,13 +197,13 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetObservations()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
@@ -235,9 +235,11 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 		assert.NoError(t, err)
 
 		_, err = dp.GetObservations()
-		assert.Error(t, err)
-
-		assert.Equal(t, "error unmarshaling item 0: value is not a valid string or number", err.Error())
+		assert.NotNil(t, err)
+		if err != nil {
+			assert.Error(t, err)
+			assert.Equal(t, "error unmarshaling item 0: value is not a valid string or number", err.Error())
+		}
 	}
 }
 
@@ -279,14 +281,14 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetObservations()
 		assert.NoError(t, err)
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 
-		actualObservations2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetObservations()
 		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
+		assert.Nil(t, actualRecord2)
 	}
 }
 
@@ -317,10 +319,10 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetObservations()
 		assert.NoError(t, err)
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 
 		reader := bytes.NewReader(data)
 		buffer := new(bytes.Buffer)
@@ -332,9 +334,9 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(buffer.Bytes())
 		assert.NoError(t, err)
 
-		actualObservations2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetObservations()
 		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
+		assert.Nil(t, actualRecord2)
 	}
 }
 

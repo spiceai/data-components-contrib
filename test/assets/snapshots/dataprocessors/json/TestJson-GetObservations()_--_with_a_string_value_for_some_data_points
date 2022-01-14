@@ -1,14 +1,15 @@
-([]observations.Observation) (len=1) {
-  (observations.Observation) {
-    Time: (int64) 996272905,
-    Identifiers: (map[string]string) <nil>,
-    Measurements: (map[string]float64) (len=2) {
-      (string) (len=11) "reply_count": (float64) 34,
-      (string) (len=13) "retweet_count": (float64) 743
-    },
-    Categories: (map[string]string) (len=1) {
-      (string) (len=4) "lang": (string) (len=2) "en"
-    },
-    Tags: ([]string) <nil>
-  }
-}
+(*array.simpleRecord)(record:
+  schema:
+  fields: 5
+    - time: type=int64
+    - measure.reply_count: type=float64
+    - measure.retweet_count: type=float64
+    - cat.lang: type=utf8
+    - tags: type=list<item: utf8, nullable>
+  rows: 1
+  col[0][time]: [996272905]
+  col[1][measure.reply_count]: [34]
+  col[2][measure.retweet_count]: [743]
+  col[3][cat.lang]: ["en"]
+  col[4][tags]: [[]]
+)
