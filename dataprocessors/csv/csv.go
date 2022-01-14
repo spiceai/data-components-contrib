@@ -10,10 +10,10 @@ import (
 
 	"sync"
 
-	"github.com/apache/arrow/go/arrow"
-	"github.com/apache/arrow/go/arrow/array"
-	arrow_csv "github.com/apache/arrow/go/arrow/csv"
-	"github.com/apache/arrow/go/arrow/memory"
+	"github.com/apache/arrow/go/v6/arrow"
+	"github.com/apache/arrow/go/v6/arrow/array"
+	arrow_csv "github.com/apache/arrow/go/v6/arrow/csv"
+	"github.com/apache/arrow/go/v6/arrow/memory"
 
 	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
