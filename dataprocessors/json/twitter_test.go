@@ -1,10 +1,12 @@
 package json
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/apache/arrow/go/v6/arrow/array"
 	"github.com/spiceai/data-components-contrib/dataconnectors/twitter"
 	"github.com/stretchr/testify/assert"
 )
@@ -80,20 +82,30 @@ func TestTwitterTweets(t *testing.T) {
 
 	wg.Wait()
 
-	observations, err := dp.GetObservations()
+	record, err := dp.GetRecord()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Len(t, observations, 5)
+	assert.Equal(t, int(record.NumRows()), 5)
 
-	for _, o := range observations {
-		assert.Greater(t, o.Time, time.Now().Add(-time.Second*30).Unix(), "invalid time") // 30 seconds buffer for clock skew
-		assert.NotEmpty(t, o.Identifiers["id"], "invalid id")
-		assert.GreaterOrEqual(t, o.Measurements["favorite_count"], 0.0, "invalid favorite_count")
-		assert.GreaterOrEqual(t, o.Measurements["quote_count"], 0.0, "invalid quote_count")
-		assert.GreaterOrEqual(t, o.Measurements["reply_count"], 0.0, "invalid reply_count")
-		assert.NotEmpty(t, o.Categories["lang"], "invalid lang")
-		assert.NotEmpty(t, o.Categories["filter_level"], "invalid filter_level")
+	fmt.Println(record)
+
+	timeCol := record.Column(0).(*array.Int64)
+	idCol := record.Column(1).(*array.String)
+	for i := 0; i < int(record.NumRows()); i++ {
+		// 30 seconds buffer for clock skew
+		assert.Greater(t, timeCol.Value(i), time.Now().Add(-time.Second*30).Unix(), "invalid time")
+		assert.NotEmpty(t, idCol.Value(i), "invalid id")
 	}
+
+	// for _, o := range observations {
+	// 	assert.Greater(t, o.Time, time.Now().Add(-time.Second*30).Unix(), "invalid time") // 30 seconds buffer for clock skew
+	// 	assert.NotEmpty(t, o.Identifiers["id"], "invalid id")
+	// 	assert.GreaterOrEqual(t, o.Measurements["favorite_count"], 0.0, "invalid favorite_count")
+	// 	assert.GreaterOrEqual(t, o.Measurements["quote_count"], 0.0, "invalid quote_count")
+	// 	assert.GreaterOrEqual(t, o.Measurements["reply_count"], 0.0, "invalid reply_count")
+	// 	assert.NotEmpty(t, o.Categories["lang"], "invalid lang")
+	// 	assert.NotEmpty(t, o.Categories["filter_level"], "invalid filter_level")
+	// }
 }

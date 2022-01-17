@@ -3,16 +3,16 @@ package dataprocessors
 import (
 	"fmt"
 
+	"github.com/apache/arrow/go/v6/arrow/array"
 	"github.com/spiceai/data-components-contrib/dataprocessors/csv"
 	"github.com/spiceai/data-components-contrib/dataprocessors/flux"
 	"github.com/spiceai/data-components-contrib/dataprocessors/json"
-	"github.com/spiceai/spiceai/pkg/observations"
 )
 
 type DataProcessor interface {
 	Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error
 	OnData(data []byte) ([]byte, error)
-	GetObservations() ([]observations.Observation, error)
+	GetRecord() (array.Record, error)
 }
 
 func NewDataProcessor(name string) (DataProcessor, error) {

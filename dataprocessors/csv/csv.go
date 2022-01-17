@@ -5,13 +5,16 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"strings"
+
 	"sync"
 
-	"github.com/spiceai/data-components-contrib/dataprocessors/conv"
-	"github.com/spiceai/spiceai/pkg/observations"
+	"github.com/apache/arrow/go/v6/arrow"
+	"github.com/apache/arrow/go/v6/arrow/array"
+	arrow_csv "github.com/apache/arrow/go/v6/arrow/csv"
+	"github.com/apache/arrow/go/v6/arrow/memory"
+
 	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
 )
@@ -33,6 +36,8 @@ type CsvProcessor struct {
 	dataMutex sync.RWMutex
 	data      []byte
 	dataHash  []byte
+
+	currentRecord array.Record
 }
 
 func NewCsvProcessor() *CsvProcessor {
@@ -75,7 +80,7 @@ func (p *CsvProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *CsvProcessor) GetObservations() ([]observations.Observation, error) {
+func (p *CsvProcessor) GetRecord() (array.Record, error) {
 	if p.data == nil {
 		return nil, nil
 	}
@@ -87,153 +92,163 @@ func (p *CsvProcessor) GetObservations() ([]observations.Observation, error) {
 		return nil, nil
 	}
 
-	reader := bytes.NewReader(p.data)
-	if reader == nil {
+	if len(p.data) == 0 {
 		return nil, nil
 	}
 
-	newObservations, err := p.getObservations(reader)
+	err := p.getObservations(p.data)
 	if err != nil {
 		return nil, err
 	}
 
 	p.data = nil
-	return newObservations, nil
+	return p.currentRecord, nil
 }
 
-func (p *CsvProcessor) getObservations(reader io.Reader) ([]observations.Observation, error) {
+func (p *CsvProcessor) getObservations(data []byte) error {
 	numTags := len(p.tags)
+
 	if len(p.identifiers)+len(p.measurements)+len(p.categories)+numTags == 0 {
-		return nil, nil
+		return nil
 	}
 
-	headers, lines, err := getCsvHeaderAndLines(reader)
+	identifiersMap := make(map[string]bool)
+	measurementsMap := make(map[string]bool)
+	categoriesMap := make(map[string]bool)
+	tagsMap := make(map[string]bool)
+	for _, key := range p.identifiers {
+		identifiersMap[key] = true
+	}
+	for _, key := range p.measurements {
+		measurementsMap[key] = true
+	}
+	for _, key := range p.categories {
+		categoriesMap[key] = true
+	}
+	for _, key := range p.tags {
+		tagsMap[key] = true
+	}
+
+	headers, err := getCsvHeader(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed to process csv: %s", err)
+		return fmt.Errorf("failed to get csv header: %s", err)
 	}
 
+	fields := make([]arrow.Field, len(headers))
+	var tagColumns []int
 	timeCol := -1
-	tagsCol := make([]int, 0, numTags)
-	headersMap := make(map[string]int, len(headers))
 	for i, header := range headers {
-		headersMap[header] = i
+		// Allocate time column index upon finding timeSelector if not yet assigned
 		if timeCol < 0 && header == p.timeSelector {
 			timeCol = i
-		}
-		for _, tag := range p.tags {
-			if header == tag {
-				tagsCol = append(tagsCol, i)
-				break
+			fields[i].Name = header
+			if p.timeFormat != "" {
+				fields[i].Type = arrow.BinaryTypes.String
+			} else {
+				fields[i].Type = arrow.PrimitiveTypes.Int64
+			}
+		} else {
+			switch {
+			case identifiersMap[header]:
+				fields[i].Name = fmt.Sprintf("id.%s", header)
+				fields[i].Type = arrow.BinaryTypes.String
+			case measurementsMap[header]:
+				fields[i].Name = fmt.Sprintf("measure.%s", header)
+				fields[i].Type = arrow.PrimitiveTypes.Float64
+			case categoriesMap[header]:
+				fields[i].Name = fmt.Sprintf("cat.%s", header)
+				fields[i].Type = arrow.BinaryTypes.String
+			case tagsMap[header]:
+				tagColumns = append(tagColumns, i)
+				fields[i].Name = fmt.Sprintf("tag.%s", header)
+				fields[i].Type = arrow.BinaryTypes.String
+			default:
+				return fmt.Errorf("Unexpected error header \"%s\", not found in maps", header)
 			}
 		}
 	}
 
 	if timeCol < 0 {
-		return nil, fmt.Errorf("time header '%s' not found", p.timeSelector)
+		return fmt.Errorf("time header '%s' not found", p.timeSelector)
 	}
 
-	identifierMappings := getFieldMappings(p.identifiers, headersMap)
-	measurementMappings := getFieldMappings(p.measurements, headersMap)
-	categoriesMappings := getFieldMappings(p.categories, headersMap)
+	schema := arrow.NewSchema(fields, nil)
+	arrowReader := arrow_csv.NewReader(
+		bytes.NewBuffer(data), schema, arrow_csv.WithHeader(true), arrow_csv.WithChunk(-1),
+		arrow_csv.WithNullReader(false))
+	defer arrowReader.Release()
 
-	var newObservations []observations.Observation
-	for line, record := range lines {
-		// Process time
-		ts, err := spice_time.ParseTime(record[timeCol], p.timeFormat)
-		if err != nil {
-			log.Printf("ignoring invalid line %d - %v: %v", line+1, record, err)
-			continue
+	arrowReader.Next()
+
+	if p.currentRecord != nil {
+		p.currentRecord.Release()
+	}
+	record := arrowReader.Record()
+	// Re allocating the name that were overwriten by the CSV reader
+	for i, field := range fields {
+		record.Schema().Fields()[i].Name = field.Name
+	}
+
+	pool := memory.NewGoAllocator()
+	if p.timeFormat != "" {
+		timeBuilder := array.NewInt64Builder(pool)
+		tagCol := record.Columns()[timeCol].(*array.String)
+		for i := 0; i < int(record.NumRows()); i++ {
+			time, err := spice_time.ParseTime(tagCol.Value(i), p.timeFormat)
+			if err != nil {
+				log.Printf("ignoring invalid line %d (%v): %v", i+1, tagCol.Value(i), err)
+				timeBuilder.Append(0)
+				continue
+			} else {
+				timeBuilder.Append(time.Unix())
+			}
 		}
+		new_fields := append([]arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}, fields[1:]...)
+		new_columns := append([]array.Interface{timeBuilder.NewArray()}, record.Columns()[1:]...)
+		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
+	}
 
-		// Process identifiers
-		identifiers := map[string]string{}
-		for fieldName, col := range identifierMappings {
-			identifiers[fieldName] = record[col]
-		}
+	if len(tagColumns) > 0 {
+		// Aggregating tags
+		tagListBuilder := array.NewListBuilder(pool, arrow.BinaryTypes.String)
+		tagValueBuilder := tagListBuilder.ValueBuilder().(*array.StringBuilder)
+		defer tagListBuilder.Release()
 
-		// Process measurements
-		measurements := map[string]float64{}
-		for fieldName, col := range measurementMappings {
-			field := record[col]
-			if field != "" {
-				val, err := conv.ParseMeasurement(field)
-				if err != nil {
-					log.Printf("csv processor: ignoring invalid field value '%s' on line %d: %s", field, line+1, err.Error())
-					continue
+		for i := 0; i < int(record.NumRows()); i++ {
+			tagListBuilder.Append(true)
+			for _, colIndex := range tagColumns {
+				tagCol := record.Columns()[colIndex].(*array.String)
+				for _, tag := range strings.Fields(tagCol.Value(i)) {
+					tagValueBuilder.Append(tag)
 				}
-				measurements[fieldName] = val
 			}
 		}
 
-		// Process categories
-		categories := map[string]string{}
-		for fieldName, col := range categoriesMappings {
-			categories[fieldName] = record[col]
-		}
-
-		// Process tags
-		var tags []string
-		tagsMap := make(map[string]bool, numTags)
-		for _, col := range tagsCol {
-			field := record[col]
-			for _, tag := range strings.Split(field, " ") {
-				if tag != "" && !tagsMap[tag] {
-					tags = append(tags, tag)
-					tagsMap[tag] = true
-				}
+		// Creating a new record without old tag columns but aggregated one
+		var new_fields []arrow.Field
+		var new_columns []array.Interface
+		for i, field := range fields {
+			if field.Name[:4] != "tag." {
+				new_fields = append(new_fields, field)
+				new_columns = append(new_columns, record.Column(i))
 			}
 		}
-
-		observation := observations.Observation{
-			Time: ts.Unix(),
-			Tags: tags,
-		}
-
-		if len(identifiers) > 0 {
-			observation.Identifiers = identifiers
-		}
-
-		if len(measurements) > 0 {
-			observation.Measurements = measurements
-		}
-
-		if len(categories) > 0 {
-			observation.Categories = categories
-		}
-
-		newObservations = append(newObservations, observation)
+		new_fields = append(new_fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
+		new_columns = append(new_columns, tagListBuilder.NewArray())
+		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
 	}
 
-	return newObservations, nil
+	p.currentRecord = record
+	p.currentRecord.Retain()
+	return nil
 }
 
-func getCsvHeaderAndLines(input io.Reader) ([]string, [][]string, error) {
-	reader := csv.NewReader(input)
+func getCsvHeader(input []byte) ([]string, error) {
+	reader := csv.NewReader(bytes.NewBuffer(input))
 	headers, err := reader.Read()
 	if err != nil {
-		return nil, nil, errors.New("failed to read header")
+		return nil, errors.New("failed to read header")
 	}
 
-	lines, err := reader.ReadAll()
-	if err != nil {
-		return nil, nil, errors.New("failed to read lines")
-	}
-
-	if len(headers) <= 1 || len(lines) == 0 {
-		return nil, nil, errors.New("no data")
-	}
-
-	return headers, lines, nil
-}
-
-func getFieldMappings(fields map[string]string, headers map[string]int) map[string]int {
-	mappings := make(map[string]int, len(fields))
-
-	for fieldName, dataName := range fields {
-		if val, ok := headers[dataName]; ok {
-			mappings[fieldName] = val
-		}
-	}
-
-	return mappings
+	return headers, nil
 }

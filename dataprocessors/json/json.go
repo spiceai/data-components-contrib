@@ -4,12 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/apache/arrow/go/v6/arrow"
+	"github.com/apache/arrow/go/v6/arrow/array"
+	"github.com/apache/arrow/go/v6/arrow/memory"
 	"github.com/spiceai/data-components-contrib/dataprocessors/conv"
-	"github.com/spiceai/spiceai/pkg/observations"
+
+	// "github.com/spiceai/spiceai/pkg/observations"
 	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
 )
@@ -22,10 +27,18 @@ type JsonProcessor struct {
 	timeFormat   string
 	timeSelector string
 
-	identifiers  map[string]string
-	measurements map[string]string
-	categories   map[string]string
-	tags         []string
+	timeBuilder     *array.Int64Builder
+	idColNames      []string
+	idFields        map[string]arrow.Field
+	idBuilders      map[string]*array.StringBuilder
+	measureColNames []string
+	measureFields   map[string]arrow.Field
+	measureBuilders map[string]*array.Float64Builder
+	catColNames     []string
+	catFields       map[string]arrow.Field
+	catBuilders     map[string]*array.StringBuilder
+	tags            []string
+	tagBuilder      *array.ListBuilder
 
 	dataMutex    sync.RWMutex
 	data         [][]byte
@@ -46,9 +59,28 @@ func (p *JsonProcessor) Init(params map[string]string, identifiers map[string]st
 		p.timeSelector = "time"
 	}
 
-	p.identifiers = identifiers
-	p.measurements = measurements
-	p.categories = categories
+	p.idFields = make(map[string]arrow.Field)
+	p.idBuilders = make(map[string]*array.StringBuilder)
+	p.measureFields = make(map[string]arrow.Field)
+	p.measureBuilders = make(map[string]*array.Float64Builder)
+	p.catFields = make(map[string]arrow.Field)
+	p.catBuilders = make(map[string]*array.StringBuilder)
+
+	for colName, fieldName := range identifiers {
+		p.idColNames = append(p.idColNames, colName)
+		p.idFields[colName] = arrow.Field{Name: fmt.Sprintf("id.%s", fieldName), Type: arrow.BinaryTypes.String}
+	}
+	sort.Strings(p.idColNames)
+	for colName, fieldName := range measurements {
+		p.measureColNames = append(p.measureColNames, colName)
+		p.measureFields[colName] = arrow.Field{Name: fmt.Sprintf("measure.%s", fieldName), Type: arrow.PrimitiveTypes.Float64}
+	}
+	sort.Strings(p.measureColNames)
+	for colName, fieldName := range categories {
+		p.catColNames = append(p.catColNames, colName)
+		p.catFields[colName] = arrow.Field{Name: fmt.Sprintf("cat.%s", fieldName), Type: arrow.BinaryTypes.String}
+	}
+	sort.Strings(p.catColNames)
 	p.tags = tags
 
 	return nil
@@ -77,7 +109,7 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
+func (p *JsonProcessor) GetRecord() (array.Record, error) {
 	if p.data == nil {
 		return nil, nil
 	}
@@ -89,7 +121,28 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 		return nil, nil
 	}
 
-	var newObservations []observations.Observation
+	// Builders creation
+	pool := memory.NewGoAllocator()
+
+	fields := []arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}
+
+	p.timeBuilder = array.NewInt64Builder(pool)
+	defer p.timeBuilder.Release()
+	for _, colName := range p.idColNames {
+		p.idBuilders[colName] = array.NewStringBuilder(pool)
+		fields = append(fields, p.idFields[colName])
+	}
+	for _, colName := range p.measureColNames {
+		p.measureBuilders[colName] = array.NewFloat64Builder(pool)
+		fields = append(fields, p.measureFields[colName])
+	}
+	for _, colName := range p.catColNames {
+		p.catBuilders[colName] = array.NewStringBuilder(pool)
+		fields = append(fields, p.catFields[colName])
+	}
+	p.tagBuilder = array.NewListBuilder(pool, arrow.BinaryTypes.String)
+	fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
+	defer p.tagBuilder.Release()
 
 	for _, data := range p.data {
 		firstChar := string(data[:1])
@@ -100,11 +153,10 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 			if err != nil {
 				return nil, err
 			}
-			o, err := p.newObservationFromJson(0, item)
+			err = p.newObservationFromJson(0, item)
 			if err != nil {
 				return nil, fmt.Errorf("error unmarshaling item: %s", err.Error())
 			}
-			newObservations = append(newObservations, *o)
 		} else {
 			var items []map[string]json.RawMessage
 
@@ -114,137 +166,147 @@ func (p *JsonProcessor) GetObservations() ([]observations.Observation, error) {
 			}
 
 			for index, item := range items {
-				o, err := p.newObservationFromJson(index, item)
+				err = p.newObservationFromJson(index, item)
 				if err != nil {
 					return nil, fmt.Errorf("error unmarshaling item %d: %s", index, err.Error())
 				}
-				newObservations = append(newObservations, *o)
 			}
 		}
 	}
 
 	p.data = nil
 
-	return newObservations, nil
+	cols := []array.Interface{p.timeBuilder.NewArray()}
+	for _, colName := range p.idColNames {
+		cols = append(cols, p.idBuilders[colName].NewArray())
+	}
+	for _, colName := range p.measureColNames {
+		cols = append(cols, p.measureBuilders[colName].NewArray())
+	}
+	for _, colName := range p.catColNames {
+		cols = append(cols, p.catBuilders[colName].NewArray())
+	}
+	cols = append(cols, p.tagBuilder.NewArray())
+
+	record := array.NewRecord(arrow.NewSchema(fields, nil), cols, int64(cols[0].Len()))
+	record.Retain()
+
+	// Builders release
+	for _, builder := range p.idBuilders {
+		defer builder.Release()
+	}
+	for _, builder := range p.measureBuilders {
+		defer builder.Release()
+	}
+	for _, builder := range p.catBuilders {
+		defer builder.Release()
+	}
+
+	return record, nil
 }
 
-func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.RawMessage) (*observations.Observation, error) {
-	timeValue, ok := item[p.timeSelector]
+func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.RawMessage) error {
+	timeEntry, ok := item[p.timeSelector]
 	if !ok {
-		return nil, fmt.Errorf("time field with selector '%s' does not exist in the message", p.timeSelector)
+		return fmt.Errorf("time field with selector '%s' does not exist in the message", p.timeSelector)
 	}
 
-	t, err := unmarshalTime(p.timeFormat, timeValue)
+	timeValue, err := unmarshalTime(p.timeFormat, timeEntry)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	p.timeBuilder.Append(timeValue.Unix())
 
-	identifiers := make(map[string]string)
-
-	for fieldName, selector := range p.identifiers {
-		if val, ok := item[selector]; ok {
+	for colName, field := range p.idFields {
+		if val, ok := item[field.Name[3:]]; ok { // Field name starts with "id."
 			var jsonVal interface{}
 			err = json.Unmarshal(val, &jsonVal)
 			if err != nil {
-				return nil, err
+				return err
 			}
-			if str, ok := jsonVal.(string); ok {
-				identifiers[fieldName] = str
-			} else if num, ok := jsonVal.(float64); ok {
-				identifiers[fieldName] = strconv.FormatFloat(num, 'f', -1, 64)
+			if stringValue, ok := jsonVal.(string); ok {
+				p.idBuilders[colName].Append(stringValue)
+			} else if numValue, ok := jsonVal.(float64); ok {
+				p.idBuilders[colName].Append(strconv.FormatFloat(numValue, 'f', -1, 64))
 			} else {
-				return nil, fmt.Errorf("identifier field '%s' is not a a valid id (string or number)", fieldName)
+				return fmt.Errorf("identifier field '%s' is not a a valid id (string or number)", colName)
 			}
+		} else {
+			p.idBuilders[colName].AppendNull()
 		}
 	}
 
-	measurements := make(map[string]float64)
-
-	for fieldName, selector := range p.measurements {
-		if val, ok := item[selector]; ok {
-			var m float64
-			err = json.Unmarshal(val, &m)
+	for colName, field := range p.measureFields {
+		if val, ok := item[field.Name[8:]]; ok { // Field name starts with "measure."
+			var numValue float64
+			err = json.Unmarshal(val, &numValue)
 			if err != nil {
 				var str string
 				strErr := json.Unmarshal(val, &str)
 				if strErr != nil {
-					return nil, err
+					return err
 				}
-				m, err = conv.ParseMeasurement(str)
+				numValue, err = conv.ParseMeasurement(str)
 				if err != nil {
-					return nil, err
+					return err
 				}
 			}
-			measurements[fieldName] = m
+			p.measureBuilders[colName].Append(numValue)
+		} else {
+			p.measureBuilders[colName].AppendNull()
 		}
 	}
 
-	categories := make(map[string]string)
-
-	for fieldName, selector := range p.categories {
-		if val, ok := item[selector]; ok {
-			str, err := unmarshalString(val)
+	for colName, field := range p.catFields {
+		if val, ok := item[field.Name[4:]]; ok { // Field name starts with "cat."
+			stringValue, err := unmarshalString(val)
 			if err != nil {
-				return nil, err
+				return err
 			}
-			categories[fieldName] = str
+			p.catBuilders[colName].Append(stringValue)
+		} else {
+			p.catBuilders[colName].AppendNull()
 		}
 	}
 
-	observation := &observations.Observation{
-		Time: t.Unix(),
-	}
+	p.tagBuilder.Append(true)
+	tagAdded := make(map[string]bool)
+	tagValueBuilder := p.tagBuilder.ValueBuilder().(*array.StringBuilder)
 
-	var tags []string
-	tagsMap := map[string]bool{}
-
-	for _, tag := range p.tags {
-		val, ok := item[tag]
+	for _, colName := range p.tags {
+		tagEntry, ok := item[colName]
 		if !ok {
 			continue
 		}
 
-		if tag == "_tags" || tag == "tags" {
-			var strs []string
-			err = json.Unmarshal(val, &strs)
+		if colName == "_tags" || colName == "tags" {
+			var stringList []string
+			err = json.Unmarshal(tagEntry, &stringList)
 			if err != nil {
-				return nil, err
+				return err
 			}
-			for _, str := range strs {
-				if _, ok := tagsMap[str]; !ok {
-					tags = append(tags, str)
-					tagsMap[str] = true
+			for _, stringValue := range stringList {
+				// Avoid duplicate entries
+				if _, ok := tagAdded[stringValue]; !ok {
+					tagValueBuilder.Append(stringValue)
+					tagAdded[stringValue] = true
 				}
 			}
 			continue
 		}
 
-		var str string
-		err = json.Unmarshal(val, &str)
+		var stringValue string
+		err = json.Unmarshal(tagEntry, &stringValue)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		if _, ok := tagsMap[str]; !ok {
-			tags = append(tags, str)
-			tagsMap[str] = true
+		if _, ok := tagAdded[stringValue]; !ok {
+			tagValueBuilder.Append(stringValue)
+			tagAdded[stringValue] = true
 		}
 	}
 
-	observation.Tags = tags
-
-	if len(identifiers) > 0 {
-		observation.Identifiers = identifiers
-	}
-
-	if len(measurements) > 0 {
-		observation.Measurements = measurements
-	}
-
-	if len(categories) > 0 {
-		observation.Categories = categories
-	}
-
-	return observation, nil
+	return nil
 }
 
 func unmarshalTime(timeFormat string, data []byte) (*time.Time, error) {

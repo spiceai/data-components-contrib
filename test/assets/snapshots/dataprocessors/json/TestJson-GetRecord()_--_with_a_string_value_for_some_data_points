@@ -1,0 +1,15 @@
+(*array.simpleRecord)(record:
+  schema:
+  fields: 5
+    - time: type=int64
+    - measure.reply_count: type=float64
+    - measure.retweet_count: type=float64
+    - cat.lang: type=utf8
+    - tags: type=list<item: utf8, nullable>
+  rows: 1
+  col[0][time]: [996272905]
+  col[1][measure.reply_count]: [34]
+  col[2][measure.retweet_count]: [743]
+  col[3][cat.lang]: ["en"]
+  col[4][tags]: [[]]
+)

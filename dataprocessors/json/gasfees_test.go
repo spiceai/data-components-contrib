@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/apache/arrow/go/v6/arrow/array"
 	"github.com/spiceai/data-components-contrib/dataconnectors/http"
 	"github.com/stretchr/testify/assert"
 )
@@ -54,6 +55,7 @@ func TestGasFeesTicker(t *testing.T) {
 		if readCount < 5 {
 			t.Logf("readCount: %d\n", readCount)
 			d, err := dp.OnData(data)
+			fmt.Println(string(d))
 			readCount++
 			wg.Done()
 			return d, err
@@ -69,20 +71,23 @@ func TestGasFeesTicker(t *testing.T) {
 
 	wg.Wait()
 
-	observations, err := dp.GetObservations()
+	record, err := dp.GetRecord()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("observations: %+v\n", observations)
+	assert.Equal(t, int(record.NumRows()), 5)
 
-	assert.Len(t, observations, 5)
-
-	for _, o := range observations {
-		assert.Greater(t, o.Time, int64(0), "invalid time")
-		assert.Greater(t, o.Measurements["slow"], 0.0, "slow")
-		assert.Greater(t, o.Measurements["normal"], 0.0, "normal")
-		assert.Greater(t, o.Measurements["fast"], 0.0, "fast")
-		assert.Greater(t, o.Measurements["instant"], 0.0, "instant")
+	timeCol := record.Column(0).(*array.Int64)
+	fastCol := record.Column(2).(*array.Float64)
+	instantCol := record.Column(3).(*array.Float64)
+	normalCol := record.Column(5).(*array.Float64)
+	slowCol := record.Column(6).(*array.Float64)
+	for i := 0; i < int(record.NumRows()); i++ {
+		assert.Greater(t, timeCol.Value(i), int64(0), "invalid time")
+		assert.Greater(t, slowCol.Value(i), 0.0, "slow")
+		assert.Greater(t, normalCol.Value(i), 0.0, "normal")
+		assert.Greater(t, fastCol.Value(i), 0.0, "fast")
+		assert.Greater(t, instantCol.Value(i), 0.0, "instant")
 	}
 }

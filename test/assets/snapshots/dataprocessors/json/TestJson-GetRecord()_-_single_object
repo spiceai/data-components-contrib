@@ -1,0 +1,15 @@
+(*array.simpleRecord)(record:
+  schema:
+  fields: 5
+    - time: type=int64
+    - measure.ave_weight: type=float64
+    - measure.population: type=float64
+    - cat.city: type=utf8
+    - tags: type=list<item: utf8, nullable>
+  rows: 1
+  col[0][time]: [980393406]
+  col[1][measure.ave_weight]: [8.39]
+  col[2][measure.population]: [4]
+  col[3][cat.city]: ["Villarreal"]
+  col[4][tags]: [["cupidatat" "est" "do" "ullamco" "voluptate"]]
+)

@@ -1,13 +1,17 @@
 package flux
 
 import (
-	"encoding/json"
 	"os"
 	"testing"
 
-	"github.com/spiceai/spiceai/pkg/observations"
+	"github.com/apache/arrow/go/v6/arrow"
+	"github.com/apache/arrow/go/v6/arrow/array"
+	"github.com/apache/arrow/go/v6/arrow/memory"
+	"github.com/bradleyjkemp/cupaloy"
 	"github.com/stretchr/testify/assert"
 )
+
+var snapshotter = cupaloy.New(cupaloy.SnapshotSubdirectory("../../test/assets/snapshots/dataprocessors/fluxcsv"))
 
 func TestFlux(t *testing.T) {
 	data, err := os.ReadFile("../../test/assets/data/annotated-csv/cpu_metrics_influxdb_annotated.csv")
@@ -16,9 +20,9 @@ func TestFlux(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
-	t.Run("GetObservations() -o observations.json", testGetObservationsFunc(data))
-	t.Run("GetObservations() called twice -o observations.json", testGetObservationsTwiceFunc(data))
-	t.Run("GetObservations() same data -o observations.json", testGetObservationsSameDataFunc(data))
+	t.Run("GetRecord() -o observations.json", testGetRecordFunc(data))
+	t.Run("GetRecord() called twice -o observations.json", testGetRecordTwiceFunc(data))
+	t.Run("GetRecord() same data -o observations.json", testGetRecordSameDataFunc(data))
 }
 
 // Tests "Init()"
@@ -33,8 +37,8 @@ func testInitFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()"
-func testGetObservationsFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()"
+func testGetRecordFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -49,46 +53,82 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1629159360,
-			Measurements: map[string]float64{
-				"usage_idle": 99.56272495215877,
-			},
-			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
+		fields := []arrow.Field{
+			{Name: "_time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.usage_idle", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
-		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
-		assert.Equal(t, expectedFirstObservation.Measurements, actualObservations[0].Measurements, "First Observation not correct")
-		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1629159360}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{99.56272495215877}, nil)
+		listBuilder := recordBuilder.Field(2).(*array.ListBuilder)
+		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+		listBuilder.Append(true)
+		valueBuilder.Append("cpu-total")
+		valueBuilder.Append("DESKTOP-2BSF9I6")
 
-		expectedObservationsBytes, err := os.ReadFile("../../test/assets/data/json/observations_TestFlux-GetObservations()-expected_observations.json")
-		if err != nil {
-			t.Fatal(err)
-		}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-		expectedObservations := make([]observations.Observation, 0, 100)
-		err = json.Unmarshal(expectedObservationsBytes, &expectedObservations)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		assert.Equal(t, len(expectedObservations), len(actualObservations), "Expected observations count different from actual")
-
-		for idx, expectedObservation := range expectedObservations {
-			assert.Equal(t, expectedObservation.Time, actualObservations[idx].Time)
-			assert.Equal(t, expectedObservation.Measurements, actualObservations[idx].Measurements)
-			assert.ElementsMatch(t, expectedObservation.Tags, actualObservations[idx].Tags)
-		}
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations() called twice"
-func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord() called twice"
+func testGetRecordTwiceFunc(data []byte) func(*testing.T) {
+	return func(t *testing.T) {
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		dp := NewFluxCsvProcessor()
+		err := dp.Init(map[string]string{"field": "_value"}, nil, nil, nil, nil)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualRecord, err := dp.GetRecord()
+		assert.NoError(t, err)
+
+		fields := []arrow.Field{
+			{Name: "_time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.usage_idle", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
+		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1629159360}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{99.56272495215877}, nil)
+		listBuilder := recordBuilder.Field(2).(*array.ListBuilder)
+		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+		listBuilder.Append(true)
+		valueBuilder.Append("cpu-total")
+		valueBuilder.Append("DESKTOP-2BSF9I6")
+
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
+
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+
+		actualRecord2, err := dp.GetRecord()
+		assert.NoError(t, err)
+		assert.Nil(t, actualRecord2)
+	}
+}
+
+// Tests "GetRecord() updated with same data"
+func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -103,61 +143,35 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1629159360,
-			Measurements: map[string]float64{
-				"usage_idle": 99.56272495215877,
-			},
-			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
+		fields := []arrow.Field{
+			{Name: "_time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.usage_idle", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
-		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
-		assert.Equal(t, expectedFirstObservation.Measurements, actualObservations[0].Measurements, "First Observation not correct")
-		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1629159360}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{99.56272495215877}, nil)
+		listBuilder := recordBuilder.Field(2).(*array.ListBuilder)
+		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+		listBuilder.Append(true)
+		valueBuilder.Append("cpu-total")
+		valueBuilder.Append("DESKTOP-2BSF9I6")
 
-		actualObservations2, err := dp.GetObservations()
-		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
-	}
-}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-// Tests "GetObservations() updated with same data"
-func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
-	return func(t *testing.T) {
-		if len(data) == 0 {
-			t.Fatal("no data")
-		}
-
-		dp := NewFluxCsvProcessor()
-		err := dp.Init(map[string]string{
-			"field": "_value",
-		}, nil, nil, nil, nil)
-		assert.NoError(t, err)
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
 
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
-
-		expectedFirstObservation := observations.Observation{
-			Time: 1629159360,
-			Measurements: map[string]float64{
-				"usage_idle": 99.56272495215877,
-			},
-			Tags: []string{"cpu-total", "DESKTOP-2BSF9I6"},
-		}
-		assert.Equal(t, expectedFirstObservation.Time, actualObservations[0].Time, "First Observation not correct")
-		assert.Equal(t, expectedFirstObservation.Measurements, actualObservations[0].Measurements, "First Observation not correct")
-		assert.ElementsMatch(t, expectedFirstObservation.Tags, actualObservations[0].Tags, "First Observation not correct")
-
-		_, err = dp.OnData(data)
-		assert.NoError(t, err)
-
-		actualObservations2, err := dp.GetObservations()
-		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
+		assert.Nil(t, actualRecord2)
 	}
 }

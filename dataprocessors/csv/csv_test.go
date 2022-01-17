@@ -1,17 +1,16 @@
 package csv
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/apache/arrow/go/v6/arrow"
+	"github.com/apache/arrow/go/v6/arrow/array"
+	"github.com/apache/arrow/go/v6/arrow/memory"
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/spiceai/data-components-contrib/dataconnectors/file"
-	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,54 +27,22 @@ func TestCsv(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
-	t.Run("GetObservations()", testGetObservationsFunc(localData))
-	t.Run("GetObservations() dirty data", testGetObservationsDirtyDataFunc())
-	t.Run("GetObservations() identifiers", testGetObservationsWithIdentifiersFunc())
-	t.Run("GetObservations() custom time format", testGetObservationsCustomTimeFunc())
-	t.Run("GetObservations() with tags", testGetObservationsFunc(localDataTags))
-	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(localData))
-	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(localData))
+	t.Run("GetRecord()", testGetRecordFunc(localData))
+	t.Run("GetRecord() dirty data", testGetRecordDirtyDataFunc())
+	t.Run("GetRecord() identifiers", testGetRecordWithIdentifiersFunc())
+	t.Run("GetRecord() custom time format", testGetRecordCustomTimeFunc())
+	t.Run("GetRecord() with tags", testGetRecordFunc(localDataTags))
+	t.Run("GetRecord() called twice", testGetRecordTwiceFunc(localData))
+	t.Run("GetRecord() updated with same data", testGetRecordSameDataFunc(localData))
 
 }
 
-func BenchmarkGetObservations(b *testing.B) {
+func BenchmarkGetRecord(b *testing.B) {
 	data, err := os.ReadFile("../../test/assets/data/csv/COINBASE_BTCUSD, 30.csv")
 	if err != nil {
 		b.Error(err)
 	}
-	b.Run("GetObservations()", benchGetObservationsFunc(data))
-}
-
-func TestGetFieldMappingsCsv(t *testing.T) {
-	headers := map[string]int{
-		"open":   10,
-		"high":   9,
-		"low":    8,
-		"extra":  7,
-		"close":  6,
-		"volume": 5,
-		"_tags":  4,
-	}
-
-	measurements := map[string]string{
-		"open":   "open",
-		"high":   "high",
-		"low":    "low",
-		"close":  "close",
-		"volume": "volume",
-	}
-
-	mappings := getFieldMappings(measurements, headers)
-
-	expectedMappings := map[string]int{
-		"open":   headers["open"],
-		"high":   headers["high"],
-		"low":    headers["low"],
-		"close":  headers["close"],
-		"volume": headers["volume"],
-	}
-
-	assert.Equal(t, expectedMappings, mappings)
+	b.Run("GetRecord()", benchGetRecordFunc(data))
 }
 
 // Tests "Init()"
@@ -90,8 +57,8 @@ func testInitFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()"
-func testGetObservationsFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()"
+func testGetRecordFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -119,44 +86,56 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1605312000,
-			Measurements: map[string]float64{
-				"open":   16339.56,
-				"high":   16339.6,
-				"low":    16240,
-				"close":  16254.51,
-				"volume": 274.42607,
-			},
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
 		}
-
-		if len(actualObservations[0].Tags) > 0 {
-			expectedFirstObservation.Tags = []string{
-				"elon_tweet",
-				"market_open",
-				"tagA",
+		withTags := false
+		for _, field := range actualRecord.Schema().Fields() {
+			if field.Name == "tags" {
+				fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
+				withTags = true
+				break
 			}
 		}
-
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
-
-		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-		if err != nil {
-			t.Fatal(err)
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		if withTags {
+			listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+			valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+			listBuilder.Append(true)
+			valueBuilder.Append("elon_tweet")
+			valueBuilder.Append("market_open")
+			valueBuilder.Append("tagA")
 		}
 
-		snapshotter.SnapshotT(t, observationsJson)
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
+
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations()" - dirty data
-func testGetObservationsDirtyDataFunc() func(*testing.T) {
+// Tests "GetRecord()" - dirty data
+func testGetRecordDirtyDataFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		data, err := os.ReadFile("../../test/assets/data/csv/dirty_data.csv")
 		if err != nil {
@@ -189,44 +168,47 @@ func testGetObservationsDirtyDataFunc() func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1605312000,
-			Measurements: map[string]float64{
-				"open":   16339.56,
-				"high":   16339.6,
-				"low":    16240,
-				"close":  16254.51,
-				"volume": 274.42607,
-			},
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+		listBuilder.Append(true)
+		valueBuilder.Append("elon_tweet")
+		valueBuilder.Append("market_open")
+		valueBuilder.Append("tagA")
 
-		if len(actualObservations[0].Tags) > 0 {
-			expectedFirstObservation.Tags = []string{
-				"elon_tweet",
-				"market_open",
-				"tagA",
-			}
-		}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
-
-		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		snapshotter.SnapshotT(t, observationsJson)
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations() - custom time format"
-func testGetObservationsCustomTimeFunc() func(*testing.T) {
+// Tests "GetRecord() - custom time format"
+func testGetRecordCustomTimeFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		epoch := time.Date(2006, 1, 1, 0, 0, 0, 0, time.UTC)
 		period := 7 * 24 * time.Hour
@@ -274,31 +256,32 @@ func testGetObservationsCustomTimeFunc() func(*testing.T) {
 		_, err = dp.OnData(localData)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1547575074,
-			Measurements: map[string]float64{
-				"val": 34,
-			},
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.val", Type: arrow.PrimitiveTypes.Float64},
 		}
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1547575074}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{34}, nil)
 
-		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-		snapshotter.SnapshotT(t, observationsJson)
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations()" identifiers
-func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
+// Tests "GetRecord()" identifiers
+func testGetRecordWithIdentifiersFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		data, err := os.ReadFile("../../test/assets/data/csv/btcusd_ticks.csv")
 		if err != nil {
@@ -328,39 +311,42 @@ func testGetObservationsWithIdentifiersFunc() func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1605312000,
-			Identifiers: map[string]string{
-				"tick_id": "1",
-			},
-			Measurements: map[string]float64{
-				"open":   16339.56,
-				"high":   16339.6,
-				"low":    16240,
-				"close":  16254.51,
-				"volume": 274.42607,
-			},
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "id.tick_id", Type: arrow.BinaryTypes.String},
 		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		recordBuilder.Field(6).(*array.StringBuilder).AppendValues([]string{"1"}, nil)
 
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-		observationsJson, err := json.MarshalIndent(actualObservations, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		snapshotter.SnapshotT(t, observationsJson)
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations()" called twice
-func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" called twice
+func testGetRecordTwiceFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -383,29 +369,40 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1605312000,
-			Measurements: map[string]float64{
-				"open":   16339.56,
-				"high":   16339.6,
-				"low":    16240,
-				"close":  16254.51,
-				"volume": 274.42607,
-			},
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
 		}
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
 
-		actualObservations2, err := dp.GetObservations()
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
+
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
+		assert.Nil(t, actualRecord2)
 	}
 }
 
-// Tests "GetObservations()" updated with same data
-func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" updated with same data
+func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -428,39 +425,43 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
-		expectedFirstObservation := observations.Observation{
-			Time: 1605312000,
-			Measurements: map[string]float64{
-				"open":   16339.56,
-				"high":   16339.6,
-				"low":    16240,
-				"close":  16254.51,
-				"volume": 274.42607,
-			},
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
 		}
-		assert.Equal(t, expectedFirstObservation, actualObservations[0], "First Observation not correct")
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16339.6}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
+		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
 
-		reader := bytes.NewReader(data)
-		buffer := new(bytes.Buffer)
-		_, err = io.Copy(buffer, reader)
-		if err != nil {
-			t.Error(err)
-		}
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
 
-		_, err = dp.OnData(buffer.Bytes())
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
+
+		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
+		assert.Nil(t, actualRecord2)
 	}
 }
 
-// Benchmark "GetObservations()"
-func benchGetObservationsFunc(data []byte) func(*testing.B) {
+// Benchmark "GetRecord()"
+func benchGetRecordFunc(data []byte) func(*testing.B) {
 	return func(b *testing.B) {
 		measurements := map[string]string{
 			"open":   "open",
@@ -479,7 +480,7 @@ func benchGetObservationsFunc(data []byte) func(*testing.B) {
 
 		for i := 0; i < 10; i++ {
 			dp.OnData(data)
-			_, err := dp.GetObservations()
+			_, err := dp.GetRecord()
 			if err != nil {
 				b.Fatal(err.Error())
 			}

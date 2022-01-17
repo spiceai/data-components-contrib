@@ -32,15 +32,15 @@ func TestJson(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
-	t.Run("GetObservations() - array", testGetObservationsFunc(puppies))
-	t.Run("GetObservations() - single object", testGetObservationsFunc(puppy))
-	t.Run("GetObservations() -- with selected identifiers", testGetObservationsSelectedIdentifiersFunc(puppies))
-	t.Run("GetObservations() -- with selected measurements", testGetObservationsSelectedMeasurementsFunc(puppies))
-	t.Run("GetObservations() -- with a string value for some data points", testGetObservationsSomeDataPointsFunc(tweets))
-	t.Run("GetObservations() -- with an invalid string value for some data points", testGetObservationsInvalidStringFunc(tweets))
-	t.Run("GetObservations() called before Init()", testGetObservationsNoInitFunc())
-	t.Run("GetObservations() called twice", testGetObservationsTwiceFunc(puppies))
-	t.Run("GetObservations() updated with same data", testGetObservationsSameDataFunc(puppies))
+	t.Run("GetRecord() - array", testGetRecordFunc(puppies))
+	t.Run("GetRecord() - single object", testGetRecordFunc(puppy))
+	t.Run("GetRecord() -- with selected identifiers", testGetRecordSelectedIdentifiersFunc(puppies))
+	t.Run("GetRecord() -- with selected measurements", testGetRecordSelectedMeasurementsFunc(puppies))
+	t.Run("GetRecord() -- with a string value for some data points", testGetRecordSomeDataPointsFunc(tweets))
+	t.Run("GetRecord() -- with an invalid string value for some data points", testGetRecordInvalidStringFunc(tweets))
+	t.Run("GetRecord() called before Init()", testGetRecordNoInitFunc())
+	t.Run("GetRecord() called twice", testGetRecordTwiceFunc(puppies))
+	t.Run("GetRecord() updated with same data", testGetRecordSameDataFunc(puppies))
 }
 
 // Tests "Init()"
@@ -55,8 +55,8 @@ func testInitFunc() func(*testing.T) {
 	}
 }
 
-// Tests "GetObservations()"
-func testGetObservationsFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()"
+func testGetRecordFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -84,18 +84,18 @@ func testGetObservationsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations()"
-func testGetObservationsSomeDataPointsFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()"
+func testGetRecordSomeDataPointsFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -121,18 +121,18 @@ func testGetObservationsSomeDataPointsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations()" with selected identifiers
-func testGetObservationsSelectedIdentifiersFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" with selected identifiers
+func testGetRecordSelectedIdentifiersFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -161,18 +161,18 @@ func testGetObservationsSelectedIdentifiersFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations()" with selected measurements
-func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" with selected measurements
+func testGetRecordSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -197,18 +197,18 @@ func testGetObservationsSelectedMeasurementsFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 	}
 }
 
-// Tests "GetObservations()" when given an invalid string data point
-func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" when given an invalid string data point
+func testGetRecordInvalidStringFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -234,26 +234,28 @@ func testGetObservationsInvalidStringFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		_, err = dp.GetObservations()
-		assert.Error(t, err)
-
-		assert.Equal(t, "error unmarshaling item 0: value is not a valid string or number", err.Error())
+		_, err = dp.GetRecord()
+		assert.NotNil(t, err)
+		if err != nil {
+			assert.Error(t, err)
+			assert.Equal(t, "error unmarshaling item 0: value is not a valid string or number", err.Error())
+		}
 	}
 }
 
-// Tests "GetObservations()" before Init() is called
-func testGetObservationsNoInitFunc() func(*testing.T) {
+// Tests "GetRecord()" before Init() is called
+func testGetRecordNoInitFunc() func(*testing.T) {
 	return func(t *testing.T) {
 		dp := NewJsonProcessor()
 
-		obs, err := dp.GetObservations()
+		obs, err := dp.GetRecord()
 		assert.NoError(t, err)
 		assert.Nil(t, obs)
 	}
 }
 
-// Tests "GetObservations()" called twice
-func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" called twice
+func testGetRecordTwiceFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -279,19 +281,19 @@ func testGetObservationsTwiceFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 
-		actualObservations2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
+		assert.Nil(t, actualRecord2)
 	}
 }
 
-// Tests "GetObservations()" updated with same data
-func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
+// Tests "GetRecord()" updated with same data
+func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -317,10 +319,10 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(data)
 		assert.NoError(t, err)
 
-		actualObservations, err := dp.GetObservations()
+		actualRecord, err := dp.GetRecord()
 		assert.NoError(t, err)
 
-		snapshotter.SnapshotT(t, actualObservations)
+		snapshotter.SnapshotT(t, actualRecord)
 
 		reader := bytes.NewReader(data)
 		buffer := new(bytes.Buffer)
@@ -332,9 +334,9 @@ func testGetObservationsSameDataFunc(data []byte) func(*testing.T) {
 		_, err = dp.OnData(buffer.Bytes())
 		assert.NoError(t, err)
 
-		actualObservations2, err := dp.GetObservations()
+		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
-		assert.Nil(t, actualObservations2)
+		assert.Nil(t, actualRecord2)
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/apache/arrow/go/v6/arrow/array"
 	"github.com/spiceai/data-components-contrib/dataconnectors/coinbase"
 	"github.com/stretchr/testify/assert"
 )
@@ -67,16 +68,19 @@ func TestCoinbaseTicker(t *testing.T) {
 
 	wg.Wait()
 
-	observations, err := dp.GetObservations()
+	record, err := dp.GetRecord()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Len(t, observations, 5)
+	assert.Equal(t, int(record.NumRows()), 5)
 
-	for _, o := range observations {
-		assert.Greater(t, o.Time, int64(0), "invalid time")
-		assert.Greater(t, o.Measurements["last_size"], 0.0, "invalid last_size")
-		assert.Greater(t, o.Measurements["price"], 0.0, "invalid price")
+	timeCol := record.Column(0).(*array.Int64)
+	lastSizeCol := record.Column(2).(*array.Float64)
+	priceCol := record.Column(3).(*array.Float64)
+	for i := 0; i < int(record.NumRows()); i++ {
+		assert.Greater(t, timeCol.Value(i), int64(0), "invalid time")
+		assert.Greater(t, lastSizeCol.Value(i), 0.0, "slow")
+		assert.Greater(t, priceCol.Value(i), 0.0, "normal")
 	}
 }

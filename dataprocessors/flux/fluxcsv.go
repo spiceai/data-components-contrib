@@ -8,11 +8,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/apache/arrow/go/v6/arrow"
+	"github.com/apache/arrow/go/v6/arrow/array"
+	"github.com/apache/arrow/go/v6/arrow/memory"
 	"github.com/influxdata/flux"
-	"github.com/influxdata/flux/array"
+	flux_array "github.com/influxdata/flux/array"
 	flux_csv "github.com/influxdata/flux/csv"
 	"github.com/spiceai/spiceai/pkg/loggers"
-	"github.com/spiceai/spiceai/pkg/observations"
 	"github.com/spiceai/spiceai/pkg/util"
 	"go.uber.org/zap"
 )
@@ -57,7 +59,7 @@ func (p *FluxCsvProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error) {
+func (p *FluxCsvProcessor) GetRecord() (array.Record, error) {
 	p.dataMutex.Lock()
 	defer p.dataMutex.Unlock()
 
@@ -75,99 +77,103 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 	}
 	defer results.Release()
 
-	var newObservations []observations.Observation
+	arrow_fields := []arrow.Field{}
+
+	pool := memory.NewGoAllocator()
+
+	timeBuilder := array.NewInt64Builder(pool)
+	defer timeBuilder.Release()
+
+	valueBuilder := array.NewFloat64Builder(pool)
+	defer valueBuilder.Release()
+
+	tagListBuilder := array.NewListBuilder(pool, arrow.BinaryTypes.String)
+	defer tagListBuilder.Release()
+	tagValueBuilder := tagListBuilder.ValueBuilder().(*array.StringBuilder)
+	defer tagValueBuilder.Release()
 
 	for results.More() {
 		result := results.Next()
 
 		err = result.Tables().Do(func(t flux.Table) error {
-			return t.Do(func(c flux.ColReader) error {
-				tableObservations := make([]observations.Observation, c.Len())
-				timeCol := -1
-				fieldCol := -1
-				valueCol := -1
-				tagColMap := make(map[string]int)
-				for col, colMeta := range c.Cols() {
+			return t.Do(func(colReader flux.ColReader) error {
+				defer colReader.Release()
+
+				timeIndex := -1
+				fieldIndex := -1
+				valueIndex := -1
+				var tagIndices []int
+				for colIndex, colMeta := range colReader.Cols() {
 					// We currently only support one field and float for now
-					if colMeta.Label == "_time" {
-						timeCol = col
+					switch {
+					case colMeta.Label == "_time":
+						timeIndex = colIndex
+					case colMeta.Label == "_field":
+						fieldIndex = colIndex
+					case colMeta.Label == "_value":
+						valueIndex = colIndex
+					case colMeta.Label == "_measurement" || colMeta.Type.String() != "string":
 						continue
+					default:
+						tagIndices = append(tagIndices, colIndex)
 					}
-
-					if colMeta.Label == "_field" {
-						fieldCol = col
-						continue
-					}
-
-					if colMeta.Label == "_value" {
-						valueCol = col
-						continue
-					}
-
-					if colMeta.Label == "_measurement" || colMeta.Type.String() != "string" {
-						continue
-					}
-
-					tagColMap[colMeta.Label] = col
 				}
 
-				if timeCol == -1 {
+				if timeIndex == -1 {
 					return errors.New("'_time' not found in table data")
 				}
 
-				if fieldCol == -1 {
+				if fieldIndex == -1 {
 					return errors.New("'_field' not found in table data")
 				}
 
-				if valueCol == -1 {
+				if valueIndex == -1 {
 					return errors.New("'_value' not found in table data")
 				}
 
-				times := c.Times(timeCol)
+				times := colReader.Times(timeIndex)
 				defer times.Release()
 
-				fields := c.Strings(fieldCol)
+				fields := colReader.Strings(fieldIndex)
 				defer fields.Release()
 
-				values := c.Floats(valueCol)
+				values := colReader.Floats(valueIndex)
 				defer values.Release()
 
-				tags := make(map[string]*array.String, len(tagColMap))
-
-				for tagName, colIndex := range tagColMap {
-					tags[tagName] = c.Strings(colIndex)
-					defer tags[tagName].Release()
+				var tags []*flux_array.String
+				for _, tagIndex := range tagIndices {
+					tags = append(tags, colReader.Strings(tagIndex))
 				}
 
-				for i := 0; i < c.Len(); i++ {
-					if times.IsValid(i) && !times.IsNull(i) &&
-						fields.IsValid(i) && !fields.IsNull(i) &&
-						values.IsValid(i) && !values.IsNull(i) {
-						rowData := make(map[string]float64, 1)
-						rowData[fields.Value(i)] = values.Value(i)
-
-						tagData := make([]string, 0)
-
-						for _, tagValue := range tags {
-							if tagValue.IsValid(i) && !tagValue.IsNull(i) {
-								tagData = append(tagData, tagValue.Value(i))
-							}
-						}
-
-						observation := observations.Observation{
-							Time:         times.Value(i) / int64(time.Second),
-							Measurements: rowData,
-							Tags:         tagData,
-						}
-
-						tableObservations[i] = observation
+				if len(arrow_fields) == 0 {
+					arrow_fields = []arrow.Field{
+						{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+						{Name: fmt.Sprintf("measure.%s", fields.Value(0)), Type: arrow.PrimitiveTypes.Float64},
+						{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 					}
 				}
 
-				defer c.Release()
+				secondScale := int64(time.Second)
+				for i := 0; i < colReader.Len(); i++ {
+					tagListBuilder.Append(true)
+					if times.IsValid(i) && !times.IsNull(i) &&
+						fields.IsValid(i) && !fields.IsNull(i) &&
+						values.IsValid(i) && !values.IsNull(i) {
 
-				newObservations = append(newObservations, tableObservations...)
+						for _, tagValue := range tags {
+							if tagValue.IsValid(i) && !tagValue.IsNull(i) {
+								tagValueBuilder.Append(tagValue.Value(i))
+							}
+						}
 
+						timeBuilder.Append(times.Value(i) / secondScale)
+						valueBuilder.Append(values.Value(i))
+					}
+				}
+
+				for _, tagCol := range tags {
+					tagCol.Release()
+				}
 				return nil
 			})
 		})
@@ -184,5 +190,10 @@ func (p *FluxCsvProcessor) GetObservations() ([]observations.Observation, error)
 
 	p.data = nil
 
-	return newObservations, nil
+	record := array.NewRecord(
+		arrow.NewSchema(arrow_fields, nil),
+		[]array.Interface{timeBuilder.NewArray(), valueBuilder.NewArray(), tagListBuilder.NewArray()},
+		int64(timeBuilder.Len()))
+
+	return record, nil
 }
