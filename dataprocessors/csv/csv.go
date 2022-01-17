@@ -96,7 +96,7 @@ func (p *CsvProcessor) GetRecord() (array.Record, error) {
 		return nil, nil
 	}
 
-	err := p.getObservations(p.data)
+	err := p.createRecord(p.data)
 	if err != nil {
 		return nil, err
 	}
@@ -105,25 +105,25 @@ func (p *CsvProcessor) GetRecord() (array.Record, error) {
 	return p.currentRecord, nil
 }
 
-func (p *CsvProcessor) getObservations(data []byte) error {
+func (p *CsvProcessor) createRecord(data []byte) error {
 	numTags := len(p.tags)
 
 	if len(p.identifiers)+len(p.measurements)+len(p.categories)+numTags == 0 {
 		return nil
 	}
 
-	identifiersMap := make(map[string]bool)
-	measurementsMap := make(map[string]bool)
-	categoriesMap := make(map[string]bool)
+	identifiersMap := make(map[string]string)
+	measurementsMap := make(map[string]string)
+	categoriesMap := make(map[string]string)
 	tagsMap := make(map[string]bool)
-	for _, key := range p.identifiers {
-		identifiersMap[key] = true
+	for key, colName := range p.identifiers {
+		identifiersMap[colName] = key
 	}
-	for _, key := range p.measurements {
-		measurementsMap[key] = true
+	for key, colName := range p.measurements {
+		measurementsMap[colName] = key
 	}
-	for _, key := range p.categories {
-		categoriesMap[key] = true
+	for key, colName := range p.categories {
+		categoriesMap[colName] = key
 	}
 	for _, key := range p.tags {
 		tagsMap[key] = true
@@ -135,6 +135,8 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 	}
 
 	fields := make([]arrow.Field, len(headers))
+	var colToInclude []int
+	includeAllColumns := true
 	var tagColumns []int
 	timeCol := -1
 	for i, header := range headers {
@@ -147,23 +149,29 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 			} else {
 				fields[i].Type = arrow.PrimitiveTypes.Int64
 			}
+			colToInclude = append(colToInclude, i)
 		} else {
-			switch {
-			case identifiersMap[header]:
-				fields[i].Name = fmt.Sprintf("id.%s", header)
+			if key, ok := identifiersMap[header]; ok {
+				fields[i].Name = fmt.Sprintf("id.%s", key)
 				fields[i].Type = arrow.BinaryTypes.String
-			case measurementsMap[header]:
-				fields[i].Name = fmt.Sprintf("measure.%s", header)
+				colToInclude = append(colToInclude, i)
+			} else if key, ok := measurementsMap[header]; ok {
+				fields[i].Name = fmt.Sprintf("measure.%s", key)
 				fields[i].Type = arrow.PrimitiveTypes.Float64
-			case categoriesMap[header]:
-				fields[i].Name = fmt.Sprintf("cat.%s", header)
+				colToInclude = append(colToInclude, i)
+			} else if key, ok := categoriesMap[header]; ok {
+				fields[i].Name = fmt.Sprintf("cat.%s", key)
 				fields[i].Type = arrow.BinaryTypes.String
-			case tagsMap[header]:
+				colToInclude = append(colToInclude, i)
+			} else if tagsMap[header] {
 				tagColumns = append(tagColumns, i)
 				fields[i].Name = fmt.Sprintf("tag.%s", header)
 				fields[i].Type = arrow.BinaryTypes.String
-			default:
-				return fmt.Errorf("Unexpected error header \"%s\", not found in maps", header)
+				colToInclude = append(colToInclude, i)
+			} else {
+				fields[i].Name = fmt.Sprintf("ignore.%s", header)
+				fields[i].Type = arrow.BinaryTypes.String
+				includeAllColumns = false
 			}
 		}
 	}
@@ -187,6 +195,21 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 	// Re allocating the name that were overwriten by the CSV reader
 	for i, field := range fields {
 		record.Schema().Fields()[i].Name = field.Name
+	}
+	if !includeAllColumns {
+		var newFields []arrow.Field
+		var newColumns []array.Interface
+		var newTagColumns []int
+		for newIndex, oldIndex := range colToInclude {
+			if fields[oldIndex].Name[:4] == "tag." {
+				newTagColumns = append(newTagColumns, newIndex)
+			}
+			newFields = append(newFields, fields[oldIndex])
+			newColumns = append(newColumns, record.Column(oldIndex))
+		}
+		fields = newFields
+		tagColumns = newTagColumns
+		record = array.NewRecord(arrow.NewSchema(fields, nil), newColumns, record.NumRows())
 	}
 
 	pool := memory.NewGoAllocator()
