@@ -34,6 +34,7 @@ func TestCsv(t *testing.T) {
 	t.Run("GetRecord() with tags", testGetRecordFunc(localDataTags))
 	t.Run("GetRecord() called twice", testGetRecordTwiceFunc(localData))
 	t.Run("GetRecord() updated with same data", testGetRecordSameDataFunc(localData))
+	t.Run("GetRecord() with partial column selection", testGetRecordPartialColumns(localData))
 
 }
 
@@ -65,11 +66,11 @@ func testGetRecordFunc(data []byte) func(*testing.T) {
 		}
 
 		measurements := map[string]string{
-			"open":   "open",
-			"high":   "high",
-			"low":    "low",
-			"close":  "close",
-			"volume": "volume",
+			"open":  "open",
+			"high":  "high",
+			"low":   "low",
+			"close": "close",
+			"vol":   "volume",
 		}
 
 		categories := map[string]string{}
@@ -98,7 +99,7 @@ func testGetRecordFunc(data []byte) func(*testing.T) {
 			{Name: "measure.high", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
-			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.vol", Type: arrow.PrimitiveTypes.Float64},
 		}
 		withTags := false
 		for _, field := range actualRecord.Schema().Fields() {
@@ -457,6 +458,52 @@ func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 		actualRecord2, err := dp.GetRecord()
 		assert.NoError(t, err)
 		assert.Nil(t, actualRecord2)
+	}
+}
+
+// Tests "GetRecord()" with partial columns selection
+func testGetRecordPartialColumns(data []byte) func(*testing.T) {
+	return func(t *testing.T) {
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		measurements := map[string]string{
+			"open":   "open",
+			"close":  "close",
+			"volume": "volume",
+		}
+
+		categories := map[string]string{}
+
+		dp := NewCsvProcessor()
+		err := dp.Init(nil, nil, measurements, categories, nil)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualRecord, err := dp.GetRecord()
+		assert.NoError(t, err)
+
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1605312000}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
+		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
+
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord.NewSlice(0, 1)), "First Record not correct")
 	}
 }
 
