@@ -213,6 +213,7 @@ func (p *CsvProcessor) createRecord(data []byte) error {
 	}
 
 	pool := memory.NewGoAllocator()
+	columns := record.Columns()
 	if p.timeFormat != "" {
 		timeBuilder := array.NewInt64Builder(pool)
 		tagCol := record.Columns()[timeCol].(*array.String)
@@ -226,17 +227,17 @@ func (p *CsvProcessor) createRecord(data []byte) error {
 				timeBuilder.Append(time.Unix())
 			}
 		}
-		new_fields := append([]arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}, fields[1:]...)
-		new_columns := append([]array.Interface{timeBuilder.NewArray()}, record.Columns()[1:]...)
-		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
+		fields = append([]arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}, fields[1:]...)
+		columns = append([]array.Interface{timeBuilder.NewArray()}, record.Columns()[1:]...)
+		record = array.NewRecord(arrow.NewSchema(fields, nil), columns, record.NumRows())
 	}
 
-	if len(tagColumns) > 0 {
-		// Aggregating tags
-		tagListBuilder := array.NewListBuilder(pool, arrow.BinaryTypes.String)
-		tagValueBuilder := tagListBuilder.ValueBuilder().(*array.StringBuilder)
-		defer tagListBuilder.Release()
+	// Aggregating tags
+	tagListBuilder := array.NewListBuilder(pool, arrow.BinaryTypes.String)
+	tagValueBuilder := tagListBuilder.ValueBuilder().(*array.StringBuilder)
+	defer tagListBuilder.Release()
 
+	if len(tagColumns) > 0 {
 		for i := 0; i < int(record.NumRows()); i++ {
 			tagListBuilder.Append(true)
 			for _, colIndex := range tagColumns {
@@ -248,18 +249,24 @@ func (p *CsvProcessor) createRecord(data []byte) error {
 		}
 
 		// Creating a new record without old tag columns but aggregated one
-		var new_fields []arrow.Field
-		var new_columns []array.Interface
+		var newFields []arrow.Field
+		var newColumns []array.Interface
 		for i, field := range fields {
 			if field.Name[:4] != "tag." {
-				new_fields = append(new_fields, field)
-				new_columns = append(new_columns, record.Column(i))
+				newFields = append(newFields, field)
+				newColumns = append(newColumns, record.Column(i))
 			}
 		}
-		new_fields = append(new_fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
-		new_columns = append(new_columns, tagListBuilder.NewArray())
-		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
+		fields = newFields
+		columns = newColumns
+	} else {
+		for i := int64(0); i < record.NumRows(); i++ {
+			tagListBuilder.Append(true)
+		}
 	}
+	fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
+	columns = append(columns, tagListBuilder.NewArray())
+	record = array.NewRecord(arrow.NewSchema(fields, nil), columns, record.NumRows())
 
 	p.currentRecord = record
 	p.currentRecord.Retain()

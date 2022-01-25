@@ -27,11 +27,11 @@ func TestCsv(t *testing.T) {
 	}
 
 	t.Run("Init()", testInitFunc())
-	t.Run("GetRecord()", testGetRecordFunc(localData))
+	t.Run("GetRecord()", testGetRecordFunc(localData, false))
 	t.Run("GetRecord() dirty data", testGetRecordDirtyDataFunc())
 	t.Run("GetRecord() identifiers", testGetRecordWithIdentifiersFunc())
 	t.Run("GetRecord() custom time format", testGetRecordCustomTimeFunc())
-	t.Run("GetRecord() with tags", testGetRecordFunc(localDataTags))
+	t.Run("GetRecord() with tags", testGetRecordFunc(localDataTags, true))
 	t.Run("GetRecord() called twice", testGetRecordTwiceFunc(localData))
 	t.Run("GetRecord() updated with same data", testGetRecordSameDataFunc(localData))
 	t.Run("GetRecord() with partial column selection", testGetRecordPartialColumns(localData))
@@ -59,7 +59,7 @@ func testInitFunc() func(*testing.T) {
 }
 
 // Tests "GetRecord()"
-func testGetRecordFunc(data []byte) func(*testing.T) {
+func testGetRecordFunc(data []byte, withTags bool) func(*testing.T) {
 	return func(t *testing.T) {
 		if len(data) == 0 {
 			t.Fatal("no data")
@@ -100,14 +100,7 @@ func testGetRecordFunc(data []byte) func(*testing.T) {
 			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.vol", Type: arrow.PrimitiveTypes.Float64},
-		}
-		withTags := false
-		for _, field := range actualRecord.Schema().Fields() {
-			if field.Name == "tags" {
-				fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
-				withTags = true
-				break
-			}
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
 		pool := memory.NewGoAllocator()
 		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
@@ -118,10 +111,11 @@ func testGetRecordFunc(data []byte) func(*testing.T) {
 		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+		defer listBuilder.Release()
+		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+		listBuilder.Append(true)
 		if withTags {
-			listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
-			valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
-			listBuilder.Append(true)
 			valueBuilder.Append("elon_tweet")
 			valueBuilder.Append("market_open")
 			valueBuilder.Append("tagA")
@@ -194,6 +188,7 @@ func testGetRecordDirtyDataFunc() func(*testing.T) {
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
 		listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+		defer listBuilder.Release()
 		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
 		listBuilder.Append(true)
 		valueBuilder.Append("elon_tweet")
@@ -266,12 +261,16 @@ func testGetRecordCustomTimeFunc() func(*testing.T) {
 		fields := []arrow.Field{
 			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
 			{Name: "measure.val", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
 		pool := memory.NewGoAllocator()
 		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
 		defer recordBuilder.Release()
 		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{1547575074}, nil)
 		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{34}, nil)
+		listBuilder := recordBuilder.Field(2).(*array.ListBuilder)
+		defer listBuilder.Release()
+		listBuilder.Append(true)
 
 		expectedRecord := recordBuilder.NewRecord()
 		defer expectedRecord.Release()
@@ -326,6 +325,7 @@ func testGetRecordWithIdentifiersFunc() func(*testing.T) {
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "id.tick_id", Type: arrow.BinaryTypes.String},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
 		pool := memory.NewGoAllocator()
 		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
@@ -337,6 +337,9 @@ func testGetRecordWithIdentifiersFunc() func(*testing.T) {
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
 		recordBuilder.Field(6).(*array.StringBuilder).AppendValues([]string{"1"}, nil)
+		listBuilder := recordBuilder.Field(7).(*array.ListBuilder)
+		defer listBuilder.Release()
+		listBuilder.Append(true)
 
 		expectedRecord := recordBuilder.NewRecord()
 		defer expectedRecord.Release()
@@ -380,6 +383,7 @@ func testGetRecordTwiceFunc(data []byte) func(*testing.T) {
 			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
 		pool := memory.NewGoAllocator()
 		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
@@ -390,6 +394,9 @@ func testGetRecordTwiceFunc(data []byte) func(*testing.T) {
 		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+		defer listBuilder.Release()
+		listBuilder.Append(true)
 
 		expectedRecord := recordBuilder.NewRecord()
 		defer expectedRecord.Release()
@@ -436,6 +443,7 @@ func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 			{Name: "measure.low", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
 		pool := memory.NewGoAllocator()
 		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
@@ -446,6 +454,9 @@ func testGetRecordSameDataFunc(data []byte) func(*testing.T) {
 		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{16240}, nil)
 		recordBuilder.Field(4).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(5).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		listBuilder := recordBuilder.Field(6).(*array.ListBuilder)
+		defer listBuilder.Release()
+		listBuilder.Append(true)
 
 		expectedRecord := recordBuilder.NewRecord()
 		defer expectedRecord.Release()
@@ -491,6 +502,7 @@ func testGetRecordPartialColumns(data []byte) func(*testing.T) {
 			{Name: "measure.open", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.close", Type: arrow.PrimitiveTypes.Float64},
 			{Name: "measure.volume", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
 		}
 		pool := memory.NewGoAllocator()
 		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
@@ -499,6 +511,9 @@ func testGetRecordPartialColumns(data []byte) func(*testing.T) {
 		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{16339.56}, nil)
 		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{16254.51}, nil)
 		recordBuilder.Field(3).(*array.Float64Builder).AppendValues([]float64{274.42607}, nil)
+		listBuilder := recordBuilder.Field(4).(*array.ListBuilder)
+		defer listBuilder.Release()
+		listBuilder.Append(true)
 
 		expectedRecord := recordBuilder.NewRecord()
 		defer expectedRecord.Release()
