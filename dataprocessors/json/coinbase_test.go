@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/apache/arrow/go/v6/arrow/array"
+	"github.com/apache/arrow/go/v7/arrow/array"
 	"github.com/spiceai/data-components-contrib/dataconnectors/coinbase"
 	"github.com/stretchr/testify/assert"
 )
