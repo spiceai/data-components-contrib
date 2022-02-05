@@ -7,6 +7,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/apache/arrow/go/v7/arrow"
+	"github.com/apache/arrow/go/v7/arrow/array"
+	"github.com/apache/arrow/go/v7/arrow/memory"
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,11 +24,6 @@ func TestJson(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	puppy, err := os.ReadFile("../../test/assets/data/json/puppy_valid.json")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
 	tweets, err := os.ReadFile("../../test/assets/data/json/tweets_valid.json")
 	if err != nil {
 		t.Fatal(err.Error())
@@ -33,7 +31,7 @@ func TestJson(t *testing.T) {
 
 	t.Run("Init()", testInitFunc())
 	t.Run("GetRecord() - array", testGetRecordFunc(puppies))
-	t.Run("GetRecord() - single object", testGetRecordFunc(puppy))
+	t.Run("GetRecord() - single object", testGetRecordSingle())
 	t.Run("GetRecord() -- with selected identifiers", testGetRecordSelectedIdentifiersFunc(puppies))
 	t.Run("GetRecord() -- with selected measurements", testGetRecordSelectedMeasurementsFunc(puppies))
 	t.Run("GetRecord() -- with a string value for some data points", testGetRecordSomeDataPointsFunc(tweets))
@@ -89,6 +87,77 @@ func testGetRecordFunc(data []byte) func(*testing.T) {
 			t.Error(err)
 			return
 		}
+
+		snapshotter.SnapshotT(t, actualRecord)
+	}
+}
+
+func testGetRecordSingle() func(*testing.T) {
+	return func(t *testing.T) {
+		data, err := os.ReadFile("../../test/assets/data/json/puppy_valid.json")
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if len(data) == 0 {
+			t.Fatal("no data")
+		}
+
+		measurements := map[string]string{
+			"average_weight": "ave_weight",
+			"population":     "population",
+		}
+
+		categories := map[string]string{
+			"city": "city",
+		}
+
+		tags := []string{
+			"t1",
+			"tags",
+			"_tags",
+		}
+
+		dp := NewJsonProcessor()
+		err = dp.Init(nil, nil, measurements, categories, tags)
+		assert.NoError(t, err)
+
+		_, err = dp.OnData(data)
+		assert.NoError(t, err)
+
+		actualRecord, err := dp.GetRecord()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		fields := []arrow.Field{
+			{Name: "time", Type: arrow.PrimitiveTypes.Int64},
+			{Name: "measure.average_weight", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "measure.population", Type: arrow.PrimitiveTypes.Float64},
+			{Name: "cat.city", Type: arrow.BinaryTypes.String},
+			{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)},
+		}
+		pool := memory.NewGoAllocator()
+		recordBuilder := array.NewRecordBuilder(pool, arrow.NewSchema(fields, nil))
+		defer recordBuilder.Release()
+		recordBuilder.Field(0).(*array.Int64Builder).AppendValues([]int64{980393406}, nil)
+		recordBuilder.Field(1).(*array.Float64Builder).AppendValues([]float64{8.39}, nil)
+		recordBuilder.Field(2).(*array.Float64Builder).AppendValues([]float64{4}, nil)
+		recordBuilder.Field(3).(*array.StringBuilder).AppendValues([]string{"Villarreal"}, nil)
+		listBuilder := recordBuilder.Field(4).(*array.ListBuilder)
+		valueBuilder := listBuilder.ValueBuilder().(*array.StringBuilder)
+		listBuilder.Append(true)
+		valueBuilder.Append("cupidatat")
+		valueBuilder.Append("est")
+		valueBuilder.Append("do")
+		valueBuilder.Append("ullamco")
+		valueBuilder.Append("voluptate")
+
+		expectedRecord := recordBuilder.NewRecord()
+		defer expectedRecord.Release()
+
+		assert.True(t, array.RecordEqual(expectedRecord, actualRecord), "Single Record not correct")
 
 		snapshotter.SnapshotT(t, actualRecord)
 	}

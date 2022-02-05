@@ -10,10 +10,10 @@ import (
 
 	"sync"
 
-	"github.com/apache/arrow/go/v6/arrow"
-	"github.com/apache/arrow/go/v6/arrow/array"
-	arrow_csv "github.com/apache/arrow/go/v6/arrow/csv"
-	"github.com/apache/arrow/go/v6/arrow/memory"
+	"github.com/apache/arrow/go/v7/arrow"
+	"github.com/apache/arrow/go/v7/arrow/array"
+	arrow_csv "github.com/apache/arrow/go/v7/arrow/csv"
+	"github.com/apache/arrow/go/v7/arrow/memory"
 
 	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
@@ -96,7 +96,7 @@ func (p *CsvProcessor) GetRecord() (array.Record, error) {
 		return nil, nil
 	}
 
-	err := p.getObservations(p.data)
+	err := p.createRecord(p.data)
 	if err != nil {
 		return nil, err
 	}
@@ -105,25 +105,25 @@ func (p *CsvProcessor) GetRecord() (array.Record, error) {
 	return p.currentRecord, nil
 }
 
-func (p *CsvProcessor) getObservations(data []byte) error {
+func (p *CsvProcessor) createRecord(data []byte) error {
 	numTags := len(p.tags)
 
 	if len(p.identifiers)+len(p.measurements)+len(p.categories)+numTags == 0 {
 		return nil
 	}
 
-	identifiersMap := make(map[string]bool)
-	measurementsMap := make(map[string]bool)
-	categoriesMap := make(map[string]bool)
+	identifiersMap := make(map[string]string)
+	measurementsMap := make(map[string]string)
+	categoriesMap := make(map[string]string)
 	tagsMap := make(map[string]bool)
-	for _, key := range p.identifiers {
-		identifiersMap[key] = true
+	for key, colName := range p.identifiers {
+		identifiersMap[colName] = key
 	}
-	for _, key := range p.measurements {
-		measurementsMap[key] = true
+	for key, colName := range p.measurements {
+		measurementsMap[colName] = key
 	}
-	for _, key := range p.categories {
-		categoriesMap[key] = true
+	for key, colName := range p.categories {
+		categoriesMap[colName] = key
 	}
 	for _, key := range p.tags {
 		tagsMap[key] = true
@@ -135,6 +135,8 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 	}
 
 	fields := make([]arrow.Field, len(headers))
+	var colToInclude []int
+	includeAllColumns := true
 	var tagColumns []int
 	timeCol := -1
 	for i, header := range headers {
@@ -147,23 +149,29 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 			} else {
 				fields[i].Type = arrow.PrimitiveTypes.Int64
 			}
+			colToInclude = append(colToInclude, i)
 		} else {
-			switch {
-			case identifiersMap[header]:
-				fields[i].Name = fmt.Sprintf("id.%s", header)
+			if key, ok := identifiersMap[header]; ok {
+				fields[i].Name = fmt.Sprintf("id.%s", key)
 				fields[i].Type = arrow.BinaryTypes.String
-			case measurementsMap[header]:
-				fields[i].Name = fmt.Sprintf("measure.%s", header)
+				colToInclude = append(colToInclude, i)
+			} else if key, ok := measurementsMap[header]; ok {
+				fields[i].Name = fmt.Sprintf("measure.%s", key)
 				fields[i].Type = arrow.PrimitiveTypes.Float64
-			case categoriesMap[header]:
-				fields[i].Name = fmt.Sprintf("cat.%s", header)
+				colToInclude = append(colToInclude, i)
+			} else if key, ok := categoriesMap[header]; ok {
+				fields[i].Name = fmt.Sprintf("cat.%s", key)
 				fields[i].Type = arrow.BinaryTypes.String
-			case tagsMap[header]:
+				colToInclude = append(colToInclude, i)
+			} else if tagsMap[header] {
 				tagColumns = append(tagColumns, i)
 				fields[i].Name = fmt.Sprintf("tag.%s", header)
 				fields[i].Type = arrow.BinaryTypes.String
-			default:
-				return fmt.Errorf("Unexpected error header \"%s\", not found in maps", header)
+				colToInclude = append(colToInclude, i)
+			} else {
+				fields[i].Name = fmt.Sprintf("ignore.%s", header)
+				fields[i].Type = arrow.BinaryTypes.String
+				includeAllColumns = false
 			}
 		}
 	}
@@ -188,8 +196,24 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 	for i, field := range fields {
 		record.Schema().Fields()[i].Name = field.Name
 	}
+	if !includeAllColumns {
+		var newFields []arrow.Field
+		var newColumns []array.Interface
+		var newTagColumns []int
+		for newIndex, oldIndex := range colToInclude {
+			if fields[oldIndex].Name[:4] == "tag." {
+				newTagColumns = append(newTagColumns, newIndex)
+			}
+			newFields = append(newFields, fields[oldIndex])
+			newColumns = append(newColumns, record.Column(oldIndex))
+		}
+		fields = newFields
+		tagColumns = newTagColumns
+		record = array.NewRecord(arrow.NewSchema(fields, nil), newColumns, record.NumRows())
+	}
 
 	pool := memory.NewGoAllocator()
+	columns := record.Columns()
 	if p.timeFormat != "" {
 		timeBuilder := array.NewInt64Builder(pool)
 		tagCol := record.Columns()[timeCol].(*array.String)
@@ -203,17 +227,17 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 				timeBuilder.Append(time.Unix())
 			}
 		}
-		new_fields := append([]arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}, fields[1:]...)
-		new_columns := append([]array.Interface{timeBuilder.NewArray()}, record.Columns()[1:]...)
-		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
+		fields = append([]arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}, fields[1:]...)
+		columns = append([]array.Interface{timeBuilder.NewArray()}, record.Columns()[1:]...)
+		record = array.NewRecord(arrow.NewSchema(fields, nil), columns, record.NumRows())
 	}
 
-	if len(tagColumns) > 0 {
-		// Aggregating tags
-		tagListBuilder := array.NewListBuilder(pool, arrow.BinaryTypes.String)
-		tagValueBuilder := tagListBuilder.ValueBuilder().(*array.StringBuilder)
-		defer tagListBuilder.Release()
+	// Aggregating tags
+	tagListBuilder := array.NewListBuilder(pool, arrow.BinaryTypes.String)
+	tagValueBuilder := tagListBuilder.ValueBuilder().(*array.StringBuilder)
+	defer tagListBuilder.Release()
 
+	if len(tagColumns) > 0 {
 		for i := 0; i < int(record.NumRows()); i++ {
 			tagListBuilder.Append(true)
 			for _, colIndex := range tagColumns {
@@ -225,18 +249,24 @@ func (p *CsvProcessor) getObservations(data []byte) error {
 		}
 
 		// Creating a new record without old tag columns but aggregated one
-		var new_fields []arrow.Field
-		var new_columns []array.Interface
+		var newFields []arrow.Field
+		var newColumns []array.Interface
 		for i, field := range fields {
 			if field.Name[:4] != "tag." {
-				new_fields = append(new_fields, field)
-				new_columns = append(new_columns, record.Column(i))
+				newFields = append(newFields, field)
+				newColumns = append(newColumns, record.Column(i))
 			}
 		}
-		new_fields = append(new_fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
-		new_columns = append(new_columns, tagListBuilder.NewArray())
-		record = array.NewRecord(arrow.NewSchema(new_fields, nil), new_columns, record.NumRows())
+		fields = newFields
+		columns = newColumns
+	} else {
+		for i := int64(0); i < record.NumRows(); i++ {
+			tagListBuilder.Append(true)
+		}
 	}
+	fields = append(fields, arrow.Field{Name: "tags", Type: arrow.ListOf(arrow.BinaryTypes.String)})
+	columns = append(columns, tagListBuilder.NewArray())
+	record = array.NewRecord(arrow.NewSchema(fields, nil), columns, record.NumRows())
 
 	p.currentRecord = record
 	p.currentRecord.Retain()

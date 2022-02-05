@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/apache/arrow/go/v6/arrow"
-	"github.com/apache/arrow/go/v6/arrow/array"
-	"github.com/apache/arrow/go/v6/arrow/memory"
+	"github.com/apache/arrow/go/v7/arrow"
+	"github.com/apache/arrow/go/v7/arrow/array"
+	"github.com/apache/arrow/go/v7/arrow/memory"
 	"github.com/spiceai/data-components-contrib/dataprocessors/conv"
 
 	// "github.com/spiceai/spiceai/pkg/observations"
@@ -66,17 +66,17 @@ func (p *JsonProcessor) Init(params map[string]string, identifiers map[string]st
 	p.catFields = make(map[string]arrow.Field)
 	p.catBuilders = make(map[string]*array.StringBuilder)
 
-	for colName, fieldName := range identifiers {
+	for fieldName, colName := range identifiers {
 		p.idColNames = append(p.idColNames, colName)
 		p.idFields[colName] = arrow.Field{Name: fmt.Sprintf("id.%s", fieldName), Type: arrow.BinaryTypes.String}
 	}
 	sort.Strings(p.idColNames)
-	for colName, fieldName := range measurements {
+	for fieldName, colName := range measurements {
 		p.measureColNames = append(p.measureColNames, colName)
 		p.measureFields[colName] = arrow.Field{Name: fmt.Sprintf("measure.%s", fieldName), Type: arrow.PrimitiveTypes.Float64}
 	}
 	sort.Strings(p.measureColNames)
-	for colName, fieldName := range categories {
+	for fieldName, colName := range categories {
 		p.catColNames = append(p.catColNames, colName)
 		p.catFields[colName] = arrow.Field{Name: fmt.Sprintf("cat.%s", fieldName), Type: arrow.BinaryTypes.String}
 	}
@@ -110,10 +110,6 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 }
 
 func (p *JsonProcessor) GetRecord() (array.Record, error) {
-	if p.data == nil {
-		return nil, nil
-	}
-
 	p.dataMutex.RLock()
 	defer p.dataMutex.RUnlock()
 
@@ -217,8 +213,8 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 	}
 	p.timeBuilder.Append(timeValue.Unix())
 
-	for colName, field := range p.idFields {
-		if val, ok := item[field.Name[3:]]; ok { // Field name starts with "id."
+	for _, colName := range p.idColNames {
+		if val, ok := item[colName]; ok { // Field name starts with "id."
 			var jsonVal interface{}
 			err = json.Unmarshal(val, &jsonVal)
 			if err != nil {
@@ -236,8 +232,8 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 		}
 	}
 
-	for colName, field := range p.measureFields {
-		if val, ok := item[field.Name[8:]]; ok { // Field name starts with "measure."
+	for _, colName := range p.measureColNames {
+		if val, ok := item[colName]; ok { // Field name starts with "measure."
 			var numValue float64
 			err = json.Unmarshal(val, &numValue)
 			if err != nil {
@@ -257,8 +253,8 @@ func (p *JsonProcessor) newObservationFromJson(index int, item map[string]json.R
 		}
 	}
 
-	for colName, field := range p.catFields {
-		if val, ok := item[field.Name[4:]]; ok { // Field name starts with "cat."
+	for _, colName := range p.catColNames {
+		if val, ok := item[colName]; ok { // Field name starts with "cat."
 			stringValue, err := unmarshalString(val)
 			if err != nil {
 				return err

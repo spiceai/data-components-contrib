@@ -20,7 +20,7 @@ require (
 )
 
 require (
-	github.com/apache/arrow/go/v6 v6.0.1
+	github.com/apache/arrow/go/v7 v7.0.0-20220125092355-231d0a6b30e7
 	github.com/gorilla/websocket v1.4.2
 )
 
@@ -44,6 +44,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
 	github.com/gocarina/gocsv v0.0.0-20211020200912-82fc2684cc48 // indirect
+	github.com/goccy/go-json v0.7.10 // indirect
 	github.com/gofrs/uuid v4.1.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
@@ -68,8 +69,10 @@ require (
 	github.com/uber/jaeger-client-go v2.29.1+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20211115234514-b4de73f9ece8 // indirect
+	golang.org/x/mod v0.5.1-0.20210830214625-1b1db11ec8f4 // indirect
 	golang.org/x/net v0.0.0-20211116231205-47ca1ff31462 // indirect
 	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
+	golang.org/x/tools v0.1.5 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.62.0 // indirect
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
