@@ -37,7 +37,7 @@ type CsvProcessor struct {
 	data      []byte
 	dataHash  []byte
 
-	currentRecord array.Record
+	currentRecord arrow.Record
 }
 
 func NewCsvProcessor() *CsvProcessor {
@@ -80,7 +80,7 @@ func (p *CsvProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *CsvProcessor) GetRecord() (array.Record, error) {
+func (p *CsvProcessor) GetRecord() (arrow.Record, error) {
 	if p.data == nil {
 		return nil, nil
 	}
@@ -198,7 +198,7 @@ func (p *CsvProcessor) createRecord(data []byte) error {
 	}
 	if !includeAllColumns {
 		var newFields []arrow.Field
-		var newColumns []array.Interface
+		var newColumns []arrow.Array
 		var newTagColumns []int
 		for newIndex, oldIndex := range colToInclude {
 			if fields[oldIndex].Name[:4] == "tag." {
@@ -228,7 +228,7 @@ func (p *CsvProcessor) createRecord(data []byte) error {
 			}
 		}
 		fields = append([]arrow.Field{{Name: "time", Type: arrow.PrimitiveTypes.Int64}}, fields[1:]...)
-		columns = append([]array.Interface{timeBuilder.NewArray()}, record.Columns()[1:]...)
+		columns = append([]arrow.Array{timeBuilder.NewArray()}, record.Columns()[1:]...)
 		record = array.NewRecord(arrow.NewSchema(fields, nil), columns, record.NumRows())
 	}
 
@@ -250,7 +250,7 @@ func (p *CsvProcessor) createRecord(data []byte) error {
 
 		// Creating a new record without old tag columns but aggregated one
 		var newFields []arrow.Field
-		var newColumns []array.Interface
+		var newColumns []arrow.Array
 		for i, field := range fields {
 			if field.Name[:4] != "tag." {
 				newFields = append(newFields, field)

@@ -59,7 +59,7 @@ func (p *FluxCsvProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *FluxCsvProcessor) GetRecord() (array.Record, error) {
+func (p *FluxCsvProcessor) GetRecord() (arrow.Record, error) {
 	p.dataMutex.Lock()
 	defer p.dataMutex.Unlock()
 
@@ -192,7 +192,7 @@ func (p *FluxCsvProcessor) GetRecord() (array.Record, error) {
 
 	record := array.NewRecord(
 		arrow.NewSchema(arrow_fields, nil),
-		[]array.Interface{timeBuilder.NewArray(), valueBuilder.NewArray(), tagListBuilder.NewArray()},
+		[]arrow.Array{timeBuilder.NewArray(), valueBuilder.NewArray(), tagListBuilder.NewArray()},
 		int64(timeBuilder.Len()))
 
 	return record, nil

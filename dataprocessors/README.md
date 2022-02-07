@@ -12,10 +12,9 @@ Writing a data processor means implementing the `DataProcessor` interface define
 
 ```golang
 type DataProcessor interface {
-	Init(params map[string]string) error
+	Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error
 	OnData(data []byte) ([]byte, error)
 	GetRecord() (arrow.Record, error)
-	GetState(fields *[]string) ([]*state.State, error)
 }
 ```
 
