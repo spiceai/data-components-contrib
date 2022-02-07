@@ -3,7 +3,7 @@ package dataprocessors
 import (
 	"fmt"
 
-	"github.com/apache/arrow/go/v7/arrow/array"
+	"github.com/apache/arrow/go/v7/arrow"
 	"github.com/spiceai/data-components-contrib/dataprocessors/csv"
 	"github.com/spiceai/data-components-contrib/dataprocessors/flux"
 	"github.com/spiceai/data-components-contrib/dataprocessors/json"
@@ -12,7 +12,7 @@ import (
 type DataProcessor interface {
 	Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error
 	OnData(data []byte) ([]byte, error)
-	GetRecord() (array.Record, error)
+	GetRecord() (arrow.Record, error)
 }
 
 func NewDataProcessor(name string) (DataProcessor, error) {

@@ -14,7 +14,6 @@ import (
 	"github.com/apache/arrow/go/v7/arrow/memory"
 	"github.com/spiceai/data-components-contrib/dataprocessors/conv"
 
-	// "github.com/spiceai/spiceai/pkg/observations"
 	spice_time "github.com/spiceai/spiceai/pkg/time"
 	"github.com/spiceai/spiceai/pkg/util"
 )
@@ -109,7 +108,7 @@ func (p *JsonProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *JsonProcessor) GetRecord() (array.Record, error) {
+func (p *JsonProcessor) GetRecord() (arrow.Record, error) {
 	p.dataMutex.RLock()
 	defer p.dataMutex.RUnlock()
 
@@ -172,7 +171,7 @@ func (p *JsonProcessor) GetRecord() (array.Record, error) {
 
 	p.data = nil
 
-	cols := []array.Interface{p.timeBuilder.NewArray()}
+	cols := []arrow.Array{p.timeBuilder.NewArray()}
 	for _, colName := range p.idColNames {
 		cols = append(cols, p.idBuilders[colName].NewArray())
 	}
