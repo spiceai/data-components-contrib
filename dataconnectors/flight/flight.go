@@ -32,7 +32,7 @@ func NewFlightConnector() *FlightConnector {
 
 func (c *FlightConnector) Init(epoch time.Time, period time.Duration, interval time.Duration, params map[string]string) error {
 	sqlPath := params["sql"]
-	apiKey := params["key"]
+	apiKey := params["api_key"]
 	c.key = apiKey
 
 	url := params["url"]
