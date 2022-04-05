@@ -37,7 +37,7 @@ func (c *FlightConnector) Init(epoch time.Time, period time.Duration, interval t
 
 	url := params["url"]
 	if url == "" {
-		url = "flight.spiceai.io:443"
+		return fmt.Errorf("No url specified")
 	}
 
 	client, err := flight.NewFlightClient(url, nil, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
