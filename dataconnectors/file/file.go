@@ -40,20 +40,17 @@ func (c *FileConnector) Init(epoch time.Time, period time.Duration, interval tim
 	path := params["path"]
 	appDir := params["appDirectory"]
 	if !filepath.IsAbs(path) {
-		path = filepath.Join(appDir, path)
+		path = filepath.Clean(filepath.Join(appDir, path))
 	}
 
 	c.path = path
 	c.noWatch = params["watch"] != "true"
 
-	newFileInfo, err := os.Stat(c.path)
-	if err == nil {
-		_, err := c.loadFileData(newFileInfo)
-		if err != nil {
+	if newFileInfo, err := os.Stat(c.path); err == nil {
+		if _, err := c.loadFileData(newFileInfo); err != nil {
 			return err
 		}
-		err = c.sendData()
-		if err != nil {
+		if err = c.sendData(); err != nil {
 			return err
 		}
 	}
@@ -161,8 +158,6 @@ func (c *FileConnector) sendData() error {
 	metadata["mod_time"] = c.fileInfo.ModTime().Format(time.RFC3339Nano)
 	metadata["size"] = fmt.Sprintf("%d", c.fileInfo.Size())
 
-	errGroup, _ := errgroup.WithContext(context.Background())
-
 	c.dataMutex.RLock()
 	defer c.dataMutex.RUnlock()
 
@@ -170,6 +165,7 @@ func (c *FileConnector) sendData() error {
 		return nil
 	}
 
+	errGroup, _ := errgroup.WithContext(context.Background())
 	for _, handler := range c.readHandlers {
 		readHandler := *handler
 		errGroup.Go(func() error {
