@@ -1,4 +1,4 @@
-# Flight Connector
+# Apache Arrow Flight Data Connector
 
 The Flight data connector will fetch data from an [Apache Flight](https://arrow.apache.org/docs/format/Flight.html) endpoint.
 
