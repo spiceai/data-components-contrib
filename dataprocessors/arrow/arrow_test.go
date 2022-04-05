@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCsv(t *testing.T) {
+func TestArrowDataProcessor(t *testing.T) {
 	t.Run("Init()", testInitFunc())
 	t.Run("GetRecord()", testProcessor())
 }
@@ -38,7 +38,8 @@ func testProcessor() func(*testing.T) {
 
 		err := localFlightConnector.Init(epoch, period, interval, map[string]string{
 			"sql": "../../test/assets/data/flight/blocks.sql",
-			"key": "3031|abcd",
+			"api_key": "3031|abcd",
+			"url": "flight.spiceai.io:443",
 		})
 		if err != nil {
 			t.Fatal(err.Error())
