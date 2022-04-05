@@ -1,1 +1,1 @@
-SELECT * FROM eth.blocks LIMIT 3;
+SELECT * FROM eth.recent_blocks LIMIT 3;
