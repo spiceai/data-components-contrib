@@ -190,10 +190,12 @@ func (p *FluxCsvProcessor) GetRecord() (arrow.Record, error) {
 
 	p.data = nil
 
+	numRows := int64(timeBuilder.Len())
+
 	record := array.NewRecord(
 		arrow.NewSchema(arrow_fields, nil),
 		[]arrow.Array{timeBuilder.NewArray(), valueBuilder.NewArray(), tagListBuilder.NewArray()},
-		int64(timeBuilder.Len()))
+		numRows)
 
 	return record, nil
 }
