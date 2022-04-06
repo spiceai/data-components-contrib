@@ -5,7 +5,8 @@ The Flight data connector will fetch data from an [Apache Flight](https://arrow.
 ## Supported parameters
 
 - `sql` [Required] File containing SQL query to execute.
-- `key` [Required] API key to use.
+- `username` [Optional] Username for authentication (omit with password if no auth).
+- `password` [Optional] Password for authentication (omit with username if no auth).
 
 ## Example Dataspace
 
@@ -21,7 +22,7 @@ dataspaces:
       connector:
         name: flight
         params:
-          api_key: 1234|abcd
+          password: 1234|abcd
           sql: query.sql 
       processor:
         name: arrow

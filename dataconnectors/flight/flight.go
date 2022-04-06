@@ -18,9 +18,10 @@ const (
 )
 
 type FlightConnector struct {
-	client flight.Client
-	key    string
-	query  []byte
+	client   flight.Client
+	username string
+	password string
+	query    []byte
 
 	stream *flight.FlightService_DoGetClient
 }
@@ -31,8 +32,10 @@ func NewFlightConnector() *FlightConnector {
 
 func (c *FlightConnector) Init(epoch time.Time, period time.Duration, interval time.Duration, params map[string]string) error {
 	sqlPath := params["sql"]
-	apiKey := params["api_key"]
-	c.key = apiKey
+	username := params["username"]
+	password := params["password"]
+	c.username = username
+	c.password = password
 
 	url := params["url"]
 	if url == "" {
@@ -58,9 +61,13 @@ func (c *FlightConnector) Read(handler func(data []byte, metadata map[string]str
 	if c.client == nil {
 		return fmt.Errorf("No flight client: init was forgotten or got an error")
 	}
-	clientContext, err := c.client.AuthenticateBasicToken(context.Background(), "", c.key)
-	if err != nil {
-		return fmt.Errorf("failed to authenticate flight client: %w", err)
+	clientContext := context.Background()
+	if c.username != "" || c.password != "" {
+		newContext, err := c.client.AuthenticateBasicToken(clientContext, c.username, c.password)
+		if err != nil {
+			return fmt.Errorf("failed to authenticate flight client: %w", err)
+		}
+		clientContext = newContext
 	}
 
 	desc := &flight.FlightDescriptor{
