@@ -1,7 +1,6 @@
 package arrow
 
 import (
-	"log"
 	"sync"
 	"testing"
 	"time"
@@ -61,19 +60,18 @@ func testProcessor() func(*testing.T) {
 			t.Fatal("no data")
 		}
 
-		measurements := map[string]string{}
+		measurements := map[string]string{
+			"gas-limit": "gas_limit",
+		}
 		categories := map[string]string{}
 		dp := NewArrowProcessor()
-		err = dp.Init(map[string]string{
-			"time_format": "2006-01-02 15:04:05-07:00",
-		}, nil, measurements, categories, nil)
+		err = dp.Init(map[string]string{"time_selector": "timestamp"}, nil, measurements, categories, nil)
 		assert.NoError(t, err)
 
 		_, err = dp.OnData(localData)
 		assert.NoError(t, err)
 
-		record, err := dp.GetRecord()
+		_, err = dp.GetRecord()
 		assert.NoError(t, err)
-		log.Println(record)
 	}
 }

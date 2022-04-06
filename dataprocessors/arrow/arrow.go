@@ -5,7 +5,9 @@ import (
 	"unsafe"
 
 	apache_arrow "github.com/apache/arrow/go/v7/arrow"
+	"github.com/apache/arrow/go/v7/arrow/array"
 	"github.com/apache/arrow/go/v7/arrow/flight"
+	"github.com/apache/arrow/go/v7/arrow/memory"
 )
 
 const (
@@ -13,7 +15,13 @@ const (
 )
 
 type ArrowProcessor struct {
-	data []byte
+	timeSelector string
+	identifiers  map[string]string
+	measurements map[string]string
+	categories   map[string]string
+	tags         []string
+
+	streamPointer *flight.FlightService_DoGetClient
 }
 
 func NewArrowProcessor() *ArrowProcessor {
@@ -21,21 +29,36 @@ func NewArrowProcessor() *ArrowProcessor {
 }
 
 func (p *ArrowProcessor) Init(params map[string]string, identifiers map[string]string, measurements map[string]string, categories map[string]string, tags []string) error {
+	if selector, ok := params["time_selector"]; ok && selector != "" {
+		p.timeSelector = selector
+	} else {
+		p.timeSelector = "time"
+	}
+
+	p.identifiers = identifiers
+	p.measurements = measurements
+	p.categories = categories
+	p.tags = tags
+
 	return nil
 }
 
 func (p *ArrowProcessor) OnData(data []byte) ([]byte, error) {
-	p.data = data
+	p.streamPointer = (*flight.FlightService_DoGetClient)(unsafe.Pointer(&data))
 	return data, nil
 }
 
+type FieldInfo struct {
+	Index int
+	Field apache_arrow.Field
+}
+
 func (p *ArrowProcessor) GetRecord() (apache_arrow.Record, error) {
-	if p.data == nil {
+	if p.streamPointer == nil {
 		return nil, nil
 	}
-	stream := (*flight.FlightService_DoGetClient)(unsafe.Pointer(&p.data))
 
-	reader, err := flight.NewRecordReader(*stream)
+	reader, err := flight.NewRecordReader(*p.streamPointer)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create record reader: %w", err)
 	}
@@ -43,7 +66,89 @@ func (p *ArrowProcessor) GetRecord() (apache_arrow.Record, error) {
 
 	if reader.Next() {
 		record := reader.Record()
-		return record, nil
+
+		// Creating field map for quick look-up from field name
+		fieldMap := make(map[string]FieldInfo)
+		for fieldIndex, field := range record.Schema().Fields() {
+			fieldMap[field.Name] = FieldInfo{Index: fieldIndex, Field: field}
+		}
+
+		// Checking time column is present
+		timeField, ok := fieldMap[p.timeSelector]
+		if !ok {
+			return nil, fmt.Errorf("time column '%s' not found", p.timeSelector)
+		}
+		if timeField.Field.Type != apache_arrow.PrimitiveTypes.Int64 {
+			return nil, fmt.Errorf("time column '%s' type mistmach", p.timeSelector)
+		}
+
+		// Creating new record: new schema + new columns
+		pool := memory.NewGoAllocator()
+		newFields := []apache_arrow.Field{timeField.Field}
+		newColumns := []apache_arrow.Array{record.Columns()[timeField.Index]}
+
+		for outputName, inputName := range p.identifiers {
+			inputField, ok := fieldMap[inputName]
+			if !ok {
+				return nil, fmt.Errorf("identifier column '%s' not found", inputName)
+			}
+			if inputField.Field.Type != apache_arrow.BinaryTypes.String {
+				return nil, fmt.Errorf("identifier column '%s' type mistmach", inputName)
+			}
+			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("id.%s", outputName), Type: inputField.Field.Type})
+			newColumns = append(newColumns, record.Columns()[inputField.Index])
+		}
+		for outputName, inputName := range p.measurements {
+			inputField, ok := fieldMap[inputName]
+			if !ok {
+				return nil, fmt.Errorf("measurement column '%s' not found", inputName)
+			}
+			// Converting type if needed
+			if inputField.Field.Type == apache_arrow.PrimitiveTypes.Float64 {
+				newColumns = append(newColumns, record.Columns()[inputField.Index])
+			} else if inputField.Field.Type == apache_arrow.PrimitiveTypes.Int64 {
+				arrayBuilder := array.NewFloat64Builder(pool)
+				defer arrayBuilder.Release()
+				column := record.Columns()[inputField.Index].(*array.Int64)
+				for entryIndex := 0; entryIndex < int(record.NumRows()); entryIndex++ {
+					if column.IsNull(entryIndex) {
+						arrayBuilder.AppendNull()
+					} else {
+						arrayBuilder.Append(float64(column.Value(entryIndex)))
+					}
+				}
+				newColumns = append(newColumns, arrayBuilder.NewArray())
+			} else {
+				return nil, fmt.Errorf("measurement column '%s' type mistmach", inputName)
+			}
+			newFields = append(newFields, apache_arrow.Field{
+				Name: fmt.Sprintf("measure.%s", outputName), Type: apache_arrow.PrimitiveTypes.Float64})
+		}
+		for outputName, inputName := range p.categories {
+			inputField, ok := fieldMap[inputName]
+			if !ok {
+				return nil, fmt.Errorf("category column '%s' not found", inputName)
+			}
+			if inputField.Field.Type != apache_arrow.BinaryTypes.String {
+				return nil, fmt.Errorf("category column '%s' type mistmach", inputName)
+			}
+			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("cat.%s", outputName), Type: inputField.Field.Type})
+			newColumns = append(newColumns, record.Columns()[inputField.Index])
+		}
+		for _, inputName := range p.tags {
+			inputField, ok := fieldMap[inputName]
+			if !ok {
+				return nil, fmt.Errorf("tag column '%s' not found", inputName)
+			}
+			if inputField.Field.Type != apache_arrow.BinaryTypes.String {
+				return nil, fmt.Errorf("tag column '%s' type mistmach", inputName)
+			}
+			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("tag.%s", inputName), Type: inputField.Field.Type})
+			newColumns = append(newColumns, record.Columns()[inputField.Index])
+		}
+
+		newRecord := array.NewRecord(apache_arrow.NewSchema(newFields, nil), newColumns, record.NumRows())
+		return newRecord, nil
 	}
 
 	return nil, fmt.Errorf("no record could be read")
