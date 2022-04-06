@@ -1,8 +1,6 @@
 package arrow
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 	"unsafe"
 
@@ -35,15 +33,7 @@ func (p *ArrowProcessor) GetRecord() (apache_arrow.Record, error) {
 	if p.data == nil {
 		return nil, nil
 	}
-
-	var out uint64
-	buf := bytes.NewReader(p.data)
-	err := binary.Read(buf, binary.BigEndian, &out)
-	if err != nil {
-		return nil, fmt.Errorf("binary.Read failed: %w", err)
-	}
-
-	stream := (*flight.FlightService_DoGetClient)(unsafe.Pointer(uintptr(out)))
+	stream := (*flight.FlightService_DoGetClient)(unsafe.Pointer(&p.data))
 
 	reader, err := flight.NewRecordReader(*stream)
 	if err != nil {

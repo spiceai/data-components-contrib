@@ -78,17 +78,8 @@ func (c *FlightConnector) Read(handler func(data []byte, metadata map[string]str
 		return fmt.Errorf("failed to receive data stream: %s", err.Error())
 	}
 	c.stream = &stream
-	// log.Printf("%p", &data)
-	dataAddress := uintptr(unsafe.Pointer(&stream))
-
-	size := int(unsafe.Sizeof(dataAddress))
-	arr := make([]byte, size)
-	for i := 0; i < size; i++ {
-		arr[size-i-1] = *(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&dataAddress)) + uintptr(i)))
-	}
 
 	metadata := map[string]string{}
-	_, err = handler(arr, metadata)
-
+	_, err = handler(*(*[]byte)(unsafe.Pointer(&stream)), metadata)
 	return nil
 }

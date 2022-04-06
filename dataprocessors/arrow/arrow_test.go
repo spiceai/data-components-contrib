@@ -1,6 +1,7 @@
 package arrow
 
 import (
+	"log"
 	"sync"
 	"testing"
 	"time"
@@ -37,9 +38,9 @@ func testProcessor() func(*testing.T) {
 		localFlightConnector := flight.NewFlightConnector()
 
 		err := localFlightConnector.Init(epoch, period, interval, map[string]string{
-			"sql": "../../test/assets/data/flight/blocks.sql",
+			"sql":     "../../test/assets/data/flight/blocks.sql",
 			"api_key": "3031|abcd",
-			"url": "flight.spiceai.io:443",
+			"url":     "flight.spiceai.io:443",
 		})
 		if err != nil {
 			t.Fatal(err.Error())
@@ -71,7 +72,8 @@ func testProcessor() func(*testing.T) {
 		_, err = dp.OnData(localData)
 		assert.NoError(t, err)
 
-		_, err = dp.GetRecord()
+		record, err := dp.GetRecord()
 		assert.NoError(t, err)
+		log.Println(record)
 	}
 }
