@@ -88,28 +88,28 @@ func (p *ArrowProcessor) GetRecord() (apache_arrow.Record, error) {
 		newColumns := []apache_arrow.Array{record.Columns()[timeField.Index]}
 
 		for outputName, inputName := range p.identifiers {
-			inputField, ok := fieldMap[inputName]
+			fieldInfo, ok := fieldMap[inputName]
 			if !ok {
 				return nil, fmt.Errorf("identifier column '%s' not found", inputName)
 			}
-			if inputField.Field.Type != apache_arrow.BinaryTypes.String {
+			if fieldInfo.Field.Type != apache_arrow.BinaryTypes.String {
 				return nil, fmt.Errorf("identifier column '%s' type mistmach", inputName)
 			}
-			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("id.%s", outputName), Type: inputField.Field.Type})
-			newColumns = append(newColumns, record.Columns()[inputField.Index])
+			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("id.%s", outputName), Type: fieldInfo.Field.Type})
+			newColumns = append(newColumns, record.Columns()[fieldInfo.Index])
 		}
 		for outputName, inputName := range p.measurements {
-			inputField, ok := fieldMap[inputName]
+			fieldInfo, ok := fieldMap[inputName]
 			if !ok {
 				return nil, fmt.Errorf("measurement column '%s' not found", inputName)
 			}
 			// Converting type if needed
-			if inputField.Field.Type == apache_arrow.PrimitiveTypes.Float64 {
-				newColumns = append(newColumns, record.Columns()[inputField.Index])
-			} else if inputField.Field.Type == apache_arrow.PrimitiveTypes.Int64 {
+			if fieldInfo.Field.Type == apache_arrow.PrimitiveTypes.Float64 {
+				newColumns = append(newColumns, record.Columns()[fieldInfo.Index])
+			} else if fieldInfo.Field.Type == apache_arrow.PrimitiveTypes.Int64 {
 				arrayBuilder := array.NewFloat64Builder(pool)
 				defer arrayBuilder.Release()
-				column := record.Columns()[inputField.Index].(*array.Int64)
+				column := record.Columns()[fieldInfo.Index].(*array.Int64)
 				for entryIndex := 0; entryIndex < int(record.NumRows()); entryIndex++ {
 					if column.IsNull(entryIndex) {
 						arrayBuilder.AppendNull()
@@ -125,26 +125,26 @@ func (p *ArrowProcessor) GetRecord() (apache_arrow.Record, error) {
 				Name: fmt.Sprintf("measure.%s", outputName), Type: apache_arrow.PrimitiveTypes.Float64})
 		}
 		for outputName, inputName := range p.categories {
-			inputField, ok := fieldMap[inputName]
+			fieldInfo, ok := fieldMap[inputName]
 			if !ok {
 				return nil, fmt.Errorf("category column '%s' not found", inputName)
 			}
-			if inputField.Field.Type != apache_arrow.BinaryTypes.String {
+			if fieldInfo.Field.Type != apache_arrow.BinaryTypes.String {
 				return nil, fmt.Errorf("category column '%s' type mistmach", inputName)
 			}
-			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("cat.%s", outputName), Type: inputField.Field.Type})
-			newColumns = append(newColumns, record.Columns()[inputField.Index])
+			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("cat.%s", outputName), Type: fieldInfo.Field.Type})
+			newColumns = append(newColumns, record.Columns()[fieldInfo.Index])
 		}
 		for _, inputName := range p.tags {
-			inputField, ok := fieldMap[inputName]
+			fieldInfo, ok := fieldMap[inputName]
 			if !ok {
 				return nil, fmt.Errorf("tag column '%s' not found", inputName)
 			}
-			if inputField.Field.Type != apache_arrow.BinaryTypes.String {
+			if fieldInfo.Field.Type != apache_arrow.BinaryTypes.String {
 				return nil, fmt.Errorf("tag column '%s' type mistmach", inputName)
 			}
-			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("tag.%s", inputName), Type: inputField.Field.Type})
-			newColumns = append(newColumns, record.Columns()[inputField.Index])
+			newFields = append(newFields, apache_arrow.Field{Name: fmt.Sprintf("tag.%s", inputName), Type: fieldInfo.Field.Type})
+			newColumns = append(newColumns, record.Columns()[fieldInfo.Index])
 		}
 
 		newRecord := array.NewRecord(apache_arrow.NewSchema(newFields, nil), newColumns, record.NumRows())
