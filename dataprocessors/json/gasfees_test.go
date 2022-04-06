@@ -37,7 +37,7 @@ func TestGasFeesTicker(t *testing.T) {
 	var interval time.Duration
 
 	params := map[string]string{
-		"url":              "https://data.spiceai.io/eth/v0.1/gasfees",
+		"url":              "https://data.spiceai.io/eth/v0.1/gasfees?api_key=3534|0a05e0808ff647ea98a656efab3f7e30",
 		"timeout":          "2s",
 		"polling_interval": "1.5s",
 	}
