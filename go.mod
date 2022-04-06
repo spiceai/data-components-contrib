@@ -7,7 +7,7 @@ require (
 	github.com/dghubble/go-twitter v0.0.0-20220319054129-995614af6514
 	github.com/dghubble/oauth1 v0.7.1
 	github.com/fsnotify/fsnotify v1.5.1
-	github.com/influxdata/flux v0.161.0
+	github.com/influxdata/flux v0.162.0
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/jonboulle/clockwork v0.2.3
 	github.com/logrusorgru/aurora v2.0.3+incompatible
@@ -31,7 +31,7 @@ require (
 	github.com/Azure/go-autorest/autorest v0.11.25 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.18 // indirect
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 // indirect
-	github.com/aws/aws-sdk-go v1.43.32 // indirect
+	github.com/aws/aws-sdk-go v1.43.33 // indirect
 	github.com/benbjohnson/immutable v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
@@ -71,12 +71,12 @@ require (
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220403103023-749bd193bc2b // indirect
-	golang.org/x/sys v0.0.0-20220405052023-b1e9470b6e64 // indirect
+	golang.org/x/sys v0.0.0-20220405210540-1e041c57c461 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.74.0 // indirect
-	google.golang.org/genproto v0.0.0-20220401170504-314d38edb7de // indirect
+	google.golang.org/genproto v0.0.0-20220405205423-9d709892a2bf // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
