@@ -22,8 +22,8 @@ dataspaces:
       connector:
         name: flight
         params:
-          password: 1234|abcd
-          sql: query.sql 
+          password: <api_key>
+          sql: query.sql
       processor:
         name: arrow
 ```
