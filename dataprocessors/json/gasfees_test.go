@@ -39,7 +39,7 @@ func TestGasFeesTicker(t *testing.T) {
 	params := map[string]string{
 		"url":              "https://data.spiceai.io/eth/v0.1/gasfees",
 		"timeout":          "2s",
-		"polling_interval": "1s",
+		"polling_interval": "1.5s",
 	}
 
 	messageMutex := sync.RWMutex{}
