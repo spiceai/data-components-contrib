@@ -38,7 +38,7 @@ func testProcessor() func(*testing.T) {
 
 		err := localFlightConnector.Init(epoch, period, interval, map[string]string{
 			"sql":      "../../test/assets/data/flight/blocks.sql",
-			"password": "3031|abcd",
+			"password": "3534|0a05e0808ff647ea98a656efab3f7e30",
 			"url":      "flight.spiceai.io:443",
 		})
 		if err != nil {
