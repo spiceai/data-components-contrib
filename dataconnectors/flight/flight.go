@@ -8,7 +8,6 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/apache/arrow/go/v7/arrow"
 	"github.com/apache/arrow/go/v7/arrow/flight"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -23,7 +22,7 @@ type FlightConnector struct {
 	key    string
 	query  []byte
 
-	data arrow.Record
+	stream *flight.FlightService_DoGetClient
 }
 
 func NewFlightConnector() *FlightConnector {
@@ -78,31 +77,18 @@ func (c *FlightConnector) Read(handler func(data []byte, metadata map[string]str
 	if err != nil {
 		return fmt.Errorf("failed to receive data stream: %s", err.Error())
 	}
+	c.stream = &stream
+	// log.Printf("%p", &data)
+	dataAddress := uintptr(unsafe.Pointer(&stream))
 
-	reader, err := flight.NewRecordReader(stream)
-	if err != nil {
-		return fmt.Errorf("failed to create record reader: %w", err)
+	size := int(unsafe.Sizeof(dataAddress))
+	arr := make([]byte, size)
+	for i := 0; i < size; i++ {
+		arr[size-i-1] = *(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&dataAddress)) + uintptr(i)))
 	}
-	defer reader.Release()
 
-	if reader.Next() {
-		c.data = reader.Record()
-		// log.Printf("%p", &data)
-		dataAddress := uintptr(unsafe.Pointer(&c.data))
-
-		size := int(unsafe.Sizeof(dataAddress))
-		arr := make([]byte, size)
-		for i := 0; i < size; i++ {
-			arr[size-i-1] = *(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&dataAddress)) + uintptr(i)))
-		}
-
-		metadata := map[string]string{}
-		_, err = handler(arr, metadata)
-		// Do not release the record here
-		// defer data.Release()
-	} else {
-		return fmt.Errorf("no record could be read")
-	}
+	metadata := map[string]string{}
+	_, err = handler(arr, metadata)
 
 	return nil
 }

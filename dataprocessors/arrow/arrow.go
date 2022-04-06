@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"unsafe"
 
-	"github.com/apache/arrow/go/v7/arrow"
+	apache_arrow "github.com/apache/arrow/go/v7/arrow"
+	"github.com/apache/arrow/go/v7/arrow/flight"
 )
 
 const (
@@ -30,7 +31,7 @@ func (p *ArrowProcessor) OnData(data []byte) ([]byte, error) {
 	return data, nil
 }
 
-func (p *ArrowProcessor) GetRecord() (arrow.Record, error) {
+func (p *ArrowProcessor) GetRecord() (apache_arrow.Record, error) {
 	if p.data == nil {
 		return nil, nil
 	}
@@ -42,6 +43,18 @@ func (p *ArrowProcessor) GetRecord() (arrow.Record, error) {
 		return nil, fmt.Errorf("binary.Read failed: %w", err)
 	}
 
-	record := (*arrow.Record)(unsafe.Pointer(uintptr(out)))
-	return *record, nil
+	stream := (*flight.FlightService_DoGetClient)(unsafe.Pointer(uintptr(out)))
+
+	reader, err := flight.NewRecordReader(*stream)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create record reader: %w", err)
+	}
+	defer reader.Release()
+
+	if reader.Next() {
+		record := reader.Record()
+		return record, nil
+	}
+
+	return nil, fmt.Errorf("no record could be read")
 }
