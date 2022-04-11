@@ -1,10 +1,10 @@
 # Apache Arrow Flight Data Connector
 
-The Flight data connector will fetch data from an [Apache Flight](https://arrow.apache.org/docs/format/Flight.html) endpoint.
+The Flight data connector will query and fetch data from an [Apache Flight](https://arrow.apache.org/docs/format/Flight.html) endpoint.
 
 ## Supported parameters
 
-- `sql` [Required] File containing SQL query to execute.
+- `sql` [Required] File or string containing a SQL query to execute.
 - `username` [Optional] Username for authentication (omit with password if no auth).
 - `password` [Optional] Password for authentication (omit with username if no auth).
 
