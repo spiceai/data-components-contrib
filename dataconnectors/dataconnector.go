@@ -6,6 +6,7 @@ import (
 
 	"github.com/spiceai/data-components-contrib/dataconnectors/coinbase"
 	"github.com/spiceai/data-components-contrib/dataconnectors/file"
+	"github.com/spiceai/data-components-contrib/dataconnectors/flight"
 	"github.com/spiceai/data-components-contrib/dataconnectors/influxdb"
 	"github.com/spiceai/data-components-contrib/dataconnectors/twitter"
 )
@@ -21,6 +22,8 @@ func NewDataConnector(name string) (DataConnector, error) {
 		return coinbase.NewCoinbaseConnector(), nil
 	case file.FileConnectorName:
 		return file.NewFileConnector(), nil
+	case flight.FlightConnectorName:
+		return flight.NewFlightConnector(), nil
 	case influxdb.InfluxDbConnectorName:
 		return influxdb.NewInfluxDbConnector(), nil
 	case twitter.TwitterConnectorName:

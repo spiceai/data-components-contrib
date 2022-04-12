@@ -1,0 +1,1 @@
+SELECT * FROM eth.recent_blocks LIMIT 3;

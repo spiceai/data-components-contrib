@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/apache/arrow/go/v7/arrow"
+	arrow_processor "github.com/spiceai/data-components-contrib/dataprocessors/arrow"
 	"github.com/spiceai/data-components-contrib/dataprocessors/csv"
 	"github.com/spiceai/data-components-contrib/dataprocessors/flux"
 	"github.com/spiceai/data-components-contrib/dataprocessors/json"
@@ -17,6 +18,8 @@ type DataProcessor interface {
 
 func NewDataProcessor(name string) (DataProcessor, error) {
 	switch name {
+	case arrow_processor.ArrowProcessorName:
+		return arrow_processor.NewArrowProcessor(), nil
 	case csv.CsvProcessorName:
 		return csv.NewCsvProcessor(), nil
 	case flux.FluxCsvProcessorName:
