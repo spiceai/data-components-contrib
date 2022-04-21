@@ -2,6 +2,7 @@
 
 Currently supported processors:
 
+- [Arrow](arrow/README.md)
 - [CSV](csv/csv.go)
 - [Flux CSV](flux/fluxcsv.go)
 - [JSON](json/README.md)
