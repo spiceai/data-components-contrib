@@ -14,9 +14,9 @@ The Flight data connector will query and fetch data from an [Apache Flight](http
 dataspaces:
   - from: spice
     name: sql
-    fields:
+    identifiers:
       - name: number
-      - name: timestamp
+    measurements:
       - name: gas_used
     data:
       connector:
@@ -26,4 +26,6 @@ dataspaces:
           sql: SELECT number, timestamp, gas_used FROM eth.recent_blocks ORDER BY number DESC
       processor:
         name: arrow
+        params:
+          time_selector: timestamp
 ```

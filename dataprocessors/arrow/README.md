@@ -22,9 +22,9 @@ Paired with the [Apache Arrow Flight Data Connector](../../dataconnectors/flight
 dataspaces:
   - from: spice
     name: sql
-    fields:
+    identifiers:
       - name: number
-      - name: timestamp
+    measurements:
       - name: gas_used
     data:
       connector:
@@ -34,4 +34,6 @@ dataspaces:
           sql: SELECT number, timestamp, gas_used FROM eth.recent_blocks ORDER BY number DESC
       processor:
         name: arrow
+        params:
+          time_selector: timestamp
 ```
