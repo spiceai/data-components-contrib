@@ -23,7 +23,7 @@ dataspaces:
         name: flight
         params:
           password: <api_key>
-          sql: query.sql
+          sql: SELECT number, timestamp, gas_used FROM eth.recent_blocks ORDER BY number DESC
       processor:
         name: arrow
 ```
