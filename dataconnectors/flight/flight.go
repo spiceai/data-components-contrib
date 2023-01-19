@@ -85,7 +85,7 @@ func (c *FlightConnector) Read(handler func(data []byte, metadata map[string]str
 	}
 
 	desc := &flight.FlightDescriptor{
-		Type: flight.FlightDescriptor_CMD,
+		Type: flight.FlightDescriptorCMD,
 		Cmd:  c.query,
 	}
 

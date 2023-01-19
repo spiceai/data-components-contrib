@@ -9,7 +9,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.1
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gorilla/websocket v1.5.0
-	github.com/influxdata/flux v0.161.0
+	github.com/influxdata/flux v0.162.0
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/jonboulle/clockwork v0.2.3
 	github.com/logrusorgru/aurora v2.0.3+incompatible
