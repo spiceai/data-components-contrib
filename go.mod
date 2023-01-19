@@ -1,6 +1,6 @@
 module github.com/spiceai/data-components-contrib
 
-go 1.18
+go 1.19
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
@@ -27,7 +27,7 @@ require (
 
 require (
 	cloud.google.com/go v0.109.0 // indirect
-	cloud.google.com/go/bigtable v1.18.1 // indirect
+	cloud.google.com/go/bigtable v1.19.1 // indirect
 	github.com/Azure/go-autorest/autorest v0.11.28 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.22 // indirect
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 // indirect

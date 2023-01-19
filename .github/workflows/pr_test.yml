@@ -11,7 +11,7 @@ jobs:
     name: go test
     runs-on: ubuntu-latest
     env:
-      GOVER: 1.18
+      GOVER: 1.19
 
     steps:
       - uses: actions/checkout@v2
