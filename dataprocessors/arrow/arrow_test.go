@@ -9,10 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	SPICE_XYZ_API_KEY = "323431|d7a8daf65b334509974fb3a1c9ec6c6d"
-)
-
 func TestInit(t *testing.T) {
 	p := NewArrowProcessor()
 
@@ -33,7 +29,7 @@ func TestProcessor(t *testing.T) {
 
 	err := localFlightConnector.Init(epoch, period, interval, map[string]string{
 		"sql":      "../../test/assets/data/flight/blocks.sql",
-		"password": SPICE_XYZ_API_KEY,
+		"password": "3534|0a05e0808ff647ea98a656efab3f7e30",
 		"url":      "flight.spiceai.io:443",
 	})
 	if err != nil {
