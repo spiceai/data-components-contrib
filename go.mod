@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/influxdata/flux v0.162.0
 	github.com/influxdata/influxdb-client-go v1.4.0
-	github.com/jonboulle/clockwork v0.2.3
+	github.com/jonboulle/clockwork v0.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spiceai/spiceai v0.5.1-alpha.0.20220405093504-e3b67ef34c12
 	github.com/stretchr/testify v1.8.0
