@@ -3,7 +3,7 @@ package dataprocessors
 import (
 	"fmt"
 
-	"github.com/apache/arrow/go/v10/arrow"
+	"github.com/apache/arrow/go/v7/arrow"
 	arrow_processor "github.com/spiceai/data-components-contrib/dataprocessors/arrow"
 	"github.com/spiceai/data-components-contrib/dataprocessors/csv"
 	"github.com/spiceai/data-components-contrib/dataprocessors/flux"
