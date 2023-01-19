@@ -10,7 +10,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/apache/arrow/go/v7/arrow/flight"
+	"github.com/apache/arrow/go/v10/arrow/flight"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
@@ -85,7 +85,7 @@ func (c *FlightConnector) Read(handler func(data []byte, metadata map[string]str
 	}
 
 	desc := &flight.FlightDescriptor{
-		Type: flight.FlightDescriptor_CMD,
+		Type: flight.DescriptorCMD,
 		Cmd:  c.query,
 	}
 

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"unsafe"
 
-	apache_arrow "github.com/apache/arrow/go/v7/arrow"
-	"github.com/apache/arrow/go/v7/arrow/array"
-	"github.com/apache/arrow/go/v7/arrow/flight"
-	"github.com/apache/arrow/go/v7/arrow/memory"
+	apache_arrow "github.com/apache/arrow/go/v10/arrow"
+	"github.com/apache/arrow/go/v10/arrow/array"
+	"github.com/apache/arrow/go/v10/arrow/flight"
+	"github.com/apache/arrow/go/v10/arrow/memory"
 )
 
 const (
