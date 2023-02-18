@@ -15,7 +15,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spiceai/spiceai v0.5.1-alpha.0.20220405093504-e3b67ef34c12
 	github.com/stretchr/testify v1.8.1
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
 	google.golang.org/grpc v1.49.0
 )
