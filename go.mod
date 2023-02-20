@@ -6,7 +6,7 @@ require (
 	github.com/apache/arrow/go/v10 v10.0.1
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
 	github.com/dghubble/go-twitter v0.0.0-20220319054129-995614af6514
-	github.com/dghubble/oauth1 v0.7.1
+	github.com/dghubble/oauth1 v0.7.2
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/influxdata/flux v0.162.0
