@@ -9,7 +9,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.1
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gorilla/websocket v1.5.0
-	github.com/influxdata/flux v0.162.0
+	github.com/influxdata/flux v0.193.0
 	github.com/influxdata/influxdb-client-go v1.4.0
 	github.com/jonboulle/clockwork v0.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
@@ -23,7 +23,7 @@ require (
 require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/apache/arrow/go/v7 v7.0.0 // indirect
+	github.com/apache/arrow/go/v7 v7.0.1 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/benbjohnson/immutable v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
@@ -36,7 +36,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/flatbuffers v2.0.8+incompatible // indirect
+	github.com/google/flatbuffers v22.9.30-0.20221019131441-5792623df42e+incompatible // indirect
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/influxdata/line-protocol v0.0.0-20210922203350-b1ad95c89adf // indirect
@@ -61,7 +61,7 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.8 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/genproto v0.0.0-20220401170504-314d38edb7de // indirect
