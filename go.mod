@@ -15,7 +15,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spiceai/spiceai v0.5.1-alpha.0.20220405093504-e3b67ef34c12
 	github.com/stretchr/testify v1.8.1
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.25.0
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
 	google.golang.org/grpc v1.49.0
 )
@@ -57,7 +57,7 @@ require (
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.8.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
